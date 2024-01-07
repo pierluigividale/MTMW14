@@ -1,0 +1,741 @@
+\chapterimage{2613-1477-max.jpg} % Chapter heading image	
+\chapter{Semi-Implicit Semi-Lagrangian}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Experimental design: choosing the type of model}
+\subsection{Grid point methods}
+	
+	Let us say that we are working with a periodic function $f$ in the interval $0..2\pi$, as shown in the figure below.
+	
+	\begin{center}
+		\begin{tabular}{c}
+			\includegraphics[width=0.55\textwidth]{Figures/Durran-figOne1.png}
+		\end{tabular}
+	\end{center}
+	
+	In grid-point methods, each function is approximated by a value at a set of discrete grid points. Using a \underline{finite difference method}, we can approximate the derivative this way:
+	
+	\begin{equation}
+		\frac{df}{dx}(x_0)\approx \frac{f(x_0+\Delta x)-f(x_0- \Delta x)}{2\Delta x}
+	\end{equation}
+
+\subsection{Finite volumes}
+
+	Using a \underline{finite volume method}, we do not really need to compute derivatives, rather the fluxes between cells, but we will need to approximate the structure of the solution inside the grid cell, for instance with a piecewise constant function, or a piecewise linear function, like this:
+	
+	\begin{equation}
+		f(x)\approx f_j +\sigma_j(x-j \Delta x) \text{ for all } x \in (j-\frac{1}{2}\Delta x,j+\frac{1}{2}\Delta x)
+	\end{equation}
+	
+	where $f_j$ is the average of the approximate solution over the grid cell centered at $j \Delta x$ and $\sigma_j =\frac{(f_{J+1}-f_j)}{\Delta x}$ 
+	
+	\begin{center}
+		\begin{tabular}{c}
+			\includegraphics[width=0.45\textwidth]{Figures/Durran-figOne2.png}
+		\end{tabular}
+	\end{center}
+	
+
+\subsection{Series expansion methods: spectral methods}
+	
+	In series expansion methods, the unknown function is approximated by a linear combination of a finite set of continuous \underline{expansion functions}, and the data set describing the approximated function is the finite set of \underline{expansion coefficients}.\\
+	
+	\medskip
+	When the expansion functions form an \textbf{orthogonal set}, the series-expansion approach is a \underline{spectral method}. For instance, we have seen already the use of Fourier series:
+	
+	\begin{equation}
+		a_1+a_2\cos{x}+a_3\sin{x}+a_4\cos{2x}+a_5\sin{2x}
+	\end{equation}
+	
+	\medskip
+	The goal is always to find coefficients that minimise the error. The five coefficients above need not be chosen such that the value of the Fourier series exactly matches the value of $f(x)$ at any specific point in the interval $0 \leq x \leq \pi$. However, we could do it at specific grid points by using the grid method we discussed in the spectral methods lecture.\\
+	
+	An alternative method is to try to minimise the integral of the square of the error (residual) in the $x$ domain.
+
+
+\subsection{Series expansion methods: Finite Elements}
+	
+	
+	If the expansion functions are nonzero in only a small part of the domain, the series expansion technique is a \underline{finite-element method}.
+	
+	\begin{equation}
+		f(x)\approx b_0s_0(x)+b_1s_1(x)+...+b_5s_5(x)
+	\end{equation}	
+
+	similar to the spectral method, but now the functions $s_n$ differ from trigonometric functions, because each function $s$ is zero over most of the domain. The simplest FE expansion functions $s$ are piecewise-linear functions defined over a grid: each function is equal to 1 at one grid point (or node) and zero everywhere else. The values of the expansion function between nodes are determined by linear interpolation.
+	
+	\begin{center}
+		\begin{tabular}{c}
+			\includegraphics[width=0.4\textwidth]{Figures/Durran-figOne3.png}
+		\end{tabular}
+	\end{center}
+	
+
+\subsection{Numerical analysis tied to phenomena}
+\subsection{What we learned in designing Project 2}
+
+	
+%\begin{minipage}[c]{0.7\textwidth}	
+\begin{center}
+	\begin{tabular}{cc}
+			\includegraphics[width=0.95\textwidth]{Figures/Logical decisions for Project 2.pdf}
+	\end{tabular}
+\end{center}
+%\end{minipage}
+
+\begin{tabular}{l}
+%		\begin{minipage}[r]{0.3\textwidth}	
+			This is all to say that there is a logical sequence to be followed when making key decisions on how to set up our experiment. We start with our scientific objectives, but we must consider several worst case scenarios, in order to make sure that our model will not become unstable, else return poor quality solutions.
+%		\end{minipage}
+\end{tabular}		
+
+
+
+\section{Advanced topic: semi-implicit schemes}
+\subsection{Semi-implicit schemes}
+
+So far we have focussed on the spatial discretisation. Now let us
+consider the discretisation of time. The two are linked, as you shall learn in Project 2.
+
+The simplest choice for time derivatives is a simple forward or
+centred (leapfrog) scheme. We can also choose the time-level of the RHS terms. For example,
+\BEQ
+\frac{u^{n+1}-u^n}{\Delta t}=fv^n ~~~~;~~~~~\frac{u^{n+1}-u^n}{\Delta t}=fv^{n+1}
+\EEQ
+
+are forward explicit and implicit schemes respectively.
+
+~
+
+Rule of thumb: implicit schemes are more stable than explicit
+(e.g., implicit schemes for exponential decay are stable for any
+time-step). However, fully implicit schemes for coupled equations are
+difficult to solve and involve expensive iterations. 
+
+~
+
+Numerical weather prediction models use semi-implicit methods where
+only the ``gravity wave terms'' are treated implicity and the rest are
+explicit. The mass conservation equation can be {\em inverted} to
+solve for future $\eta^{n+1}$. No iteration is required and schemes
+are devised so that the matrix inversion is only done once. 
+
+~
+
+{\bf Benefit:} Lifts CFL restriction on time-step associated with
+the fast GWs.
+
+{\bf Cost:} Distorts and slows gravity waves.
+
+
+\subsection{The simplest possible approach to SI}
+
+In atmospheric models, the fastest gravity waves, i.e., the external-gravity or “Lamb” waves, have speeds on the order of 300 $m s^{-1}$ , which is also the speed of sound. The typical time step for a model with a 10km mesh will thus have to be \underline{\hspace{1cm}}? This is unfortunate, because the external gravity modes are believed to play only a minor role in weather and climate dynamics. 
+
+%\begin{minipage}{0.4\textwidth}
+\begin{figure}
+	\includegraphics[trim={2cm 4.5cm 0cm 3cm},clip,width=4.cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/Figures/SWE_GWs_Implicit}
+	\label{fig:Spherical}
+	%\setbeamerfont{caption name}{size=\tiny}
+	\caption{\label{fig:blue_rectangle} \tiny 1D SWEs in implicit form}
+\end{figure}
+%\end{minipage} 
+
+\hfill
+
+\begin{minipage}{0.55\textwidth}
+	Gravity waves are, therefore, commonly treated with implicit schemes, in order to mitigate this problem. However, this means solving a matrix problem (see following slides).	
+\end{minipage}
+
+%\begin{minipage}{0.4\textwidth}
+\begin{figure}
+	\includegraphics[trim={1cm 2cm 0cm 2cm},clip,width=3.5cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/Figures/SWE_GWs_FWBW_h_equation}\\
+	\includegraphics[trim={0cm 2cm 0cm 2cm},clip,width=3.5cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/Figures/SWE_GWs_FWBW_u_equation}
+	\label{fig:Spherical}
+	%\setbeamerfont{caption name}{size=\tiny}
+	\caption{\label{fig:blue_rectangle} \tiny 1D SWEs in FW-BW form}
+\end{figure}
+%\end{minipage} \hfill
+
+%\begin{minipage}{0.55\textwidth}
+Another approach is to go for the so called \emph{forward-backward} scheme, which eliminated the need for solving a matrix problem.
+%\end{minipage}
+
+
+\subsection{A semi-implicit scheme for SWEs}
+
+The shallow water equations linearised about a state of rest are below
+discretised using a leapfrog scheme for Coriolis terms but a
+trapezoidal scheme (mixed implicit-explicit) for the gravity wave
+terms:
+\begin{eqnarray*}
+	\frac{u^{n+1}-u^{n-1}}{2\Delta t}-fv^n+\frac{g}{2}
+	\left( \partd{h}{x}^{n+1} +\partd{h}{x}^{n-1} \right) & = & 0 \\
+	\frac{v^{n+1}-v^{n-1}}{2\Delta t}+fu^n+\frac{g}{2}
+	\left( \partd{h}{y}^{n+1} +\partd{h}{y}^{n-1} \right) & = & 0 \\
+	\frac{h^{n+1}-h^{n-1}}{2\Delta t}+\frac{H}{2}
+	\left( \partd{u}{x}^{n+1} +\partd{u}{x}^{n-1}
+	+\partd{v}{y}^{n+1} +\partd{v}{y}^{n-1} 
+	\right) & = & 0. 
+\end{eqnarray*}
+
+Re-arranging with future values on the left:
+\begin{eqnarray*}
+	u^{n+1}+\Delta t g \partd{h}{x}^{n+1} & = & A \\
+	v^{n+1}+\Delta t g \partd{h}{y}^{n+1} & = & B \\
+	h^{n+1}+\Delta t H \left( \partd{u}{x}^{n+1}+\partd{v}{y}^{n+1} \right) & = & C
+\end{eqnarray*}
+
+\subsection{A semi-implicit scheme for SWEs}
+
+Substituting $u^{n+1}$ and $v^{n+1}$ into the mass conservation
+equation gives:
+\begin{eqnarray*}
+	\left\{ 1-\Delta t^2 gH \left( \partd{^2}{x^2}+\partd{^2}{y^2} \right) 
+	\right\} h^{n+1}
+	& = & C-\Delta t H \left\{ \partd{A}{x}+\partd{B}{y} \right\} \\
+	{\cal L}\,h^{n+1} & = & F(u^{n-1},u^n,v^{n-1},v^n,h^{n-1},h^n) \\
+	h^{n+1} & = & {\cal L}^{-1} F
+\end{eqnarray*}
+
+In words, the future depth can be found if the operator $\cal{L}$ can be
+{\em inverted}. Once $h^{n+1}$ has been found, we can easily solve for
+$u^{n+1}$ and $v^{n+1}$. 
+
+
+\subsection{A semi-implicit scheme for SWEs}
+The form of the operator $\cal{L}$ depends on the
+representation of spatial derivatives by the numerical model. For
+example, if a second order finite difference scheme is used:
+\begin{equation}
+	\partd{^2 h}{x^2}\approx \frac{h_{i+1}-2h_i+h_{i-1}}{\Delta x^2}
+\end{equation}
+then the $\cal{L}$ operator (in 1-D) becomes a tri-diagonal matrix:
+\begin{equation}
+	\left(
+	\begin{array}{ccccccc}
+		1-d & d & 0 & 0 & 0 & 0 & ... \\
+		d & 1-2d & d & 0 & 0 & 0 & ... \\
+		0 & d & 1-2d & d & 0 & 0 & ... \\
+		& & \vdots & & & & ... 
+	\end{array}
+	\right) \left(
+	\begin{array}{c}
+		h^{n+1}_1 \\
+		h^{n+1}_2 \\
+		h^{n+1}_3 \\
+		\vdots
+	\end{array}
+	\right) = \left(
+	\begin{array}{c}
+		F_1 \\
+		F_2 \\
+		F_3 \\
+		\vdots
+	\end{array}
+	\right)
+\end{equation}
+
+where $d=gH\Delta t^2/\Delta x^2$. In this case the matrix is
+time-invariant and only needs to be inverted once. The semi-implicit
+scheme barely costs more that an explicit scheme per time-step but
+enables a much longer time-step because it lifts the CFL restriction
+associated with gravity wave speed $\sqrt{gH}$.
+
+\section{Frames of reference}
+\subsection{A reminder: Eulerian and Lagrangian frames of reference}
+	
+	We want to describe  the evolution of a chemical tracer $\Psi(x,t)$ in a one dimensional flow field, with sources/sinks $S(x,t)$.	We can do so within two frameworks:	
+
+%\begin{tabular}{lc}
+%\begin{minipage}[l]{0.5\textwidth}	
+
+\begin{itemize}
+	\item Eulerian: $\frac {\partial \Psi}{\partial t} + u \frac {\partial \Psi}{\partial x}= S$
+	\item Lagrangian: $\frac {d \Psi}{d t} = S$ ~ (1)		
+\end{itemize}
+
+%\end{minipage}
+%\end{tabular}
+
+%\begin{minipage}[c]{0.5\textwidth}	
+	\begin{center}
+		\begin{tabular}{cc}
+			\rotatebox{0}{\includegraphics[width=0.3\textwidth]{Figures/UP-Eulerian.png}} \\
+			\rotatebox{0}{\includegraphics[width=0.15\textwidth]{Figures/UP-Lagrangian.png}}
+		\end{tabular}
+	\end{center}
+%\end{minipage}
+
+
+The two are tied by the definition of the total derivative: $\frac {d}{d t} = \frac {\partial }{\partial t} + \frac {d x}{d t} \frac {\partial }{\partial x}$\\
+and the definition of velocity: $\frac {d x}{d t} = u$ ~ (2)\\
+
+~
+
+We could solve (1) as an initial value problem, by choosing a number of regularly spaced fluid particles at $t=0$, assigning a $\Psi$ value to each and then following them around the flow by integrating the two ODEs (1) and (2) in time.\\
+
+~
+
+\underline{Problem:} the parcels would very likely spread out in a non-homogeneous fashion, so that any numerical approximation of $\Psi(x,t)$ will become highly inaccurate wherever they are sparse (see the extra slides at the end for more). What can we do?
+
+\section{The Lagrangian method}
+\subsection{Trajectory calculations}
+\subsection{Lagrangian models in practice}
+
+\setcounter{equation}{2}	
+	First calculate fluid parcel trajectories by
+	integrating:
+	\begin{equation}
+	\frac{{d x}}{d t}={ u}({ x},t)
+	\label{velocity}	
+	\end{equation}
+	
+	and then calculate the evolution of air parcel properties, $\Psi$,
+	following fluid parcels by modelling $S$ and integrating
+	(\ref{velocity}).
+	
+	~
+	
+	{\bf Advantages:} No underlying grid, so can represent air masses
+	accurately as they thin to arbitrarily fine-scales. Also, no CFL
+	criterion to limit time-step (i.e., parcels can travel far in one
+	time-step).
+	
+	~
+	
+	{\bf Disadvantages:} Velocity stirs air parcels so they are
+	irregularly spaced and often far apart, making estimation of gradients
+	difficult. In {\em kinematic models}, velocity is given but mixing
+	between air-masses typically depends on concentration gradients. 
+	
+
+\section{The Semi-Lagrangian method}
+
+\subsection{A compromise}
+
+We learned that:
+\begin{itemize}
+	\item \underline{Eulerian frameworks} are limited by CFL criteria, thus requiring short time steps (e.g. I would need to use $\Delta t = 0.3s$ in my 10km GCM, instead of 4 minutes).
+	\item \underline{Lagrangian frameworks} are most often impractical \footnote{\tiny we could remove parcels from regions where they are too abundant, add them where they are sparse} and/or locally inaccurate.
+\end{itemize}
+
+A better scheme could be chosen, in which we re-define the number and distribution of the fluid parcels at every time step. We choose parcels in this set as being those arriving at each node on a regularly spaced grid at the end of each time step. This will automatically regulate the number and distribution of the fluid parcels. \textbf{This is known as the \emph{semi-Lagrangian method} (Wiin-Nielsen, 1959).}\\
+
+~
+
+In practice, choose $t^n=n\Delta t$ and $x_j=n\Delta x$, then (1) can be approximated as:
+ 
+ \begin{equation}
+ \frac {\Phi(x_j,t^{n+1}) - \Phi (\tilde{x_j^n},t^{n})}{\Delta t}=\frac{S(x_j,t^{n+1}) + S (\tilde{x_j^n},t^{n})}{2}
+ \label{SL}	
+ \end{equation}
+
+where $\Phi$ is the numerical approximation of $\Psi$ and $\tilde{x_j^n}$ is the estimated x coordinate of the \underline{departure point} of the trajectory originating at time $t$ and arriving at grid point and time: $(x_j,t^{n+1})$. The value of $\tilde{x_j^n}$ can be found by integrating (3) backwards over a time interval $\Delta t$, with initial condition: $x(t^{n+1})= x_j$. We shall need interpolation...
+
+
+\subsection{A simple 1D example: temperature evolution.}
+
+We want to predict the evolution of temperature for a fluid. We postulate that there are no sources/sinks of energy, so that temperature is conserved and we can say that, from the \emph{Lagrangian} perspective:
+\begin{equation}
+\frac{d T } {d t} = 0
+\label{eq_Lagr}
+\end{equation}
+
+If we now take the \emph{Eulearian} view and we decide to predict the evolution of temperature at a particular location, the local change of temperature will be governed by temperature advection alone: 
+\begin{equation}
+\frac{\partial T } {\partial t} = -U \frac{\partial T } {\partial x}
+\label{eq_Eul}
+\end{equation}
+
+where $T$ is temperature $[K]$, the variable we are predicting; $t$ is time $[s]$, $x$ is the zonal distance $[m]$ and $U$ is the zonal velocity $[ms^{-1}]$.\\
+
+We can also solve \ref{eq_Lagr} by using the semi-Lagrangian (SL) method, which also enables a longer time step: 
+\begin{equation}
+\Delta t_{s}=n\Delta t_{e}
+\end{equation}
+
+where $\Delta t_{s}$ is the SL time step and $\Delta t_{e}$ is the Eulerian time step.
+We will start from our original grid at time $t^0=0s$. \textbf{Remember that, with SL, you will be using the total derivative}, because the problem, seen from a Lagrangian perspective, is simply:
+\begin{equation}
+\frac{d T } {d t} = 0
+\label{eqn_Lagrange}
+\end{equation}
+
+A semi-Lagrangian approximation to \ref{eqn_Lagrange} can be written in this form:
+
+\begin{equation}
+\frac {T(x_j,t^{n+1})-T(\tilde{x}^n_j,t^n)}{\Delta t} = 0
+\end{equation}
+
+where $\tilde{x}^n_j$ denotes the point of origin of a trajectory originating at time $t^n$ and arriving at point $(x_j,t^{n+1})$.
+
+Since velocity $U$ is constant, it is quite easy to show that:
+\begin{equation}
+\tilde{x}^n_j=x_j-U \Delta t
+\label{eqn_departure_point}
+\end{equation}
+
+
+\subsection{Semi-Lagrangian Methods in 2D: how to find $\tilde{x}^n_{i,j}$}
+
+	
+	Calculate short trajectories backward-in-time from a fixed grid and
+	use them to evaluate the Lagrangian rates of change at every
+	grid-point. Trajectory calculation can be cheap, because quite short. 
+	For example, the two-stage mid-point method:
+	\begin{eqnarray*}
+		x_* & = & x^{n+1}_{i,j}-u(x^{n+1}_{i,j},t^n) \Delta t/2 \\
+		\tilde{x}^n_{i,j} & = & x^{n+1}_{i,j}-u(x_*,t^{n+\frac{1}{2}}) \Delta t
+	\end{eqnarray*}
+	
+	gives the {\em departure points}, $\tilde{x}^n_{i,j}$. The advection equation
+	is then solved using simple methods such a trapezoidal scheme (see
+	Durran's book, Chap.~6):
+	\begin{equation}
+	\frac{\Phi^{n+1}_{i,j}-\Phi(\tilde{x}^n_{i,j}, t^n)}{\Delta t}\approx \frac{1}{2}\left\{ 
+	S^{n+1}_{i,j}+\tilde{S}^n_{i,j} \right\} 
+	\end{equation}
+	
+	{\bf Advantages:} avoids CFL criterion for numerical stability
+	(especially nonlinear ${\bf u}.\nabla {\bf u}$ term), allowing longer
+	time-step. For same accuracy Ritchie {\em et al}\footnote{\BTi Ritchie {\em et al} (1995)
+		\emph{Monthly Weather Rev.}, {\bf 114}, 135-146.\ETi},  found that the
+	time-step of the ECMWF forecast model could be increased from 3 to 15
+	minutes.
+	
+	{\bf Disadvantages:} the schemes are not positive
+	definite. Interpolation is necessary from the grid to the departure
+	points, which is equivalent to strong {\em numerical dissipation}. 
+	
+
+\subsection{Real world applications of the Semi-Lagrangian method}
+	
+%\begin{tabular}{lc}
+%		\begin{minipage}[c]{0.35\textwidth}
+			\setlength{\unitlength}{1 cm}
+			\begin{picture}(1,7.5)
+			\arakawa
+			\put(1.93,1.93){$\bullet$}
+			\put(2.1,1.7){$\Phi_{ij}$}
+			\put(2,0.75){\vector(0,1){0.5}}
+			\put(2,2.75){\vector(0,1){0.5}}
+			\put(0.75,2){\vector(1,0){0.5}}
+			\put(2.75,2){\vector(1,0){0.5}}
+			\put(1.1,1.7){$u_{ij}$}
+			\put(2.1,0.7){$v_{ij}$}
+			\end{picture}
+%		\end{minipage}
+		
+		
+%		\begin{minipage}[c]{0.65\textwidth}
+			
+			We aim to predict the value of $\Phi$ at time $t= n+1$, so $\Phi(x^{n+1})$, or $\Phi^{n+1}_{i,j}$. \\
+			
+			Because we are projecting a Lagrangian calculation onto an Eulearian grid, we always know where we are going to be at time t=n+1: the \textbf{arrival point} $x^{n+1}=x_{i,j}$. \\
+			
+			Unlike in purely Eulearian frameworks, we do not know a-priori where information is coming from; we must compute the \textbf{departure point} $\tilde{x}^n_{i,j}$\\
+			
+			
+			{\bf Target is the future (time = n+1): ~ }  $\Phi^{n+1}_{i,j}$ \\
+			{\bf Available to us now (time = n):  ~ ~ }  $\Phi^n_{i,j}, ~ u^n_{i,j}, ~ S^n_{i,j}$ \\
+			
+			We integrate ${u}^n_{i,j}$ to find $\tilde{x}^n_{i,j}$, thus $\Phi (\tilde{x_{i,j}^n},t^{n})$ and $S(\tilde{x_{i,j}^n},t^{n})$.
+			
+			Finally, we compute the future state like this: 
+\begin{equation}
+			\Phi^{n+1}_{i,j}  \approx  \Phi(\tilde{x}^n_{i,j}, t^n) 
+			+ \Delta t \left\{ \frac{S(x_{i,j},t^{n+1}) + S (\tilde{x_{i,j}^n},t^{n})}{2}\right\} 
+\end{equation}
+
+%		\end{minipage}
+%\end{tabular}
+
+
+\subsection{From first order to second order}
+
+	
+	It is perfectly possible to only use a single time level to compute departure points. However, if we were to simply make use of $u^n_{i,j}$ to find $\tilde{x}^n_{i,j}$, we would inevitably end up with a first order scheme:
+	
+	\begin{eqnarray*}
+		\tilde{x}^n_{i,j} & = & x^{n+1}_{i,j}-u(x^{n+1}_{i,j},t^n) \Delta t \\
+	\end{eqnarray*}
+		
+	Instead, we saw previously that we can use a two-stage mid-point method:
+	\begin{eqnarray*}
+		x_* & = & x^{n+1}_{i,j}-u(x^{n+1}_{i,j},t^n) \Delta t/2 \\
+		\tilde{x}^n_{i,j} & = & x^{n+1}_{i,j}-u(x_*,t^{n+\frac{1}{2}}) \Delta t
+	\end{eqnarray*}
+	
+	Ideally we would want to compute the mid-point, $x_*$, based on current and future velocities, but this would result in an implicit scheme (and expensive iteration).\\
+	
+	It is possible, instead, to use interpolation and \emph{forward extrapolation} in time to keep the scheme explicit and yet second-order. When computing this term: $u(x_*,t^{n+\frac{1}{2}})$, we can write:
+	\begin{equation}
+	u(t^{n+\frac{1}{2}})=\frac{3}{2}u(t^n)-\frac{1}{2}u(t^{n-1})
+	\end{equation}
+	
+	\underline{Note that we now need to carry two time levels.}
+	
+
+\section{Semi-Implicit method combined with the Semi-Lagrangian method}
+
+Explicit methods tend to have a time-step restriction for numerical
+stability at a given spatial resolution, summarised by the CFL criterion:
+\[
+\alpha=\frac{c \Delta t}{\Delta x}< 1
+\]
+
+where $c$ is the fastest speed of information propagation. Generally,
+flows are {\em unbalanced} meaning that there are fast waves involving
+fluid movement that is not related to PV. Such fast waves can limit
+the time-step. Then, \underline{the semi-Lagrangian method} does not
+help, because it \underline{only ensures stability with respect to advection}.
+
+\begin{itemize}
+\item
+Sound waves are fastest but filtered out by the anelastic
+approximation.
+
+\item
+Gravity waves are not filtered out unless more severe balance
+approximations are made - therefore $c_{GW} (> U)$ limits $\Delta t$.
+
+\item
+Semi-implicit methods lift this restriction by treating the {\bf
+gravity wave terms} implicitly while the rest of the terms in the equations are
+explicit.
+\end{itemize}
+
+All global NWP models currently use semi-implicit, semi-Lagrangian
+methods attempting to achieve stability for long time-steps ($1 < \alpha <
+10$).
+
+
+\subsection{From Lecture 5: gravity waves and Semi Implicit}
+
+	In atmospheric models, the fastest gravity waves, i.e., the external-gravity or “Lamb” waves, have speeds on the order of 300 $m s^{-1}$ , which is also the speed of sound, requiring a very short time step. This is unfortunate, because the external gravity modes are believed to play only a minor role in weather and climate dynamics. 
+	
+The SWEs are discretised below
+using a leapfrog scheme for Coriolis terms but a
+trapezoidal scheme (mixed implicit-explicit) for the gravity wave
+terms:
+\begin{eqnarray*}
+	\frac{u^{n+1}-u^{n-1}}{2\Delta t}-fv^n+\frac{g}{2}
+	\left( \partd{h}{x}^{n+1} +\partd{h}{x}^{n-1} \right) & = & 0 \\
+	\frac{v^{n+1}-v^{n-1}}{2\Delta t}+fu^n+\frac{g}{2}
+	\left( \partd{h}{y}^{n+1} +\partd{h}{y}^{n-1} \right) & = & 0 \\
+	\frac{h^{n+1}-h^{n-1}}{2\Delta t}+\frac{H}{2}
+	\left( \partd{u}{x}^{n+1} +\partd{u}{x}^{n-1}
+	+\partd{v}{y}^{n+1} +\partd{v}{y}^{n-1} 
+	\right) & = & 0. 
+\end{eqnarray*}
+
+Re-arranging with future values on the left:
+\begin{eqnarray*}
+	u^{n+1}+\Delta t g \partd{h}{x}^{n+1} & = & A \\
+	v^{n+1}+\Delta t g \partd{h}{y}^{n+1} & = & B \\
+	h^{n+1}+\Delta t H \left( \partd{u}{x}^{n+1}+\partd{v}{y}^{n+1} \right) & = & C
+\end{eqnarray*}
+	
+
+
+\section{Some real world applications}
+\subsection{Hurricane and Typhoon simulation in climate GCMs: precipitation composite}
+
+	\begin{center}	
+		\includegraphics[width=0.8\textwidth]{Figures/TC-precipitation}
+	\end{center}
+	
+
+
+\subsection{Hurricane and Typhoon simulation in climate GCMs: vertical structure composite}
+	\begin{center}	
+		\includegraphics[width=0.8\textwidth]{Figures/TC-structures}
+	\end{center}
+	
+
+\subsection{Why the differences}
+
+	These GCMs are very different in terms of dynamical core, parameterizations etc., but they are also quite different in terms of the use of the time step. I have been experimenting with our UK model (HadGEM3), and Colin Zarzycki has been experimenting with the NCAR model, managing to double the number of hurricanes with a time step of 1/4, but I have also tested the same ideas in the ECMWF model, since it is the one that uses very long time steps.
+	\begin{center}	
+		\includegraphics[width=0.8\textwidth]{Figures/tden_PRESENT_TC_map_STD}
+	\end{center}
+	
+
+
+\subsection{Hurricane and Typhoon simulation in climate GCMs: frequency}
+
+	\begin{center}	
+		\includegraphics[width=0.8\textwidth]{Figures/Zarz1}
+	\end{center}
+	
+
+
+\subsection{Hurricane and Typhoon simulation in climate GCMs: dynamics and physics}
+	
+	\begin{center}	
+		\includegraphics[width=0.8\textwidth]{Figures/Zarz2}
+	\end{center}
+	
+
+\section{Extras}
+
+\subsection{Eulerian and Lagrangian rates of change}
+\subsection{Monotonicity and Positive Definiteness}
+
+	\begin{itemize}
+		\item
+		Many properties are carried with the flow . A statement of {\bf
+			material conservation} is:
+		\begin{equation}
+		\lagd{q}{t}=S
+		\label{lagdef}
+		\end{equation}
+		
+		where the {\em Lagrangian derivative} is the rate of change following a fluid parcel:
+		\begin{equation}
+		\lagd{q}{t}=\partd{q}{t}+{\bf u}.\nabla q
+		\end{equation}
+		
+		Some implications for solutions (for conserved properties where $S=0$) are:
+		
+%		\begin{tabular}{lc}
+%			\begin{minipage}[l]{0.6\textwidth}
+				
+				\begin{itemize}
+					\item
+					{\bf monotonicity preservation:} no new maxima or minima in $q$ can appear
+					
+					\item
+					{\bf positive definiteness:} if {\em tracer} has $q\ge 0$ everywhere at
+					initial time, no negative values can appear (e.g., humidity mixing
+					ratio).
+				\end{itemize}
+				
+%			\end{minipage}
+%			\begin{minipage}[c]{0.4\textwidth}
+				\rotatebox{0}{\includegraphics[width=0.8\textwidth]{Figures/q_contour.eps}}
+%			\end{minipage}
+%		\end{tabular}
+		
+	\end{itemize}
+
+\subsection{Kinematic Lagrangian model example} 
+
+	
+	This example shows trajectories calculated from analysed winds
+	(gridded in space and time). Initiated from the coordinates of the
+	flight of a research aircraft\footnote{Methven,
+		J. {\em et al.}  (2006) \emph{J. Geophys. Res.}, {\bf 111}, D23S62,
+		doi:10.1029/2006JD007540. }, July 2004. Ozone concentrations
+	have been integrated forward in time along the trajectories using a
+	Lagrangian model for photochemistry and mixing, initialised with the
+	aircraft measurements of constituent concentrations.
+	\begin{center}
+		\begin{tabular}{cc}
+			\rotatebox{90}{\includegraphics[width=0.32\textwidth]{Figures/Ftj0_x4_2004715.eps}} &
+			\rotatebox{90}{\includegraphics[width=0.32\textwidth]{Figures/Fxvy0_x8_y10_2004715.eps}}
+		\end{tabular}
+	\end{center}
+	
+	The crosses show the coordinates and ozone measurements made during
+	three further flights intercepting the air-mass downstream.
+
+
+\subsection{Contour dynamics}
+\subsection{Balanced dynamics} 
+
+	
+	{\em Dynamics} involves solution for velocity (and pressure) as well as
+	tracer equations. Neither of these are conserved variables.
+	
+	\vspace{0.5cm}
+	However, in {\em balanced dynamics}, potential vorticity (PV) is carried as a
+	{\em tracer} and all other variables are obtained by {\em inverting PV}.
+	
+	\vspace{0.5cm}
+	Simplest example is the barotropic vorticity equation where
+	
+	\[
+	q=f+\nabla^2 \psi
+	\]
+	
+	This is inverted to obtain the streamfunction and geostrophic velocity:
+	\[
+	\psi=\nabla^{-2} (q-f)\;\;\;\;\;
+	u_g=-\partd{\psi}{y}  \;\;\;\;\;
+	v_g=\partd{\psi}{x} \]
+	
+	The inversion operation typically does not depend on time, but is a
+	difficult {\em boundary value problem} akin to integration.
+	
+
+
+\subsection{Models for balanced dynamics} 
+
+	
+	A family of models is obtained by treating the {\em material
+		conservation} and {\em PV inversion} operations in an Eulerian or
+	Lagrangian framework.
+	
+	\vspace{0.5cm}
+	{\bf Contour dynamics}\footnote{\BTi
+		Zabusky {\em et al} (1979) \emph{J. Comput. Phys.}, {\bf 30},
+		96-106.\ETi}
+	- a fully Lagrangian method
+	
+	\begin{itemize}
+		\item
+		Nodes are placed around PV contours (more nodes where curvature is higher). 
+		\item
+		The inversion step to obtain velocity at the nodes is done by
+		integration around PV contours (without the use of a grid).
+		\item
+		Nodes are stepped forward by calculating trajectories (4th order
+		Runge-Kutta method), giving updated PV contours.
+		\item
+		Repeat the inversion and trajectory steps.
+	\end{itemize}
+	
+	{\bf Advantages:} No underlying grid, so accurate in principal and no CFL $\Delta t$  restriction.
+	
+	{\bf Disadvantages:} As the contours stir into convoluted shapes, the
+	number of nodes increases exponentially to retain accuracy. Inversion
+	by contour integration cost scales with {\em nodes} $\times$ {\em
+		contours} and becomes too expensive.
+	
+	Also implicit assumption is that PV values are discretised changes
+	wave dynamics.
+	
+
+\section{Hybrid models}
+\subsection{Contour-advective semi-Lagrangian (CASL)}
+	
+	\begin{tabular}{lc}
+%		\begin{minipage}[l]{0.6\textwidth}
+			Potential vorticity is treated in a Lagrangian way (by
+			calculating trajectories of nodes on tracer contours).
+			
+			~
+			
+			Example here shows a single contour advected by an unsteady polar
+			vortex. Note the finescale filamentary structure.
+%		\end{minipage}
+%		\begin{minipage}[c]{0.4\textwidth}
+			\rotatebox{90}{\includegraphics[width=0.9\textwidth]{Figures/T170F6_t170.eps}}
+%		\end{minipage}
+	\end{tabular}
+	
+	But velocity and other {\em wave-like} variables are stored on a fixed
+	grid\footnote{\BTi Dritschel, D.G. and Ambaum, M.H.P. (1997) \emph{ Quart. J. Roy. Meteor. Soc.}, {\bf 123},
+		1097-1130.\ETi}.
+	
+	{\bf Advantages:} Avoids numerical dissipation of conserved variables
+	and the CFL criterion. Potential vorticity inversion to obtain {\em
+		balanced velocity} is cheap because contour-to-grid conversion
+	estimates {\em coarse-grained PV} on the velocity grid and then inversion
+	can be done by fast Fourier transform methods.
+	
+	{\bf Disadvantages:} Allowing for non-conservation (e.g.,
+	sources/sinks) is difficult because such processes violate
+	monotonicity preservation and must introduce new $q$-contours.

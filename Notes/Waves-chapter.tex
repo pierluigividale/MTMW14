@@ -1,0 +1,307 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
+\chapterimage{2613-1477-max.jpg} % Chapter heading image	
+\chapter{Wave propagation in two dimensions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\vspace{1em} 
+
+\section{Wave propagation in SWE}
+\subsection{Linear wave propagation} 
+
+Why choose one grid staggering in preference to others? There are advantages and disadvantages to each configuration. Moreover, staggered grids represent wave propagation
+differently.
+
+~
+
+The shallow water equations support {\em inertia-gravity waves} and  {\em Rossby waves}. 
+
+~
+
+{\bf Inertia-gravity waves}: propagation of anomalies in total fluid
+depth. Wave restoration by gravitational acceleration. Typically much
+higher frequency and smaller scale.
+
+~
+
+{\em Simplest form: seen as waves in free surface elevation on ocean with
+	flat bottom. }
+
+~
+
+{\bf Rossby waves}: propagate by sideways displacement of potential
+vorticity (PV) contours (where PV gradients exist). Wave restoration by
+``Rossby elasticity''. Typically low frequency and large-scale.
+
+~
+
+{\em Simplest form: wave propagates westwards relative to a uniform
+	zonal flow, perpendicular to the \underline{poleward gradient} in planetary
+	vorticity.}
+
+
+
+\subsection{A reminder of a few basic definitions: Phase and Group velocities}
+
+Wave movement can be described by two quantities:
+
+{\bf Phase velocity}: given in terms of the wavelength $\lambda$ and period $T$ as:
+\begin{equation}
+	v_{p} ={\frac {\lambda }{T}} 
+\end{equation}
+
+Equivalently, in terms of the wave's angular frequency $\omega$, which specifies angular change per unit of time, and wavenumber (or angular wave number) $\kappa$, which represents the proportionality between the angular frequency $\omega$ and the linear speed (speed of propagation) $v_p$,
+
+\begin{equation}
+	v_{p}={\frac {\omega }{k}}
+\end{equation}
+
+which means that a wave with frequency $\omega$ and wavenumber $\kappa$ moves to distance x after time t according to this relation: $\kappa x = \omega t$. The function $\omega(\kappa)$, which gives $\omega$ as a function of $\kappa$, is known as the \textbf{dispersion relation}. \\
+~
+~
+
+{\bf Group velocity}: of a wave is the velocity with which the overall shape of the waves' amplitudes, known as the modulation or envelope of the wave, propagates through space.
+
+\begin{equation}
+	v_{g}\ \equiv \ {\frac {\partial \omega }{\partial k}}
+\end{equation}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% INERTIA - GRAVITY
+
+\section{Inertia-gravity waves}
+\subsection{Analytic dispersion relation for I-G waves}
+
+One of the many types of wave motion supported by SWEs. Forcing comes from pressure (height) gradient and Coriolis. While the pure gravity waves are not dispersive ($\omega^2 = c_p^2 k^2$, where $c_p=\sqrt{gH}$), inertia-gravity waves are slighly dispersive, due to the $f_0$ term in the dispersion relation ($\frac{\omega^2} {f_0^2}=1 + R_D^2\left(k^2+l^2\right)$).
+
+\begin{center}
+	\begin{tabular}{cc}
+		\includegraphics[width=0.45\textwidth]{Figures/Height_40.png}
+	\end{tabular}
+\end{center}
+
+where $R_D = \sqrt{gH}/f_0$ is the {\bf Rossby deformation radius}.
+
+
+\subsection{Analytical dispersion relation of inertia-gravity waves}
+
+Let us start by assuming a wave like solution of the form
+\begin{equation}
+	\left \{ \begin{array}{c} \eta(x,y,t) \\ u(x,y,t) \\ v(x,y,t) \end{array} \right \} 
+	= 
+	\left \{ \begin{array}{c} \tilde{\eta} \\ \tilde{u} \\ \tilde{v} \end{array} \right \} e^{i (kx+ly-\omega t)}
+\end{equation}
+
+where $k$ and $l$ are the $x$ and $y$ components of the wave vector $\mathbf{k}$ and $\omega$ is the angular frequency of the wave and a constant Coriolis parameter ($f = f_0$). By plugging this solution into the model equations, we obtain the following system :
+
+\[
+\left( \begin{array}{ccc}
+	-i \omega & ikH & ilH \\
+	ikg & -i \omega & -f_0 \\
+	ilg & f_0 & -i \omega 
+\end{array} \right )
+\left( \begin{array}{c} \tilde{\eta} \\ \tilde{u} \\ \tilde{v} \end{array} \right )
+= 
+\mathbf{0}.
+\]
+
+For a non-trivial solution to exist, the determinant of this matrix
+must equal zero, giving a {\em dispersion relation} between the wave
+frequency and wave number: 
+
+\BEQ 
+\label{disp_exact}
+\frac{\omega^2}{f_0^2} = 1 + R_D^2(k^2 + l^2), 
+\EEQ 
+
+where $R_D = \sqrt{gH}/f_0$ is the Rossby deformation radius. The
+phase speed of the two inertia gravity waves is $c=\omega/\sqrt{k^2+l^2}
+\approx \pm\sqrt{gH}$ and the Rossby wave has $\omega=0$. 
+
+
+\subsection{A couple of notes on inertia-gravity waves and Rossby waves}
+
+\begin{enumerate}
+	\item On the previous page, oceanographers call the wave with $\omega=0$ a Rossby wave; we would simply call it geostrophic balance!
+	\item Do try to solve the equations for the simpler case with $f_0=0$, as an exercise: what happens, and what do we call the waves?
+	\item Can you remember the table in Lecture 4, with waves, names, properties? Start to fill it in. Again, an exercise...
+	\item Watch these video to appreciate how fast some geophysical phenomena are: 1) \href{https://www.youtube.com/watch?v=oeKewmAoBEM}{1960 Chile Tsunami}; 2) \href{https://www.youtube.com/watch?v=jH3-hQjTGDQ}{2011 Japan Tsunami}. What waves are these?
+	\item Before we go to the numerical solutions, please read the small "Simple note on advection" that is complementary to this lecture.
+\end{enumerate}
+
+\subsection{Inertia-gravity waves: dispersion relation for the A-grid on an $f$-plane}
+
+The same calculations can be performed on the space discretized equations obtained by using Arakawa's finite difference grids. When using the A-grid, we have the following spatially-discrete equations:
+\begin{eqnarray*}
+	&&\frac{\ud \eta_{ij}}{\ud t} + H \left[ \frac{u_{i+1,j}-u_{i-1,j}}{2 d} + \frac{v_{i,j+1}-v_{i,j-1}}{2 d} \right] = 0,\\
+	&&\frac{\ud u_{ij}}{\ud t} - f_0 v_{ij} + g \frac{\eta_{i+1,j}-\eta_{i-1,j}}{2 d} = 0, \\
+	&&\frac{\ud v_{ij}}{\ud t} + f_0 u_{ij} + g \frac{\eta_{i,j+1}-\eta_{i,j-1}}{2 d} = 0, \\
+\end{eqnarray*}
+where we have assumed that $\Delta x = \Delta y = d$. By assuming again a wave-like solution of the form $u_{ij} = \tilde{u} e^{i(kx_i+ly_j-\omega t)}$, we obtain the following system:
+\[
+\left( \begin{array}{ccc}
+	-i \omega & iH\frac{\sin(kd)}{d} & iH\frac{\sin(ld)}{d} \\
+	ig\frac{\sin(kd)}{d} & -i \omega & -f_0 \\
+	ig\frac{\sin(ld)}{d} & f_0 & -i \omega 
+\end{array} \right )
+\left( \begin{array}{c} \tilde{\eta} \\ \tilde{u} \\ \tilde{v} \end{array} \right)
+= 
+\mathbf{0}
+\]
+and the corresponding dispersion relation is
+\BEQ \label{disp_A}
+\left(\frac{\omega^2}{f_0^2}\right)_A = 1 + \frac{R_D^2}{d^2} \left(\sin^2(kd) + \sin^2(ld)\right).
+\EEQ
+
+
+\subsection{Dispersion relations for the B- and C-grids}
+
+By doing the same for the B- and C-grids, we can obtain the following relations:
+\begin{eqnarray}
+	\left(\frac{\omega^2}{f_0^2}\right)_B &=& 1 + 2\frac{R_D^2}{d^2} \left(1 - \cos(kd)\sin(ld)\right), \\
+	\left(\frac{\omega^2}{f_0^2}\right)_C &=& \cos^2(kd)\cos^2(ld) + 4\frac{R_D^2}{d^2} \left(\sin^2(\frac{kd}{2}) + \sin^2(\frac{ld}{2})\right).
+\end{eqnarray}
+
+These relations show that all three grids underestimate the wave
+frequency. Also, for most of them, the slope of wave frequency with
+respect to wavenumber (i.e., the group velocity) can be negative. This
+means that energy might propagate in the wrong direction. 
+
+
+\subsection{Graphical representation ($R_D/d = 10$), fine grid}
+\begin{center}
+	\begin{tabular}{cc}
+		\includegraphics[width=0.45\textwidth]{Figures/gravity_exact_dispersion_Rd_10.eps} &
+		\includegraphics[width=0.45\textwidth]{Figures/gravity_Agrid_dispersion_Rd_10.eps}
+		\\
+		\includegraphics[width=0.45\textwidth]{Figures/gravity_Bgrid_dispersion_Rd_10.eps} &
+		\includegraphics[width=0.45\textwidth]{Figures/gravity_Cgrid_dispersion_Rd_10.eps}
+	\end{tabular}
+\end{center}
+Shading shows $\omega/f_0$ ranging from blue (low) to red (high)
+(contour interval varies between panels). The graphs show solution for
+$l=0$. On a fine grid ($d \ll R_D$, high-resolution) the C-grid gives the best results.  
+
+
+\subsection{Graphical representation ($R_D/d = 1/10$), coarse grid}
+\begin{center}
+	\begin{tabular}{cc}
+		\includegraphics[width=0.45\textwidth]{Figures/gravity_exact_dispersion_Rd_01.eps} &
+		\includegraphics[width=0.45\textwidth]{Figures/gravity_Agrid_dispersion_Rd_01.eps}
+		\\
+		\includegraphics[width=0.45\textwidth]{Figures/gravity_Bgrid_dispersion_Rd_01.eps} &
+		\includegraphics[width=0.45\textwidth]{Figures/gravity_Cgrid_dispersion_Rd_01.eps}
+	\end{tabular}
+\end{center}
+On a coarse (low-resolution) grid (i.e., when the grid size is larger than the
+Rossby radius of deformation) the B-grid gives the best
+results. Therefore, it was used in the old generation of global ocean
+models. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% ROSSBY   ROSSBY    ROSSBY     ROSSBY 
+
+\section{Rossby waves}
+
+One of the many types of wave motion supported by SWEs. Forcing comes from dependence of Coriolis term on latitude. They propagate {\bf westward}.
+\begin{center}
+	\begin{tabular}{cc}
+		\includegraphics[width=0.45\textwidth]{Figures/Height_480.png}
+	\end{tabular}
+\end{center}
+
+
+\subsection{Planetary (Rossby) waves (on a $\beta$-plane)}
+
+The restoring force of Rossby waves is the dependence of the Coriolis parameter on latitude. Rossby waves propagate information and energy westward across ocean basins. They are responsible for the \emph{westward intensification} associated with western boundary currents. The importance of Rossby waves for the large-scale circulation makes it important to choose an appropriate horizontal gridding scheme.
+
+\vspace{0.2cm} To obtain the dispersion relation, we consider the linear shallow water equations expressed on a $\beta$-plane ($f=f_0 + \beta y$) with a constant depth. The dispersion relation, whose derivation will not be shown here\footnote{\BTi For details, see the book by A.E. Gill ``Atmosphere-Ocean Dynamics'', Academic press, 1982.\ETi}, is given by
+\BEQ
+\omega = - \frac{\beta k}{k^2 + l^2 + R_D^{-2}}.
+\EEQ
+
+
+\subsection{Dispersion relation for the A-, B- and C-grids}
+
+The discrete dispersion relations for Rossby waves on the first three Arakawa grids are:
+\begin{eqnarray}
+	\left(\frac{\omega^2}{\beta d}\right)_A &=& \frac{-(R_D/d)^2 \sin(kd)\cos(ld)}{1 + (R_D/d)^2 \left[ \sin^2(kd) + \sin^2(ld) \right]},
+	\\
+	\left(\frac{\omega^2}{\beta d}\right)_B &=& \frac{-(R_D/d)^2 \sin(kd)}{1 + 2(R_D/d)^2 \left[1 - \cos(kd)\cos(ld) \right]},
+	\\
+	\left(\frac{\omega^2}{\beta d}\right)_C &=& \frac{-(R_D/d)^2 \sin(kd)\cos^2(ld/2)}{\cos^2(kd/2)\cos^2(ld/2) + 4(R_D/d)^2 \left[ \sin^2(kd/2) + \sin^2(ld/2) \right]}.
+\end{eqnarray}
+For these waves, the A-grid still gives the poorest results. The B- and C- grids are quite similar and give quite good results on a fine grid. When the grid is coarser, the errors for both increase. Unlike inertia-gravity waves, numerical methods can both under-estimate and over-estimate the analytical wave frequency.
+
+
+\subsection{Graphical representation ($R_D/d = 10$), fine grid}
+\begin{center}
+	\begin{tabular}{cc}
+		\includegraphics[width=0.45\textwidth]{Figures/rossby_exact_dispersion_Rd_10.eps} &
+		\includegraphics[width=0.45\textwidth]{Figures/rossby_Agrid_dispersion_Rd_10.eps}
+		\\
+		\includegraphics[width=0.45\textwidth]{Figures/rossby_Bgrid_dispersion_Rd_10.eps} &
+		\includegraphics[width=0.45\textwidth]{Figures/rossby_Cgrid_dispersion_Rd_10.eps}
+	\end{tabular}
+\end{center}
+
+On a fine grid (high-resolution), the B- and C-grids give similar results.
+
+
+\subsection{Graphical representation ($R_D/d = 1/10$), coarse grid}
+\begin{center}
+	\begin{tabular}{cc}
+		\includegraphics[width=0.45\textwidth]{Figures/rossby_exact_dispersion_Rd_01.eps} &
+		\includegraphics[width=0.45\textwidth]{Figures/rossby_Agrid_dispersion_Rd_01.eps}
+		\\
+		\includegraphics[width=0.45\textwidth]{Figures/rossby_Bgrid_dispersion_Rd_01.eps} &
+		\includegraphics[width=0.45\textwidth]{Figures/rossby_Cgrid_dispersion_Rd_01.eps}
+	\end{tabular}
+\end{center}
+
+Again, on a coarse grid (low-resolution), the B- and C-grids are quite similar for long waves.
+
+
+
+\section{Equatorial waves: propagation in SWEs}
+\subsection{A general view of dispersion relations}
+
+The review by Wheller and Nguyen (2015) goes through the derivations in the previous pages, and produces analytic solutions for a number of waves. The plot that shows the dispersion relation is a very useful reminder of various waves properties.
+
+\begin{center}
+	\begin{tabular}{cc}
+		\includegraphics[width=0.45\textwidth]{Figures/Wheeler-Nguyen_Dispersion.png} &
+		\includegraphics[width=0.45\textwidth]{Figures/Wheeler-Nguyen_Dispersion-label.png}
+	\end{tabular}
+\end{center}
+
+\underline{Exercise}: extract information from this plot and insert in the Table provided at the start of Lecture 4.
+
+\section{Practical considerations in preparation for Project 2 and test}
+\begin{enumerate}
+	\item list one advantage and one disadvantage of using a A grid
+	\item list one advantage and one disadvantage of using a C grid
+	\item what happens with array dimensions when using a C grid?
+	\item after dimensional analysis, you have opted for a C grid. How would you arrange the mass and velocity fields for simulating oceanic flow in a basin?
+	Velocity at the boundaries? Mass at the boundaries? Why?
+\end{enumerate}
+
+
+\subsection{Something to think about in preparation for Project 2}
+Waves in 2D can propagate in \underline{any} direction; they are not bound to travel along the zonal or meridional direction.
+
+\begin{center}
+	\includegraphics[width=0.7\textwidth]{Figures/2DGaussian.png}
+\end{center}
+
+
+\underline{Question}: what does this 2D propagation mean for our CFL criterion? Is the time step requirement going to be stricter? Or is it going to be less strict?
+
+\medskip
+
+{\bf How to solve this puzzle:} draw a simple circular wave front on a 2D cartesian grid and think of the distance covered by the wave front over a sequence of 3-4 time steps.
+What happens to the signal along the $x$, $y$ axes and what happens along the diagonal?
+

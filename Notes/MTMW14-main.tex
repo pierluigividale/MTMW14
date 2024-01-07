@@ -1,0 +1,264 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  My documentation report
+%  Objetive: Explain what I did and how, so someone can continue with the investigation
+%
+% Important note:
+% Chapter heading images should have a 2:1 width:height ratio,
+% e.g. 920px width and 460px height.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[11pt,fleqn]{book} % Default font size and left-justified equations
+
+\usepackage[top=3cm,bottom=3cm,left=3.2cm,right=3.2cm,headsep=10pt,letterpaper]{geometry} % Page margins
+
+\usepackage{xcolor,lipsum} % Required for specifying colors by name
+\definecolor{ocre}{RGB}{51,102,0} 
+\definecolor{lightgray}{RGB}{229,229,229} 
+% Font Settings
+\usepackage{avant} % Use the Avantgarde font for headings
+%\usepackage{times} % Use the Times font for headings
+\usepackage{mathptmx} % Use the Adobe Times Roman as the default text font together with math symbols from the Sym­bol, Chancery and Com­puter Modern fonts
+
+\usepackage{microtype} % Slightly tweak font spacing for aesthetics
+\usepackage[utf8]{inputenc} % Required for including letters with accents
+\usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
+
+% MATHS PACKAGE
+\usepackage{amsmath,tikz}
+\usetikzlibrary{matrix}
+\newcommand*{\horzbar}{\rule[0.05ex]{2.5ex}{0.5pt}}
+\usepackage{calc}
+
+% VERBATIM PACKAGE
+\usepackage{verbatim}
+
+% Bibliography
+\usepackage[style=alphabetic,sorting=nyt,sortcites=true,autopunct=true,babel=hyphen,hyperref=true,abbreviate=false,backref=true,backend=biber]{biblatex}
+\addbibresource{bibliography.bib} % BibTeX bibliography file
+\defbibheading{bibempty}{}
+
+\input{structure} % Insert the commands.tex file which contains the majority of the structure behind the template
+
+\begin{document}
+	
+	\let\cleardoublepage\clearpage
+	
+	%----------------------------------------------------------------------------------------
+	%	TITLE PAGE
+	%----------------------------------------------------------------------------------------
+	
+	\begingroup
+	\thispagestyle{empty}
+	\AddToShipoutPicture*{\put(0,0){\includegraphics[scale=.075]{stars_cloud_moon4}}} % Image background
+	\centering
+	\vspace*{0cm}
+	\par\normalfont\fontsize{30}{25}\sffamily\selectfont
+	\textbf{MTMW14\\NUMERICAL MODELLING OF THE ATMOSPHERE AND OCEAN}\\
+	{\LARGE }\par % Book title
+	\vspace*{1cm}
+	{\color{white}{\Huge P.L. Vidale \\ January 2024}}\par % Author name
+	\endgroup
+	
+	%----------------------------------------------------------------------------------------
+	%	COPYRIGHT PAGE
+	%----------------------------------------------------------------------------------------
+	
+	\newpage
+	~\vfill
+	\thispagestyle{empty}
+	
+	%\noindent Copyright \copyright\ 2014 Andrea Hidalgo\\ % Copyright notice
+	
+	\noindent \textsc{Jan 2024, the University of Reading, Reading, UK}\\
+	
+	\noindent Original template design and graphics by Andrea Hidalgo (2014) and Hervé CARDOT (2015).\\ % License information
+	
+	\noindent Front page image from Apollo run by Daniel Klocke and colleagues, MPI Hamburg (2023).\\ % License information
+	
+	\noindent \textit{Published in Jan 2024} % Printing/edition date
+	
+	%----------------------------------------------------------------------------------------
+	%	TABLE OF CONTENTS
+	%----------------------------------------------------------------------------------------
+	
+	\chapterimage{2613-1477-max.jpg} % heading image	
+	\pagestyle{empty} % No headers
+	
+	\renewcommand\contentsname{Table of Contents}
+	\renewcommand{\bibname}{Bibliography}
+	\tableofcontents% Print the table of contents itself
+	
+	%\cleardoublepage % Forces the first chapter to start on an odd page so it's on the right
+	
+	\pagestyle{fancy} % Print headers again
+	
+	%----------------------------------------------------------------------------------------
+	%	CHAPTER 1
+	%----------------------------------------------------------------------------------------
+	
+\chapterimage{2613-1477-max.jpg} % Chapter heading image	
+\chapter{Introduction}
+	
+	\section{Module guide}
+	\subsection{MTMW14 objectives}
+	MTMW14 aims to take you from the basic principles of numerical modelling, mostly learned in MTMW12, to the foundations of current weather and climate models, bringing you up to speed with the vital components of state-of-the-art numerical models for atmospheres and oceans and their use in predicting weather and climate.
+	
+	Starting from fundamental properties of atmosphere and ocean:
+\begin{itemize}
+\item	Learn how to design numerical schemes, preserving key properties.
+\item	Perform simple prediction using models you will build.
+\item	Critically evaluate and interrogate models.
+\item	Prepare you for designing, implementing and testing your own components, to be inserted and used in complex models.
+\end{itemize}
+	
+	This competence is going to be very useful in your careers, even if you aim to analyse, albeit not develop models. All is accomplished by doing, rather than just watching a lecturer.\\
+	
+	
+	This module is therefore mostly hands-on: you will learn by doing, and 70\% of the total marks are awarded for your work in the two projects.  \\
+	
+	Project 1 is about oscillatory / periodic behaviour, and is designed to explore ideas of model initialisation, chaos, ensemble forecasting. \\
+	
+	Project 2 is about 2D wave motion, and introduces spatial schemes and solution methods that are commonly found in today's state-of-the-art models. \\
+	
+	In both cases, it is important to distinguish what is expected from the analytical solutions (when available) and what is produced by the numerical solutions.
+	
+	\subsection{A map of MTMW14 topics}
+	\begin{figure}
+	\includegraphics[width=1.\textwidth]{Figures/MTMW14_mindmap.png}
+	\caption{A map of MTMW14 topics, and how they are related}
+	\end{figure}
+	
+	\subsection{MTMW14 calendar}
+	
+	
+	\begin{figure}
+	\includegraphics[width=1.5\textwidth, angle=90]{MT4YF_MTMW14 Class Calendar 2024.pdf}
+	\caption{The 2024 calendar: please always refer to the eletronic version for last-minute changes of venue}
+	\end{figure}
+	
+	\subsection{MTMW14 resources}
+	
+	\begin{itemize}
+		\item	Dale Durran's book
+		\item	Dave Randall's notes
+		\item	MTMW12 notes
+		\item	These notes and the papers introducing the two projects
+	\end{itemize}
+	
+	\section{Motivation}\index{Motivation}
+	
+	\vspace{1em}
+	
+	Numerical modelling is ...
+	
+	\vspace{2em}
+	
+	\subsection{Going for numbers}
+	
+	\vspace{1em}
+	
+	There are no analytical solutions to the Primitive Equations: we mostly rely on numerical solutions, which are achieved by a number of methods. The most common method is the finite difference method, but we shall briefly look into the spectral and finite elements methods.
+	
+	The following is a mindmap of this ten week module.
+	
+	
+	\section{Historical aspects of Numerical Modelling}
+	
+	This \href{https://journals.ametsoc.org/view/journals/amsm/59/1/amsmonographs-d-18-0018.1.xml}{Historic review by David Randall} provides a great and synthetic history of numerical modelling for the atmosphere and ocean, which has evolved from very simple box models all the way to complex, multi-scale, multi-component "Earth System Models". \\
+	
+		\begin{figure}[h]
+		\includegraphics[width=1.\textwidth, angle=0]{Figures/ClimateModellingTimeline}
+		\caption{As climate modeling has evolved over the last 120 years, increasing amounts of physical science have been incorporated into the models. This figure shows when various components of the climate system became regularly included in global climate model simulations.}
+	\end{figure}
+
+	Please read the article, which is available free of charge here:  
+
+\href{https://journals.ametsoc.org/view/journals/amsm/59/1/amsmonographs-d-18-0018.1.xml} {\includegraphics[width=1.\textwidth, angle=0]{Figures/Randall-ESM100-title.png}}
+
+
+	
+	
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage	
+\chapterimage{2613-1477-max.jpg} % Chapter heading image
+\chapter{Time Schemes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\vspace{1em}
+	
+The fundamental ideas in this chapter ...
+	
+
+\subsection{Real world applications: hurricane and Typhoon simulation in climate GCMs}
+
+\begin{center}	
+	\includegraphics[width=0.8\textwidth]{Figures/TC-structures}
+\end{center}
+
+\subsection{Why the differences}
+These GCMs are very different in terms of dynamical core, parameterizations etc., but they are also quite different in terms of the use of the time step. I have been experimenting with our UK model (HadGEM3), and Colin Zarzycki has been experimenting with the NCAR model, managing to double the number of hurricanes with a time step of 1/4, but I have also tested the same ideas in the ECMWF model, since it is the one that uses very long time steps.
+\begin{center}	
+	\includegraphics[width=0.8\textwidth]{Figures/tden_PRESENT_TC_map_STD}
+\end{center}
+	
+	
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapterimage{2613-1477-max.jpg} % Chapter heading image	
+\chapter{Lorenz's Chaos and Predictability}
+	
+\vspace{1em}
+	
+The fundamental ideas in this chapter revolve around chaos theory, and how it affects predictability in the Earth System.
+	
+\vspace{1em}
+	
+	\section{Can we predict the predictions?}
+	
+	\vspace{1em}
+		
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 2D CFL
+\newpage	
+\input{2D-CFL-Chapter}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SWES
+\newpage	
+\input{SWE-Chapter}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% WAVES IN 2D WAVES
+\newpage	
+\input{Waves-Chapter}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Semi-Implicit Semi-Lagrangian 
+\newpage	
+\input{SISL-Chapter}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage	
+\chapterimage{2613-1477-max.jpg} % Chapter heading image
+\chapter{The Spectral Method}	
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
+\chapterimage{2613-1477-max.jpg} % Chapter heading image
+\chapter{Numerical Modelling and HPC}	
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	
+	\vspace{1em} 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% APPENDICES
+\newpage	
+\input{Appendices-Bibl}
+
+\end{document}
