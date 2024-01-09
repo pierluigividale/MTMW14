@@ -38,11 +38,18 @@
 \usepackage{verbatim}
 
 % Bibliography
-\usepackage[style=alphabetic,sorting=nyt,sortcites=true,autopunct=true,babel=hyphen,hyperref=true,abbreviate=false,backref=true,backend=biber]{biblatex}
-\addbibresource{bibliography.bib} % BibTeX bibliography file
-\defbibheading{bibempty}{}
+%\usepackage[style=alphabetic,sorting=nyt,sortcites=true,autopunct=true,babel=hyphen,hyperref=true,abbreviate=false,backref=true,backend=biber]{biblatex}
+%\addbibresource{johns.bib} % BibTeX bibliography file
+%\defbibheading{bibempty}{}
 
 \input{structure} % Insert the commands.tex file which contains the majority of the structure behind the template
+%\usepackage{hyperref} 
+%\addbibresource{johns.bib} % BibTeX bibliography file
+
+% Bibliography
+\usepackage[style=alphabetic,sorting=nyt,sortcites=true,autopunct=true,babel=hyphen,hyperref=true,abbreviate=false,backref=true,backend=biber]{biblatex}
+\addbibresource{johns.bib} % BibTeX bibliography file
+\defbibheading{bibempty}{}
 
 \begin{document}
 	
@@ -78,7 +85,7 @@
 	
 	\noindent Original template design and graphics by Andrea Hidalgo (2014) and Hervé CARDOT (2015).\\ % License information
 	
-	\noindent Front page image from Apollo run by Daniel Klocke and colleagues, MPI Hamburg (2023).\\ % License information
+	\noindent Front page image and chapter headers credits are due to MPIM, DKRZ and NVIDIA, for their groundbreaking "Apollo run" (2023).\\ % License information
 	
 	\noindent \textit{Published in Jan 2024} % Printing/edition date
 	
@@ -116,62 +123,54 @@
 \item	Prepare you for designing, implementing and testing your own components, to be inserted and used in complex models.
 \end{itemize}
 	
-	This competence is going to be very useful in your careers, even if you aim to analyse, albeit not develop models. All is accomplished by doing, rather than just watching a lecturer.\\
+	This competence is going to be very useful in your careers, even if you aim to analyse, albeit not develop models. All is accomplished by doing, rather than just watching a lecturer.  This module is therefore mostly hands-on: you will learn by doing, and 70\% of the total marks are awarded for your work in the two projects. 
 	
-	
-	This module is therefore mostly hands-on: you will learn by doing, and 70\% of the total marks are awarded for your work in the two projects.  \\
-	
-	Project 1 is about oscillatory / periodic behaviour, and is designed to explore ideas of model initialisation, chaos, ensemble forecasting. \\
-	
-	Project 2 is about 2D wave motion, and introduces spatial schemes and solution methods that are commonly found in today's state-of-the-art models. \\
-	
-	In both cases, it is important to distinguish what is expected from the analytical solutions (when available) and what is produced by the numerical solutions.
+\vspace{1em}
+\fcolorbox{ocre}{lime}{\parbox{\dimexpr \linewidth-2\fboxsep-2\fboxrule}{
+			\textbf{Project 1}
+			 focusses on oscillatory / periodic behaviour, and is designed to explore ideas of model initialisation, chaos, ensemble forecasting. 
+	}}
+
+\vspace{1em}
+
+\fcolorbox{ocre}{pink}{\parbox{\dimexpr \linewidth-2\fboxsep-2\fboxrule}{
+		\textbf{Project 2}
+		is concerned with wave propagation in two dimensions, and introduces spatial schemes and solution methods that are commonly found in today's state-of-the-art models.
+}}
+\vspace{1em}
+		
+When setting out to solve the problems proposed in either project, it is important to distinguish what is expected from the analytical solutions (when available) and what is produced by the numerical solutions.
 	
 	\subsection{A map of MTMW14 topics}
-	\begin{figure}
+	\begin{figure}[h!]
 	\includegraphics[width=1.\textwidth]{Figures/MTMW14_mindmap.png}
 	\caption{A map of MTMW14 topics, and how they are related}
-	\end{figure}
-	
-	\subsection{MTMW14 calendar}
-	
-	
-	\begin{figure}
-	\includegraphics[width=1.5\textwidth, angle=90]{MT4YF_MTMW14 Class Calendar 2024.pdf}
-	\caption{The 2024 calendar: please always refer to the eletronic version for last-minute changes of venue}
 	\end{figure}
 	
 	\subsection{MTMW14 resources}
 	
 	\begin{itemize}
-		\item	Dale Durran's book
-		\item	Dave Randall's notes
+		\item	Dale Durran's book:  \cite {Durran-book}
+		\item	Dave Randall's notes:  \cite{Randall-notes}
+		\item   Roger Pielke's book:  \cite {Pielke-book}
+		\item   Haltiner and Williams:  \cite {Haltiner-Williams-book}
 		\item	MTMW12 notes
-		\item	These notes and the papers introducing the two projects
+		\item	These notes and the papers introducing the two projects		
 	\end{itemize}
 	
 	\section{Motivation}\index{Motivation}
 	
-	\vspace{1em}
+	Dale Durran's introductory words provide both a concise history of numerical simulation, and motivation for learning as much as possible about state-of-the-art numerical methods.
 	
-	Numerical modelling is ...
-	
-	\vspace{2em}
-	
-	\subsection{Going for numbers}
-	
-	\vspace{1em}
-	
-	There are no analytical solutions to the Primitive Equations: we mostly rely on numerical solutions, which are achieved by a number of methods. The most common method is the finite difference method, but we shall briefly look into the spectral and finite elements methods.
-	
-	The following is a mindmap of this ten week module.
-	
-	
+	\begin{quotation}
+	The possibility of deterministic weather prediction was suggested by Vilhelm Bjerknes as early as 1904. Around the time of the First World War, Lewis Richardson actually attempted to produce such a forecast by manually integrating a finite-difference approximation to the equations governing atmospheric motion. Unfortunately, his calculations did not yield a reasonable forecast. Moreover, the human labor required to obtain this disappointing result was so great that subsequent attempts at deterministic weather prediction had to await the introduction of a high-speed computational aid. In 1950, a team of researchers, under the direction of Jule Charney and John von Neumann at the Institute for Advanced Study, at Princeton, journeyed to the Aberdeen Proving Ground, where they worked for approximately 24 h to coax a one-day weather forecast from the first general-purpose electronic computer, the ENIAC.\footnote{ENIAC is an acronym for Electronic Numerical Integrator and Calculator.} The first computer-generated weather forecast was surprisingly good, and its success led to the rapid growth of a new meteorological subdiscipline, “numerical weather prediction.” These early efforts in numerical weather prediction also began a long and fruitful collaboration between numerical analysts and atmospheric scientists.\footnote{Further details about these early weather prediction efforts may be found in Bjerknes (1904), Richardson (1922), Charney et al. (1950), Burks and Burks (1981), and Thompson (1983).} The use of numerical models in atmospheric and oceanic science has subsequently expanded into almost all areas of active research. Numerical models are currently employed to study phenomena as diverse as global climate change, the interaction of ocean currents with bottom topography, the evolution of atmospheric pollutants within an urban airshed, and the development of rotation in tornadic thunderstorms.
+	\end{quotation}
+
 	\section{Historical aspects of Numerical Modelling}
 	
-	This \href{https://journals.ametsoc.org/view/journals/amsm/59/1/amsmonographs-d-18-0018.1.xml}{Historic review by David Randall} provides a great and synthetic history of numerical modelling for the atmosphere and ocean, which has evolved from very simple box models all the way to complex, multi-scale, multi-component "Earth System Models". \\
+	Expanding upon Dale Durran's introduction, this \href{https://journals.ametsoc.org/view/journals/amsm/59/1/amsmonographs-d-18-0018.1.xml}{Historic review by David Randall} provides a great and synthetic history of numerical modelling for the atmosphere and ocean, which has evolved from very simple box models all the way to complex, multi-scale, multi-component "Earth System Models". \\
 	
-		\begin{figure}[h]
+		\begin{figure}[h!]
 		\includegraphics[width=1.\textwidth, angle=0]{Figures/ClimateModellingTimeline}
 		\caption{As climate modeling has evolved over the last 120 years, increasing amounts of physical science have been incorporated into the models. This figure shows when various components of the climate system became regularly included in global climate model simulations.}
 	\end{figure}
@@ -180,46 +179,26 @@
 
 \href{https://journals.ametsoc.org/view/journals/amsm/59/1/amsmonographs-d-18-0018.1.xml} {\includegraphics[width=1.\textwidth, angle=0]{Figures/Randall-ESM100-title.png}}
 
+\clearpage
+\subsection{MTMW14 calendar}
 
-	
-	
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure}[h!]
+	\includegraphics[width=1.25\textwidth, angle=90]{MT4YF_MTMW14 Class Calendar 2024.pdf}
+	\caption{The 2024 calendar: please always refer to the electronic version for last-minute changes of venue}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Time Schemes
 \newpage	
-\chapterimage{2613-1477-max.jpg} % Chapter heading image
-\chapter{Time Schemes}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	\vspace{1em}
-	
-The fundamental ideas in this chapter ...
-	
+\input{TimeSchemes-Chapter}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Real world applications: hurricane and Typhoon simulation in climate GCMs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Chaos and Predictability
+\newpage	
+\input{ChaosPredictability-Chapter}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{center}	
-	\includegraphics[width=0.8\textwidth]{Figures/TC-structures}
-\end{center}
-
-\subsection{Why the differences}
-These GCMs are very different in terms of dynamical core, parameterizations etc., but they are also quite different in terms of the use of the time step. I have been experimenting with our UK model (HadGEM3), and Colin Zarzycki has been experimenting with the NCAR model, managing to double the number of hurricanes with a time step of 1/4, but I have also tested the same ideas in the ECMWF model, since it is the one that uses very long time steps.
-\begin{center}	
-	\includegraphics[width=0.8\textwidth]{Figures/tden_PRESENT_TC_map_STD}
-\end{center}
-	
-	
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapterimage{2613-1477-max.jpg} % Chapter heading image	
-\chapter{Lorenz's Chaos and Predictability}
-	
-\vspace{1em}
-	
-The fundamental ideas in this chapter revolve around chaos theory, and how it affects predictability in the Earth System.
-	
-\vspace{1em}
-	
-	\section{Can we predict the predictions?}
-	
-	\vspace{1em}
-		
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 2D CFL
 \newpage	
@@ -233,7 +212,7 @@ The fundamental ideas in this chapter revolve around chaos theory, and how it af
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% WAVES IN 2D WAVES
+% WAVE PROPAGATION IN 2D 
 \newpage	
 \input{Waves-Chapter}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
@@ -245,16 +224,16 @@ The fundamental ideas in this chapter revolve around chaos theory, and how it af
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SPECTRAL 
 \newpage	
-\chapterimage{2613-1477-max.jpg} % Chapter heading image
-\chapter{The Spectral Method}	
+\input{Spectral-Chapter}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
-\chapterimage{2613-1477-max.jpg} % Chapter heading image
-\chapter{Numerical Modelling and HPC}	
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	
-	\vspace{1em} 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% HPC
+\newpage	
+\input{HPC-Chapter}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % APPENDICES

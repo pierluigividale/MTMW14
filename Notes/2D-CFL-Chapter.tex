@@ -4,34 +4,85 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Re-visiting advection and time step limitations}
-\subsection{A graphical description}
 
-	Let us start with something familiar, e.g. simple advection solved with CTCS.
-	We have our beloved CFL criterion from studying the problem of advection:
-	$\alpha = U \frac{\Delta t}{\Delta h} \le \alpha_{max}$
-	, where $\Delta h$ is our grid spacing.\\
-	
-	~
+In this chapter we are going to re-visit some of the ideas about numerical stability in 1D, then moving on to 2D flows, and relative stability, finally to consider aspects of coupling between equations.
 
-\begin{figure}
+\subsection{Horizontal advection}
+
+In atmosphere or ocean science we often consider quantities that are
+carried with the flow without changing. Examples include the mixing
+ratio of an unreactive trace gas or potential temperature. Such
+quantities can be used to mark air parcels and follow them and
+therefore they are called {\em tracers}. If the wind field ${\bf
+	u}({\bf x}, t)$ is known the {\em trajectories} of air parcels can be
+found by numerically integrating the ODE:
+\begin{equation}
+	\frac{D{\bf x}}{Dt}={\bf u}({\bf x}, t)
+\end{equation}
+where ${\bf x}$ is the position of an air parcel and the capital
+$D/Dt$ is used to mean rate of change following an air parcel. 
+The tracer value, $\theta_j$, does not change following parcel $j$ so
+if we know the values $\theta_j$ for all parcels at time $t_i$ and
+their initial positions, we can use their trajectories
+to infer the new distribution of tracer at a later time $t_f$. A model
+based on following fluid parcels is called a {\em Lagrangian model}.
+
+However, many atmospheric processes occur relative to a fixed
+position. Examples include a pollution source from a city and
+temperature fluxes from the land or ocean. Sometimes it is better
+devise a model which considers atmospheric changes relative to fixed
+points. These are called {\em Eulerian
+	models}. What happens when air masses carrying tracers pass over a
+point?
+
+\subsection{The Advection Equation}
+
+\begin{figure}[h!]
 	\begin{center}
-\includegraphics[width=0.55\textwidth]{Figures/image_grid_cfl.jpg}
+		\includegraphics[scale=0.35]{/Users/vidale/Projects/Teaching/MTMW14/Figures/advection.pdf}
+	\end{center}
+	\caption{Temperature at a point increases when wind blows from the warm side.}
+	\label{fig:kencfl}
+\end{figure}
+
+
+In Figure~\ref{fig:ken}, the wind is bringing air from the $-x$
+direction. If the air `upstream' is warmer than the air `downstream',
+the observer will see the temperature increasing. The rate of change of
+temperature observed must depend on both the magnitude of this
+gradient and the speed at which the air is moving, {\em i.e.,}
+\begin{equation}
+	\frac{\partial T}{\partial t} =- u \frac{\partial T}{\partial x}.
+	\label{advectioncont}
+\end{equation}
+where the left hand side means the rate of change at a given position
+$x$ and the right hand side is called the {\em advection term}. $u$ is
+the wind component and $\partial T/\partial x$ means the gradient in
+the $x$-direction at a given time. 
+
+We can solve this analytically, but the question is what happens when we solve it numerically. As an example, let us look at CTCS.
+
+
+\subsection{A graphical description of what happens with finite differences}
+
+	Let us continue with something very familiar in numerical modelling, e.g. simple advection solved with CTCS.
+		
+	We have our beloved CFL criterion from studying the problem of advection:
+	$\alpha = U \frac{\Delta t}{\Delta x} \le \alpha_{max}$
+	, where $\Delta x$ is our grid spacing (at times $\Delta x$ will be written as $\Delta h$, else  using the shorthand $d$).\\
+
+\begin{figure}[h!]
+	\begin{center}
+\includegraphics[trim={0cm .8cm 0cm .5cm},clip,width=0.8\textwidth]{Figures/image_grid_cfl.jpg}
 	\end{center}
 \caption{CFL in the x direction}
 \end{figure}
 	
 What is the practical meaning of CFL for Eulearian finite differences?
 
-~
-
 If we think of it as a method for propagating information in space, the CFL criterion is telling us that we are not allowed to transmit information from grid point $i$ to grid point $i+2$ without first making a stop at grid point $i+1$.
 If our information "leapfrogs", very bad things will happen.
-
-	\begin{center}
-\includegraphics[width=0.2\textwidth]{Figures/GameOver.jpg}
-	\end{center}
 	
-
 \subsection{A short reminder of the meaning of the CFL condition}
 \subsection{The example of advection in 1D}
 
@@ -73,7 +124,6 @@ If our information "leapfrogs", very bad things will happen.
 	The \underline{unstable case} concerns us from the point of view of the amplitude of the signal. In fact, if $|\sigma| > 1$, then $\left( 1 - \sigma^2 \right)^{1/2}$ is imaginary and both roots will be pure imaginary:
 	
 	
-	
 	\begin{align}
 		B_{+}^{\Delta t}  &= -i \left ( \sigma -S \right)  \mathrm{,where } | \sigma| > S \equiv \left(  \sigma^2 - 1 \right)^{1/2} \nonumber \\
 		B_{-}^{\Delta t}  &= -i \left ( \sigma +S \right)  \nonumber
@@ -91,52 +141,67 @@ If our information "leapfrogs", very bad things will happen.
 		\left | \frac {c \Delta t}{\Delta x} \sin \mu \Delta x \right | \leq 1
 	\end{equation}	
 	
-	If this condition is to hold for all admissible values of the wavelength $\mu$, then the maximum value of $\sin \mu \Delta x$ will happen for the highest resolved wavenumber (that is a wavelenght $L=4 \Delta x$), which requires that:
+	If this condition is to hold for all admissible values of the wavelength $\mu$, then:
 	
+	
+	\begin{theorem}[Courant-Friedrichs-Levy (CFL) condition for computational stability in 1D]		
+	The maximum value of $\sin \mu \Delta x$ will happen for the highest resolved wavenumber (that is a wavelenght $L=4 \Delta x$), which requires that:
 	\begin{equation}
-		\left | \frac {c \Delta t}{\Delta x}  \right | \leq 1
+		\left | \frac {c \Delta t}{\Delta x}  \right | \leq 1       \textrm{  ~~  or, with the notation used later ($\Delta x = d$): ~~ } \left | \frac {V_s \Delta t}{d}  \right | \leq 1 
 	\end{equation}	
-	which is commonly referred to as the \emph{\textbf{Courant-Friedrichs-Levy (CFL)} condition for computational stability}.
+	\end{theorem}
 
+	which is commonly referred to as the \emph{\textbf{Courant-Friedrichs-Levy} condition for computational stability} (in one dimension).
 
 \subsection{The CFL condition in 1D: plugging in some numbers}
 
-
 What happens in practice? What typical time step are we contending with, in the horizontal and vertical directions?
 
-\medskip
-
-%\begin{minipage}{0.45\textwidth}
 	{\bf Horizontal example:} $\Delta x = 10km$, $c = O(100) ms^{-1}$ what $\Delta t$ can we afford?
-	
-	\medskip
-	
-	But what happens for a contemporary grid, like this one?	
-	\begin{figure}
-		\includegraphics[trim={0cm 0.cm 0cm 0cm},clip,width=0.65\textwidth]{Figures/horizontal-irregular-grid}
+		
+	But what will happen for a contemporary grid, like the one in Figure  \ref{horizontal-grid-stretch}?	
+	\begin{figure}[h!]
+			\begin{center}
+		\includegraphics[trim={0cm 0.cm 0cm 0cm},clip,width=0.8\textwidth]{Figures/horizontal-irregular-grid}
+		\end{center}
+		\caption{Variable grid length in the horizontal direction: example from the MPAS GCM, used for weather and climate applications}
+			\label{horizontal-grid-stretch}
 	\end{figure}
-%\end{minipage}
-
-\hfill
-
-%\begin{minipage}{0.45\textwidth}
 
 {\bf Vertical example:} $\Delta z = 500m$, $c = O(1) ms^{-1}$ what $\Delta t$ can we afford?
 
-	\medskip
-
-But what happens for a typical vertical atmospheric grid, telescoped, like this one?
-	\begin{figure}
-	\includegraphics[trim={0cm 0.cm 0cm 0cm},clip,width=0.6\textwidth]{Figures/vertical-telescoped-grid}
+... and what about a typical vertical atmospheric grid, telescoped, like the one in Figure \ref{veftical-grid-stretch}?
+\begin{figure}[h!]
+	\begin{center}
+	\includegraphics[trim={0cm 0.cm 0cm 0cm},clip,width=0.5\textwidth]{Figures/vertical-telescoped-grid}
+	\end{center}
+	\caption{Variable grid length in the vertical direction: example from a typical GCM used for weather and climate}
+	\label{vertical-grid-stretch}
 \end{figure}
-%\end{minipage}
 
+\clearpage
 
 \section{The CFL condition in 2 dimensions}
 
+Waves in 2D can propagate in \underline{any} direction; they are not bound to travel along the zonal or meridional direction.
+
+\begin{center}
+	\includegraphics[width=0.7\textwidth]{Figures/2DGaussian.png}
+\end{center}
+
+\vspace{2em}
+	\fcolorbox{ocre}{lightgray}{\parbox{\dimexpr \linewidth-2\fboxsep-2\fboxrule}{
+		\textbf{Question: }
+		what does this 2D propagation mean for our CFL criterion? Is the time step requirement going to be stricter? Or is it going to be less strict?
+}}
+\vspace{2em}
+	
+{\bf How to solve this puzzle:} draw a simple circular wave front on a 2D cartesian grid and think of the distance covered by the wave front over a sequence of 3-4 time steps.
+What happens to the signal along the $x$, $y$ axes and what happens along the diagonal?
+
 \subsection{The Courant-Friedrichs-Levy (CFL) condition in 2D}
 
-	Same problem as before, albeit advection in 2D:
+	Having explored these ideas graphically, we can approach the advection problem once again, albeit in two dimensions (2D) in a more formal way:
 	
 	\begin{equation}
 		\frac{\partial A}{\partial t} + \mathbf{V}_s \cdot \grad{A} = 0 \textrm{, where } \mathbf{V}_s=U\mathbf{i}+V\mathbf{j} = \textrm{const.}
@@ -156,7 +221,7 @@ But what happens for a typical vertical atmospheric grid, telescoped, like this 
 		\label{adv-CTCS-2D-solution}
 	\end{equation}
 	
-	We can solve by defining $D=B^{n-1}$, re-writing (\ref{adv-CTCS-2D-solution}) in matrix form and finding its eigenvalues. This is quite similar to what is done on page 127 of Haltiner and Williams to solve the 1D case we treated before, which results in a quadratic equation ((5-55), page 127) with coefficients identical to what we found previously (equation (\ref{adv-CTCS-1D-eigenvalues}), else see (5-16) in H\&W, page 112).
+	We can solve by defining $D=B^{n-1}$, re-writing (\ref{adv-CTCS-2D-solution}) in matrix form and finding its eigenvalues. This is quite similar to what is done on page 127 of \cite{Haltiner-Williams-book} to solve the 1D case we treated before, which results in a quadratic equation ((5-55), page 127 of \cite{Haltiner-Williams-book}) with coefficients identical to what we found previously (equation (\ref{adv-CTCS-1D-eigenvalues}), else see equation (5-16) in \cite{Haltiner-Williams-book}, page 112).
 
 \subsection{The 2D eigenvalues for stability and the 2D CFL}
 
@@ -179,88 +244,37 @@ But what happens for a typical vertical atmospheric grid, telescoped, like this 
 	\end{equation}
 	
 	Which is the wind direction $\theta$ that is most likely to violate CFL? Since the wave numbers $p,q$ are independent, we can choose the maximum value, $1$, for each of the two terms: $\sin pd$ and $\sin qd$, and we are left with the task of maximising the remaining sum: $\cos \theta + \sin \theta$, which is $\sqrt{2}=0.707$, corresponding to $\theta=\pi/4=45^o$.
-	
-	So, \textbf{for 2D CTCS, the CFL condition} that will allow us to avoid computational instability under all circumstances (even with wind blowing at an angle of $45^o$) is: 
+
+
+\begin{theorem}[CFL condition in 2D]
+	For 2D CTCS, the CFL condition that will allow us to avoid computational instability under all circumstances (even with wind blowing at an angle of $45^o$) is: 
 	\begin{equation}
-		V_s \Delta t \sqrt{2} / d \leq 1 \textrm{ or } V_s \Delta t \leq 0.707 d 
+		V_s \Delta t \sqrt{2} / d \leq 1 \textrm{   ~~~~~      or     ~~~~~  } V_s \Delta t \leq 0.707 d 
 	\end{equation}
+\end{theorem}
+
+
+\begin{figure}[h!]
+	\begin{center}
+		\includegraphics[width=0.4\textwidth]{Figures/GameOver.jpg}
+		\caption{CFL in the 2D: what happens at the time of "BOOM!"}
+	\end{center}
+\end{figure}	
+
 	
 \subsection{2D CFL: graphical interpretation}
 
 	In summary, we have seen that in 2D the maximum value of $\Delta t$ required for computational stability is almost 30\% smaller than for the 1D case, other things being equal. In order to understand this, consider the two figures below: on the left is the grid as seen normally, while on the right is the grid as seen when aligned with the progressing wavefront, at an angle of $45^o$.
 	A wave propagating at that angle (e.g from the SW to the NE) encounters an effective distance of $d/\sqrt{2}$ between gridpoints. So, the CFL stability criterion says that the wave cannot move more than the effective distance between gridpoints ($d/\sqrt{2}$ at its shortest) during time $\Delta t$, without incurring computatational instability.
 	
-	\medskip
-	
-%	\begin{minipage}{0.45\textwidth}
-		\begin{figure}
-			\includegraphics[trim={5.25cm 0.cm 6.25cm 1.25cm},clip,width=0.75\textwidth]{Figures/2D_CFL_drawing}
-		\end{figure}
-%	\end{minipage}
-	
-%	\begin{minipage}{0.45\textwidth}
-		\begin{figure}
-			\includegraphics[trim={4.25cm 0.cm 7.25cm 4.5cm},clip,width=0.75\textwidth]{Figures/2D_CFL_drawing_rotated}
-		\end{figure}
-%	\end{minipage}
-	
-
-\subsection{Readl world applications: CFL in current GCMs}
-	
-	In lectures 4,5 we started to learn about Arakawa-sensei's staggered grids, and I showed you my current C-grid configuration, for the UM's EndGame dynamical core. \\
-	
-	\medskip
-	
-	In the last row near the poles, my $\Delta x \approx 5$km GCM has a grid spacing of 3.1m. Given a "worst case scenario" for wave propagation, what should my time step be, according to the 1D ("optimistic!") CFL criterion? Please compute that now, and raise your hand as soon you have the answer.\\
-	
-	\medskip
-	
-	Here is my real time step: 
-	
-	\begin{figure}
-		\includegraphics[width=0.75\textwidth]{Figures/Stevens_Table5}
-		\tiny{\caption{DYAMOND GCMs, with typical $\Delta x \approx 5$km, from Stevens et al., 2019}}
+	\begin{figure}[h!]
+	\mbox{\scalebox{0.5}{\includegraphics[trim={5.25cm 15.cm 5.25cm 2cm},clip,width=1.1\textwidth]{Figures/2D_CFL_drawing}}
+	            \scalebox{0.5}{\includegraphics[trim={4.25cm 15.cm 7.25cm 2.cm},clip,width=.9\textwidth]{Figures/2D_CFL_drawing_rotated}}}
+			\caption{Wavefront propagation across a 2D checkerboard: as seen with the original grid orientation (left panel), and as seen by aligning with the wavefront, at 45 degrees (right panel).}
 	\end{figure}
 	
-	
-	How can such magic be possible?
-	
 
-\subsection{CFL and coupled equations: where does $\Delta t$ matter?}
-
-	Let us not confuse the advection process with the other processes, described in parametrizations, or with the coupling between the equations. 
-	
-	Also, remember that the time step may be set by the 2D CFL, but the vertical grid spacing is very likely far smaller, meaning that we must use a different numerical scheme in the vertical.
-	
-	As an example, take a look at our SWEs:
-	\begin{eqnarray*}
-		\frac{u^{n+1}-u^{n-1}}{2\Delta t}-fv^n+\frac{g}{2}
-		\left( \partd{h}{x}^{n+1} +\partd{h}{x}^{n-1} \right) & = & 0 \\
-		\frac{v^{n+1}-v^{n-1}}{2\Delta t}+fu^n+\frac{g}{2}
-		\left( \partd{h}{y}^{n+1} +\partd{h}{y}^{n-1} \right) & = & 0 \\
-		\frac{h^{n+1}-h^{n-1}}{2\Delta t}+\frac{H}{2}
-		\left( \partd{u}{x}^{n+1} +\partd{u}{x}^{n-1}
-		+\partd{v}{y}^{n+1} +\partd{v}{y}^{n-1} 
-		\right) & = & 0. 
-	\end{eqnarray*}
-
-\subsection{Hurricane and Typhoon simulation in climate GCMs: frequency}
-
-	\begin{center}	
-		\includegraphics[width=0.8\textwidth]{Figures/Zarz1}
-	\end{center}
-	
-
-\subsection{Hurricane and Typhoon simulation in climate GCMs: dynamics and physics}
-
-	\begin{center}	
-		\includegraphics[width=0.8\textwidth]{Figures/Zarz2}
-	\end{center}
-	
-
-
-
-\section{Practical considerations: stability analysis in 1D and 2D for Project 2}
+\section{CFL and coupled equations: where does $\Delta t$ matter?}
 
 The goal of the second project is to solve the Stommel model on the finite difference C-grid with a FBT time integration scheme. The Stommel model is the simplest geophysical flow model able to represent a wind-driven circulation in a closed basin with a western boundary layer. The model equations read:
 \begin{eqnarray}
@@ -269,10 +283,33 @@ The goal of the second project is to solve the Stommel model on the finite diffe
 	&&\frac{\partial \eta}{\partial t} + h \bnabla \cdot \mathbf{u} = 0,
 \end{eqnarray}
 where $f_0$ is the reference value of the Coriolis parameter, $\beta$ is the reference value of the Coriolis parameter first derivative in the $y$-direction, $\gamma$ is a linear friction coefficient, $\rho$ is the homogeneous density of the fluid and $\btau^{\eta}$ is the wind stress acting on the surface of the fluid. The model solutions look like these:
-\begin{center}
-	\includegraphics[width=0.9\textwidth]{Figures/sol_project2.eps}
-\end{center}
 
+\begin{figure}[h!]
+	\begin{center}
+		\includegraphics[width=0.9\textwidth]{Figures/sol_project2.eps}
+	\end{center}
+\end{figure}
+
+
+\subsection{Practical considerations: stability analysis in 1D and 2D for Project 2}
+
+When solving this problem numerically, and considering 2D CFL, let us not confuse the advection process with the other processes, described in parametrizations, or with the coupling between the equations. 
+As an example, take a look at the numerical solutions proposed for the SWEs that will be the focus of Practical 2:
+
+\begin{eqnarray*}
+	\frac{u^{n+1}-u^{n-1}}{2\Delta t}-fv^n+\frac{g}{2}
+	\left( \partd{h}{x}^{n+1} +\partd{h}{x}^{n-1} \right) & = & 0 \\
+	\frac{v^{n+1}-v^{n-1}}{2\Delta t}+fu^n+\frac{g}{2}
+	\left( \partd{h}{y}^{n+1} +\partd{h}{y}^{n-1} \right) & = & 0 \\
+	\frac{h^{n+1}-h^{n-1}}{2\Delta t}+\frac{H}{2}
+	\left( \partd{u}{x}^{n+1} +\partd{u}{x}^{n-1}
+	+\partd{v}{y}^{n+1} +\partd{v}{y}^{n-1} 
+	\right) & = & 0. 
+\end{eqnarray*}
+
+\emph{Questions}: can you identify the advection terms, and how CFL impacts the stability of the solutions? What processes are coupled at every time step?
+
+Also, for a real NWP or climate model, remember that the time step may be set by the 2D CFL, but the vertical grid spacing is very likely far smaller, meaning that we must use a different numerical scheme in the vertical.
 
 \subsection{How do we decide on grid, grid spacing, time step?}
 
@@ -295,9 +332,8 @@ Questions that we must consider when we choose the numerical method to solve our
 	
 \end{enumerate}
 
-
+\section{More considerations in choosing $\Delta t$ and $\Delta x $}
 \subsection{Numerical analysis of the 1D "upstream" advection equation}
-\subsection{There is more to choosing $\Delta t$ and $\Delta x $}
 
 It is not a given that going for a small $\mu$ is always the best possible decision.
 For instance, let us start with the advection equation and let us choose the \textbf{upstream scheme}, which we know is \textbf{dissipative}. That means, each time step we lose a bit of the signal.
@@ -357,137 +393,51 @@ This relationship says that $\lambda$ depends on $J$ (the resolution) in two dif
 Which is it?
 Let us pick a wavelength half the domain size, so that $kD=4 \pi$. This causes the $\cos$ factor in the equation to approach 1, which \textbf{weakens the damping}; on the other hand it also causes the exponent to increase, which \textbf{strenghtens the damping}. This is shown in the figure, for two values of $\mu$.
 
-%	\begin{minipage}{0.4\textwidth}
-	\begin{figure}
-		\includegraphics[trim={0cm 0cm 0cm 0cm},clip,width=5.cm]{/Users/vidale/Projects/Teaching/MTMW14/Figures/Resolution_damping.png}
+	\begin{figure}[h!]
+		\includegraphics[trim={0cm 0cm 0cm 0cm},clip,width=15.cm]{/Users/vidale/Projects/Teaching/MTMW14/Figures/Resolution_damping.png}
+		\caption{The compromise between simulation stability and fidelity}
 	\end{figure}
-	%	\end{minipage}
-\hfill
-%	\begin{minipage}{0.5\textwidth}
-	Overall, \textbf{increasing the resolution, $J$, is good}: $\lambda$ tends to 1 on the right hand side, even though we take more time steps, $N$, to complete the integration. However, if we fix $J$ and decrease $\mu$, by decreasing the time step $\Delta t$, the damping increases and \textbf{the solution will be less accurate}. 
-	
-	%	\end{minipage}
 
+	Overall, \textbf{increasing the resolution, $J$, is good}: $\lambda$ tends to 1 on the right hand side, even though we take more time steps, $N$, to complete the integration. However, if we fix $J$ and decrease $\mu$, by decreasing the time step $\Delta t$, the damping increases and \textbf{the solution will be less accurate}. 
 
 \subsection{Recommendations on choosing $\Delta t$ and $\Delta x $}
 
-%	\begin{minipage}{0.4\textwidth}
 	\begin{itemize}
 		\item perform numerical analysis, speficically for each scheme
 		\item \textbf{for the upstream scheme}, the amplitude error can be minimised by using the largest stable value of $\mu$.
 		\item that is, do not exaggerate in making $\mu$ much less than 1: this decision impacts both cost and quality of the solutions
 		\item in other words, \underline{it pays off to live dangerously}!
 	\end{itemize}
-	%\end{minipage}
-	\hfill
-	%	\begin{minipage}{0.5\textwidth}	
-		\begin{figure}
-			\includegraphics[trim={0cm 0cm 0cm 0cm},clip,width=7.cm]{/Users/vidale/Projects/Teaching/MTMW14/Figures/Resolution_damping.png}
-		\end{figure}
-		%	\end{minipage}
 
+\section{Real world applications: CFL in current GCMs}
 
-\section{Appendix: Why advection by the grid point method is imperfect}
+In lectures 4,5 we will learn about Arakawa-sensei's staggered grids, and I showed you my current C-grid configuration, for the UM's EndGame dynamical core. \\
 
-\subsection{The Advection Equation}
+In the last row near the poles, my $\Delta x \approx 5$km GCM has a grid spacing of 3.1m. Given a "worst case scenario" for wave propagation, what should my time step be, according to the 1D ("optimistic!") CFL criterion? Please compute that now, and raise your hand as soon you have the answer.\\
 
-\begin{figure}[h]
-	\begin{center}
-		\includegraphics[scale=0.35]{/Users/vidale/Projects/Teaching/MTMW14/Figures/advection.pdf}
-	\end{center}
-	\caption{Temperature at a point increases when wind blows from the warm side.}
-	\label{fig:ken}
+Here is my real time step: 
+
+\begin{figure}[h!]
+	\includegraphics[width=1.\textwidth]{Figures/Stevens_Table5}
+	\caption{DYAMOND GCMs, with typical $\Delta x \approx 5$km, from Stevens et al., 2019}
+\end{figure}
+
+How can such magic be possible?
+
+\subsection{Hurricane and Typhoon simulation in climate GCMs: frequency}
+
+\begin{figure}[h!]
+\begin{center}	
+	\includegraphics[width=0.8\textwidth]{Figures/Zarz1}
+\end{center}
 \end{figure}
 
 
-In Figure~\ref{fig:ken}, the wind is bringing air from the $-x$
-direction. If the air `upstream' is warmer than the air `downstream',
-the observer will see the temperature increasing. The rate of change of
-temperature observed must depend on both the magnitude of this
-gradient and the speed at which the air is moving, {\em i.e.,}
-\begin{equation}
-	\frac{\partial T}{\partial t} =- u \frac{\partial T}{\partial x}.
-	\label{advectioncont}
-\end{equation}
-where the left hand side means the rate of change at a given position
-$x$ and the right hand side is called the {\em advection term}. $u$ is
-the wind component and $\partial T/\partial x$ means the gradient in
-the $x$-direction at a given time. 
+\subsection{Hurricane and Typhoon simulation in climate GCMs: dynamics and physics}
 
-We can solve this analytically, but the question is what happens when we solve it numerically. As an example, let us look at CTCS.
-
-\subsubsection{Computational modes: The CTCS advection scheme}
-
-Let us try using the centred difference in time and the
-centred difference in space (CTCS for short):
-\BEQ \frac{T_{j}^{n+1}-T_{j}^{n-1}}{2\Delta t} + u \frac{T_{j+1}^{n} - T_{j-1}^{n}}{2\Delta x} = 0 \EEQ
-We can rewrite this equation to get:
-\BEQ T_{j}^{n+1} = T_{j}^{n-1} - \frac{u\Delta t}{\Delta x} \left[ T_{j+1}^{n} - T_{j-1}^{n} \right] \label{ctcsmodel} \EEQ
-The quantity $u\Delta t / \Delta x$ is dimensionless.  It appears so often in
-numerical schemes for the advection equation that it has its own name --- the
-\emph{Courant number}:
-\BEQ \alpha = \frac{u\Delta t}{\Delta x} .\EEQ
-
-The von Neumann stability analysis for the CTCS scheme is most easily
-done using complex notation for the trial solution, 
-\BEQ T_j^n=e^{ikx_j}\;\; ; \;\;\;\; T_j^{n+1}=ST_j^n \EEQ
-where $S=Ae^{i\phi}$ expresses 
-the change in amplitude and phase over one time-step.
-
-
-
-When we substitute the trial solution $T_j^n=e^{ikx_j}$ into a CTCS scheme, we shall end up with three terms that express what temperature is at points: \BEQ j-1, \;\;\;\ j \;\;\;\ \textrm{   and  } \;\; j+1 \EEQ
-These three terms are: \BEQ e^{ik(x_j-\Delta x)},  \;\;\;\;\; e^{ikx_j} \;\;\;\;\; \textrm{   and   } \;\; e^{ik(x_j + \Delta x)}\EEQ
-
-The common term $e^{ikx_j}$ cancels out, so that plugging the trial solution into the model (\ref{ctcsmodel}) yields:
-\BEQ
-S=S^{-1}-\alpha\left[ e^{ik\Delta x}-e^{-ik\Delta x} \right]
-\EEQ
-
-which can be re-arranged as a quadratic equation
-for the complex factor, $S$, by remembering Euler's formula: $\frac {e^{i\theta} - e^{-i \theta}}{2i}= sin(\theta)$:
-\BEQ
-S^2+S\alpha 2i\sin k\Delta x -1=0
-\EEQ
-
-which has two roots:
-\BEQ
-S_{\pm}=-i \alpha \sin k\Delta x\pm \sqrt{1-\alpha^2 \sin^2 k\Delta x}
-\label{asoln}
-\EEQ
-
-If the Courant number $|\alpha | \le 1$, the number under the root must
-be positive since $\sin^2 k\Delta x \le 1$. 
-
-{\em Exercise: Show that when $|\alpha | \le 1$ the magnitude of the
-	amplification factor $|S|^2=S^* S=1$, meaning that the scheme is
-	stable. However, when $|\alpha | > 1$ the $S_{-}$ solution is
-	unstable.}
-
-This is an improvement on the FTCS scheme, which was unconditionally
-unstable. This is the single most important result in the numerical
-modelling of fluid flows.  It is called the Courant-Friedrichs-Lewy
-(CFL) condition.  What it boils down to is that, for a given
-grid-spacing $\Delta x$, the time step must satisfy \BEQ \Delta t <
-\frac{\Delta x}{u} . \EEQ The physical interpretation of this condition
-is that \emph{the scheme is unstable if fluid parcels move more than
-	one gridbox in one timestep}.
-
-The solution with +ve real part in (\ref{asoln}) does not change sign
-every timestep and is called the {\em physical mode}. However, the
-solution with the -ve square root alternates sign every step which is
-unphysical behaviour and is called the {\em computational mode}. The
-relative amplitudes of the two modes is determined by projection from
-the initial conditions. The implication is that although the CTCS
-scheme is stable for $|\alpha | \le 1$ we can expect unphysical
-oscillations that are worst at the grid-scale (where $\sin k\Delta
-x=1$).
-
-\begin{figure}
-	%\begin{center}
-	\mbox{\scalebox{0.05}{\includegraphics{Figures/adv-ctcs.png}}
-		\scalebox{0.05}{\includegraphics{Figures/adv-upstream.png}}}
-	%\end{center}
-	\caption{\textsl{Comparing numerical solutions for the advection of a top-hat distribution by uniform flow. Left: CTCS solution exhibits unphysical undershoots and overshoots. Right: Upstream scheme remains monotonic.}}
-	\label{fig:ctcs}
+\begin{figure}[h!]
+\begin{center}	
+	\includegraphics[width=0.8\textwidth]{Figures/Zarz2}
+\end{center}
 \end{figure}
+

@@ -9,7 +9,7 @@
 	
 	\begin{center}
 		\begin{tabular}{c}
-			\includegraphics[width=0.55\textwidth]{Figures/Durran-figOne1.png}
+			\includegraphics[width=0.85\textwidth]{Figures/Durran-figOne1.png}
 		\end{tabular}
 	\end{center}
 	
@@ -31,7 +31,7 @@
 	
 	\begin{center}
 		\begin{tabular}{c}
-			\includegraphics[width=0.45\textwidth]{Figures/Durran-figOne2.png}
+			\includegraphics[width=0.85\textwidth]{Figures/Durran-figOne2.png}
 		\end{tabular}
 	\end{center}
 	
@@ -66,19 +66,17 @@
 	
 	\begin{center}
 		\begin{tabular}{c}
-			\includegraphics[width=0.4\textwidth]{Figures/Durran-figOne3.png}
+			\includegraphics[width=0.85\textwidth]{Figures/Durran-figOne3.png}
 		\end{tabular}
 	\end{center}
 	
 
-\subsection{Numerical analysis tied to phenomena}
-\subsection{What we learned in designing Project 2}
-
+\subsection{Numerical analysis tied to phenomena: examples from Project 2}
 	
 %\begin{minipage}[c]{0.7\textwidth}	
 \begin{center}
 	\begin{tabular}{cc}
-			\includegraphics[width=0.95\textwidth]{Figures/Logical decisions for Project 2.pdf}
+			\includegraphics[width=0.9\textwidth]{Figures/Logical decisions for Project 2.pdf}
 	\end{tabular}
 \end{center}
 %\end{minipage}
@@ -134,10 +132,10 @@ In atmospheric models, the fastest gravity waves, i.e., the external-gravity or 
 
 %\begin{minipage}{0.4\textwidth}
 \begin{figure}
-	\includegraphics[trim={2cm 4.5cm 0cm 3cm},clip,width=4.cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/Figures/SWE_GWs_Implicit}
+	\includegraphics[trim={2cm 4.5cm 0cm 3cm},clip,width=12.cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/Figures/SWE_GWs_Implicit}
 	\label{fig:Spherical}
 	%\setbeamerfont{caption name}{size=\tiny}
-	\caption{\label{fig:blue_rectangle} \tiny 1D SWEs in implicit form}
+	\caption{\label{fig:blue_rectangle} 1D SWEs in implicit form}
 \end{figure}
 %\end{minipage} 
 
@@ -149,11 +147,11 @@ In atmospheric models, the fastest gravity waves, i.e., the external-gravity or 
 
 %\begin{minipage}{0.4\textwidth}
 \begin{figure}
-	\includegraphics[trim={1cm 2cm 0cm 2cm},clip,width=3.5cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/Figures/SWE_GWs_FWBW_h_equation}\\
-	\includegraphics[trim={0cm 2cm 0cm 2cm},clip,width=3.5cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/Figures/SWE_GWs_FWBW_u_equation}
+	\includegraphics[trim={1cm 2cm 0cm 2cm},clip,width=12cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/Figures/SWE_GWs_FWBW_h_equation}\\
+	\includegraphics[trim={0cm 2cm 0cm 2cm},clip,width=12cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/Figures/SWE_GWs_FWBW_u_equation}
 	\label{fig:Spherical}
 	%\setbeamerfont{caption name}{size=\tiny}
-	\caption{\label{fig:blue_rectangle} \tiny 1D SWEs in FW-BW form}
+	\caption{\label{fig:blue_rectangle} 1D SWEs in FW-BW form}
 \end{figure}
 %\end{minipage} \hfill
 
@@ -410,9 +408,8 @@ Since velocity $U$ is constant, it is quite easy to show that:
 	
 
 \subsection{Real world applications of the Semi-Lagrangian method}
-	
-%\begin{tabular}{lc}
-%		\begin{minipage}[c]{0.35\textwidth}
+
+\begin{center}	
 			\setlength{\unitlength}{1 cm}
 			\begin{picture}(1,7.5)
 			\arakawa
@@ -425,31 +422,28 @@ Since velocity $U$ is constant, it is quite easy to show that:
 			\put(1.1,1.7){$u_{ij}$}
 			\put(2.1,0.7){$v_{ij}$}
 			\end{picture}
-%		\end{minipage}
-		
-		
-%		\begin{minipage}[c]{0.65\textwidth}
+\end{center}
 			
-			We aim to predict the value of $\Phi$ at time $t= n+1$, so $\Phi(x^{n+1})$, or $\Phi^{n+1}_{i,j}$. \\
+We aim to predict the value of $\Phi$ at time $t= n+1$, so $\Phi(x^{n+1})$, or $\Phi^{n+1}_{i,j}$. \\
 			
-			Because we are projecting a Lagrangian calculation onto an Eulearian grid, we always know where we are going to be at time t=n+1: the \textbf{arrival point} $x^{n+1}=x_{i,j}$. \\
+Because we are projecting a Lagrangian calculation onto an Eulearian grid, we always know where we are going to be at time t=n+1: the \textbf{arrival point} $x^{n+1}=x_{i,j}$. \\
 			
-			Unlike in purely Eulearian frameworks, we do not know a-priori where information is coming from; we must compute the \textbf{departure point} $\tilde{x}^n_{i,j}$\\
+Unlike in purely Eulearian frameworks, we do not know a-priori where information is coming from; we must compute the \textbf{departure point} $\tilde{x}^n_{i,j}$\\
+						
+{\bf Target is the future (time = n+1): ~ ~ }  $\Phi^{n+1}_{i,j}$ \\
 			
+\medskip
 			
-			{\bf Target is the future (time = n+1): ~ }  $\Phi^{n+1}_{i,j}$ \\
-			{\bf Available to us now (time = n):  ~ ~ }  $\Phi^n_{i,j}, ~ u^n_{i,j}, ~ S^n_{i,j}$ \\
+{\bf Available to us now (time = n):  ~ ~ }  $\Phi^n_{i,j}, ~ u^n_{i,j}, ~ S^n_{i,j}$ \\
 			
-			We integrate ${u}^n_{i,j}$ to find $\tilde{x}^n_{i,j}$, thus $\Phi (\tilde{x_{i,j}^n},t^{n})$ and $S(\tilde{x_{i,j}^n},t^{n})$.
+We integrate ${u}^n_{i,j}$ to find $\tilde{x}^n_{i,j}$, thus $\Phi (\tilde{x_{i,j}^n},t^{n})$ and $S(\tilde{x_{i,j}^n},t^{n})$.
 			
-			Finally, we compute the future state like this: 
+Finally, we compute the future state like this: 
+
 \begin{equation}
 			\Phi^{n+1}_{i,j}  \approx  \Phi(\tilde{x}^n_{i,j}, t^n) 
 			+ \Delta t \left\{ \frac{S(x_{i,j},t^{n+1}) + S (\tilde{x_{i,j}^n},t^{n})}{2}\right\} 
 \end{equation}
-
-%		\end{minipage}
-%\end{tabular}
 
 
 \subsection{From first order to second order}
@@ -539,14 +533,13 @@ Re-arranging with future values on the left:
 	
 
 
-\section{Some real world applications}
+\section{Some real world applications: explicit GCMs and SISL GCMs}
 \subsection{Hurricane and Typhoon simulation in climate GCMs: precipitation composite}
 
 	\begin{center}	
 		\includegraphics[width=0.8\textwidth]{Figures/TC-precipitation}
 	\end{center}
 	
-
 
 \subsection{Hurricane and Typhoon simulation in climate GCMs: vertical structure composite}
 	\begin{center}	
@@ -557,25 +550,6 @@ Re-arranging with future values on the left:
 \subsection{Why the differences}
 
 	These GCMs are very different in terms of dynamical core, parameterizations etc., but they are also quite different in terms of the use of the time step. I have been experimenting with our UK model (HadGEM3), and Colin Zarzycki has been experimenting with the NCAR model, managing to double the number of hurricanes with a time step of 1/4, but I have also tested the same ideas in the ECMWF model, since it is the one that uses very long time steps.
-	\begin{center}	
-		\includegraphics[width=0.8\textwidth]{Figures/tden_PRESENT_TC_map_STD}
-	\end{center}
-	
-
-
-\subsection{Hurricane and Typhoon simulation in climate GCMs: frequency}
-
-	\begin{center}	
-		\includegraphics[width=0.8\textwidth]{Figures/Zarz1}
-	\end{center}
-	
-
-
-\subsection{Hurricane and Typhoon simulation in climate GCMs: dynamics and physics}
-	
-	\begin{center}	
-		\includegraphics[width=0.8\textwidth]{Figures/Zarz2}
-	\end{center}
 	
 
 \section{Extras}

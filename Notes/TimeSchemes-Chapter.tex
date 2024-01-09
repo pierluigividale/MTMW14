@@ -1,0 +1,19 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
+\chapterimagetwo{tas1} % Chapter heading image
+\chapter{Time Schemes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The fundamental ideas in this chapter is that there is no generally good time scheme: all depends on what equation we are trying to solve.
+
+
+\subsection{Real world applications: hurricane and Typhoon simulation in climate GCMs}
+
+\begin{center}	
+	\includegraphics[width=0.8\textwidth]{Figures/TC-structures}
+\end{center}
+
+\subsection{Why the differences}
+These GCMs are very different in terms of dynamical core, parameterizations etc., but they are also quite different in terms of the use of the time step. I have been experimenting with our UK model (HadGEM3), and Colin Zarzycki has been experimenting with the NCAR model, managing to double the number of hurricanes with a time step of 1/4, but I have also tested the same ideas in the ECMWF model, since it is the one that uses very long time steps.
+\begin{center}	
+	\includegraphics[width=0.8\textwidth]{Figures/tden_PRESENT_TC_map_STD}
+\end{center}

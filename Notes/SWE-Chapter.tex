@@ -97,9 +97,10 @@ Filters sound waves.
 ~
 
 {\bf Boussinesq approximation ($\Delta \rho /\rho_0 \ll 1$ and $H\ll H_{\rho}$)} Huge density height scale, $H_{\rho}$, implies $w \partd{\rho_r}{z}\ll
-\rho_r \partd{w}{z}$. In practice, the density variation is only important in the buoyancy term of the (vertical) momentum equation, $\rho g$. The continuity equation:
+\rho_r \partd{w}{z}$. In practice, the density variation is only important in the buoyancy term of the (vertical) momentum equation, $\rho g$. The \emph{continuity equation}:
 \begin{equation}
 	\frac{1}{\rho} \lagd{\rho}{t} + \nabla \cdot \mathbf{u} = 0
+	\label{continuity-equation}
 \end{equation}
 
 ends up simplified to its incompressible ($\rho_r \approx$ constant) form: $\nabla \cdot \mathbf{u} = 0$. 
@@ -118,7 +119,7 @@ If we also want to filter out gravity waves, we must additionally set the local 
 
 \section{Simplifying the PEs}
 \subsection{PEs on the sphere}
-In an Eulerian framework, our equation (1) ends up looking like this:
+In an Eulerian framework, our momentum equations end up looking like this:
 \begin{eqnarray}
 	\frac {\partial u}{\partial t} + \left(\mathbf{v}\cdot\nabla\right)u=-\frac{1}{\rho} \frac{\partial p}{\partial x}+F_x \\
 	\frac {\partial v}{\partial t} + \left(\mathbf{v}\cdot\nabla\right)v=-\frac{1}{\rho} \frac{\partial p}{\partial y}+F_y \\
@@ -127,53 +128,79 @@ In an Eulerian framework, our equation (1) ends up looking like this:
 
 We must now consider the fact that we are studying fluids (atmosphere, ocean) on our planet, which is approximately a sphere of radius $a$, rotating with angular velocity $\Omega$,
 
-\begin{minipage}{0.4\textwidth}
-	%	\begin{figure}
-		%\includegraphics[trim={0cm 2cm 0cm 2cm},clip,width=3.cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/RotatingEarthDiagram.pdf}
-		%\label{fig:Spherical}
+\begin{figure}[h!]
+	\begin{center}
+		\includegraphics[trim={0cm 2cm 0cm 2cm},clip,width=7.cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/RotatingEarthDiagram.pdf}
+		\label{fig:Spherical}
 		%%\setbeamerfont{caption name}{size=\tiny}
-		%\caption{\label{fig:blue_rectangle} \tiny Schematic of spherical coordinate system}
-		%	\end{figure}
-\end{minipage} \hfill
+	\end{center}
+	\caption{\label{fig:blue_rectangle} Schematic of spherical coordinate system}
+\end{figure}
 
-\begin{minipage}{0.55\textwidth}
 	In the spherical coordinate system we use $\lambda$ (longitude), $\theta$ (latitude) and r, to replace $x,y,z$, where $x=r \cos{\theta} \lambda$; $y=r\theta$; $z=r-a$, so that:
 	\begin{eqnarray}
-		u=\frac {dx}{dt}=r \cos{\theta} \frac {d \lambda}{d t} ; v=\frac {dy}{dt}= r\frac {d\theta}{dt}= ; w=\frac {dz }{dt }
+		u=\frac {dx}{dt}=r \cos{\theta} \frac {d \lambda}{d t} ; ~~~~~~~~~~~ v=\frac {dy}{dt}= r\frac {d\theta}{dt}= ; ~~~~~~~~~~~ w=\frac {dz }{dt }
 	\end{eqnarray}
-	are how we write our spatial derivatives on the Sphere.	
-\end{minipage}
+	are how we write our spatial derivatives on the Sphere.	 The momentum equations in spherical coordinates are then given by:
+
+\begin{eqnarray}
+	\frac {\partial u}{\partial t} + \left(\mathbf{v}\cdot\nabla\right)u - \frac{u \tan \theta}{a} v  + \frac{w}{a}u =-\frac{1}{\rho} \frac{\partial p}{\partial x}+F_x \\
+	\frac {\partial v}{\partial t} + \left(\mathbf{v}\cdot\nabla\right)v + \frac{u \tan \theta}{a} u  + \frac{w}{a}v =-\frac{1}{\rho} \frac{\partial p}{\partial y}+F_y \\
+	\frac {\partial w}{\partial t} + \left(\mathbf{v}\cdot\nabla\right)w - \frac{u^2 + v^2}{a} =-\frac{1}{\rho} \frac{\partial p}{\partial z}-g+F_z
+\end{eqnarray}
+
 
 \subsection{PEs on the Sphere before scale analysis}
-\includegraphics[trim={2cm 10.5cm 0cm 2.cm},clip,width=10.cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/PEs_Sphere_1.pdf}
-\label{fig:Spherical-PEs1}
+
+The full form of the momentum equations in a rotating spherical coordinate system is then:
+
+\begin{eqnarray}
+	\frac {\partial u}{\partial t} + \left(\mathbf{v}\cdot\nabla\right)u - \frac{2 \Omega \sin \theta + u \tan \theta}{a} v  + \frac{w}{a}u + w \cdot 2 \Omega \cos \theta =-\frac{1}{\rho} \frac{\partial p}{\partial x}+F_x \\
+	\frac {\partial v}{\partial t} + \left(\mathbf{v}\cdot\nabla\right)v + \frac{2 \Omega \sin \theta +u \tan \theta}{a} u  + \frac{w}{a}v =-\frac{1}{\rho} \frac{\partial p}{\partial y}+F_y \\
+	\frac {\partial w}{\partial t} + \left(\mathbf{v}\cdot\nabla\right)w - \frac{u^2 + v^2}{a} - u \cdot 2 \Omega \cos \theta =-\frac{1}{\rho} \frac{\partial p}{\partial z}-g+F_z
+\end{eqnarray}
+
+where the terms involving $\Omega$ are the Coriolis terms. The symbol $f$ is often used to represent the Coriolis term that appears in both horizontal momentum equations ($2 \Omega \sin \theta$ ). The equation of state and the continuity, thermodynamic and constituent equations are not modified by the effects of rotation.
+
+%\includegraphics[trim={2cm 10.5cm 0cm 2.cm},clip,width=10.cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/PEs_Sphere_1.pdf}
+%\%label{fig:Spherical-PEs1}
 %	%\setbeamerfont{caption name}{size=\tiny}
 %\caption{\label{fig:blue_rectangle} \tiny PEs on the Sphere}
 
-\includegraphics[trim={2cm 5cm 0cm 4cm},clip,width=10.cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/PEs_Sphere_2.pdf}
-\label{fig:Spherical-PEs2}
+%\includegraphics[trim={2cm 5cm 0cm 4cm},clip,width=10.cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/PEs_Sphere_2.pdf}
+%\label{fig:Spherical-PEs2}
 %	%\setbeamerfont{caption name}{size=\tiny}
 %\caption{\label{fig:blue_rectangle} \tiny PEs on the Sphere}
 
 
 \subsection{Small quantities, big quantities: Scale Analysis}
 
-Cancelling out the smallest terms, we end up with simpler equations and some important approximations, for instance hydrostatic in the vertical momentum equation.
+Some of the terms in the equation set are very small: do take a look at Table \ref{fig:Scale-Analysis-Tables} and you will see that there are differences amounting to several orders of magnitude. We are tempted to neglect the smaller terms, so that we may end up with a simpler equation set. This is in fact what  was commonly done  in the 1960s, when digital computers were far less powerful than today's computers
+Cancelling out the smallest terms, we end up with simpler equations and some important approximations, for instance hydrostatic balance in the vertical momentum equation.
 
-\begin{figure}
-	\includegraphics[trim={0cm 0cm 0cm 1cm},clip,width=11.cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/ScaleAnalysisTables.pdf}
-	\label{fig:Spherical}
+\begin{figure}[h!]
+		\begin{center}
+	\includegraphics[trim={4cm 1.5cm 0cm 1cm},clip,width=18.cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/ScaleAnalysisTables.pdf}
+		\end{center}
 	%	%\setbeamerfont{caption name}{size=\tiny}
-	\caption{\label{fig:blue_rectangle} \tiny Scale Analysis Tables}
+	\caption{\label{fig:blue_rectangle} Scale Analysis Tables for PE terms in the atmosphere (A) and ocean (O)}
+		\label{fig:Scale-Analysis-Tables}
 \end{figure}
 
 \subsection{Simplified PEs after scale analysis}
 
-\includegraphics[trim={2cm 2.5cm 0cm 2.cm},clip,width=12.cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/PEs_Sphere_3.pdf}
-\label{fig:Spherical-PEs1}
+If we make careful use of scale analysis, we can strongly simplify the PEs we want to integrate, by neglecting terms that are small, and do not significantly contribute to balance and/or the time evolution of our prognostic variables. Using the numbers in Table \ref{fig:Scale-Analysis-Tables}, we can, for instance removing terms smaller than $10^{-4}$, we arrive at:
+
+\begin{eqnarray}
+	\frac {\partial u}{\partial t} + \left(\mathbf{v}\cdot\nabla\right)u - \frac{2 \Omega \sin \theta + u \tan \theta}{a} v  = -\frac{1}{\rho} \frac{\partial p}{\partial x}+F_x \\
+	\frac {\partial v}{\partial t} + \left(\mathbf{v}\cdot\nabla\right)v + \frac{2 \Omega \sin \theta +u \tan \theta}{a} u  = -\frac{1}{\rho} \frac{\partial p}{\partial y}+F_y \\
+	0 =-\frac{1}{\rho} \frac{\partial p}{\partial z}-g+F_z
+\end{eqnarray}
+
+%\includegraphics[trim={2cm 2.5cm 0cm 2.cm},clip,width=17.cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/PEs_Sphere_3.pdf}
+%\label{fig:Spherical-PEs1}
 %	%\setbeamerfont{caption name}{size=\tiny}
 %\caption{\label{fig:blue_rectangle} \tiny PEs on the Sphere}
-
 
 \subsection{Simplified PEs after scale analysis, now back on a PLANE}
 
@@ -195,7 +222,6 @@ reference latitude $\phi_0$.
 %\label{fig:Spherical-PEs1}
 %%\setbeamerfont{caption name}{size=\tiny}
 %\caption{\label{fig:blue_rectangle} \tiny PEs on the Sphere}
-
 
 \section{Shallow water equations}
 
@@ -306,25 +332,23 @@ where $\eta$ is the surface elevation, $H$ is fluid depth, $(u,v)$ is
 the depth-averaged horizontal velocity, $f$ is the Coriolis parameter
 and $g$ is the gravitational acceleration. 
 
-~~
-
 Now discretise the problem using regular grids to describe $u$, $v$ and $\eta$ 
 
 e.g., $\eta_{ij}=$ free surface elevation at the $i$th longitude and $j$th
 latitude point.
 
-~
 
-Arakawa\footnote{\BTi Arakawa
+Arakawa\footnote{Arakawa
 	A. (1966) Computational design for long-term numerical integration of
 	the equations of fluid motion: Two-dimensional incompressible
 	flow. Part I. \emph{Journal of Computational Physics}, \textbf{1},
-	119-143.\ETi} proposed a number of staggered finite difference
+	119-143.} proposed a number of staggered finite difference
 grids that can be used to solve the shallow water equations.  
 
 
 \subsection{Arakawa's A grid}
-Simplest and intuitive, but there is the danger of computational modes.
+Simplest and intuitive, but there is the danger of computational modes.\\
+
 \begin{tabular}{lc}
 	\begin{minipage}[c]{0.6\textwidth}
 		\begin{eqnarray*}
@@ -363,7 +387,7 @@ Simplest and intuitive, but there is the danger of computational modes.
 \end{tabular}
 
 \subsection{Arakawa's B grid}
-Stagger the variables, eliminate computational mode, but lots of interpolation...\\
+Stagger the variables, eliminate computational mode, but we pay the cost of lots of interpolation...\\
 
 \begin{tabular}{lc}
 	\begin{minipage}[c]{0.6\textwidth}
@@ -483,44 +507,94 @@ Idea similar to B grid, but we push out $u,v$ instead of $\eta$: stagger the var
 	\label{fig:Arakawa_all}
 \end{figure}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+
+\section{Boundary Conditions (BCs)}
+
+\subsection{Dirichlet, Neuman}
+The \textbf{Dirichlet (or first-type) boundary condition }is a type of boundary condition, named after Peter Gustav Lejeune Dirichlet (1805–1859). When imposed on an ordinary or a partial differential equation, it specifies the values that a solution needs to take on along the boundary of the domain. For example, for an ODE:
+
+\begin{equation}
+	y''+y=0
+\end{equation}
+we could specify $y(a)=\alpha; y(b)=\beta$ on the interval $[a,b]$, where $\alpha$, $\beta$ are given numbers.
+
+The \textbf{Neumann (or second-type) boundary condition} is a type of boundary condition, named after Carl Neumann. When imposed on an ordinary or a partial differential equation, the condition specifies the values in which the derivative of a solution is applied within the boundary of the domain. For example, for the same ODE above:
+
+we could specify $y'(a)=\alpha; y'(b)=\beta$ on the interval $[a,b]$, where $\alpha$, $\beta$ are given numbers.
+
+\subsection{Robin, mixed}
+The \textbf{Robin boundary condition, or third type boundary condition}, is a type of boundary condition, named after Victor Gustave Robin (1855–1897). When imposed on an ordinary or a partial differential equation, it is a specification of a linear combination of the values of a function and the values of its derivative on the boundary of the domain. For instance:\\
+
+\begin{equation}
+	au+b\frac{\partial u}{\partial n}y=g \textrm{ on } \partial \Omega
+\end{equation}
+
+
+\begin{figure}[h!]
+	\begin{center}
+		\includegraphics[width=0.2\textwidth]{Figures/440px-Mixed_boundary_conditions.png}
+	\end{center}
+	\caption{Mixed boundary conditions}
+\end{figure}
+
+
+In 1-D, on the interval $\Omega=[0,1]$ we could for instance have:
+
+\begin{eqnarray}
+	au(0)-Bu'(0)=g(0) \\
+	au(1)+Bu'(1)=g(1)
+\end{eqnarray}
+
+This contrasts with \textbf{mixed boundary conditions}, which are boundary conditions of different types specified on different subsets of the boundary.\\
+
+\clearpage
 
 \section{Excursus: SWEs in 1D}
 
-\begin{figure}
-\includegraphics[trim={0cm 0.5cm 0cm 2.cm},clip,width=11.cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/Adv_2_SWEs_1.pdf}
+Before carrying out analysis of the different numerical approaches to integrating the 2D SWEs, can we predict what their behaviour will be, based on experience we have gained before? Let us start with advection in 1D, and build from here.
+
+\begin{figure}[h!]
+\includegraphics[trim={0cm 0.5cm 0cm 2.cm},clip,width=16.cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/Adv_2_SWEs_1.pdf}
 \label{fig:Spherical-PEs1}
 %	%\setbeamerfont{caption name}{size=\tiny}
-\caption{\label{fig:blue_rectangle} \tiny PEs on the Sphere}
-\end{figure}
-
-\subsection{Resolving waves on a grid} 
-\begin{figure}
-\includegraphics[trim={0cm 0.cm 0cm 0.cm},clip,width=9.cm]{/Users/vidale/Projects/Teaching/MTMW14/"2019 module/Waves resolved on a Grid".png}
-\label{fig:Spherical-PEs2}
-%	%\setbeamerfont{caption name}{size=\tiny}
-\caption{\label{fig:blue_rectangle} \tiny PEs on the Sphere}
+\caption{\label{fig:blue_rectangle} From linear non non-linear advection in 1D}
 \end{figure}
 
 \subsection{How 1D SWEs help to understand grid stagger} 
-\begin{figure}
-\includegraphics[trim={0cm 0.5cm 0cm 2.cm},clip,width=11.cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/Adv_2_SWEs_2.pdf}
+If we want to move from the linear problem to the non-linear problem, we must add an equation for the time change of velocity.
+
+\begin{figure}[h!]
+\includegraphics[trim={0cm 0.5cm 0cm 2.cm},clip,width=15.cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/Adv_2_SWEs_2.pdf}
 \label{fig:Spherical-PEs2}
 %	%\setbeamerfont{caption name}{size=\tiny}
-\caption{\label{fig:blue_rectangle} \tiny PEs on the Sphere}
+\caption{\label{fig:blue_rectangle} 1D Shallow Water Equations}
 \end{figure}
 
-\begin{figure}
-\includegraphics[trim={0cm 0.5cm 0cm 2.cm},clip,width=11.cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/Adv_2_SWEs_3.pdf}
-\label{fig:Spherical-PEs2}
-%	%\setbeamerfont{caption name}{size=\tiny}
-\caption{\label{fig:blue_rectangle} \tiny PEs on the Sphere}
+\subsection{Resolving waves on a grid} 
+
+We must always be aware of the dangers of under-representing our waves: we saw aliasing in the time domain, and the same principle applies here, for space.
+
+\begin{figure}[h!]
+	\includegraphics[trim={0cm 0.cm 0cm 0.cm},clip,width=15.cm]{/Users/vidale/Projects/Teaching/MTMW14/"2019 module/Waves resolved on a Grid".png}
+	\label{fig:Spherical-PEs2}
+	%	%\setbeamerfont{caption name}{size=\tiny}
+	\caption{\label{fig:blue_rectangle} Aliasing in 1D (example carried from the time domain).}
 \end{figure}
 
-\begin{figure}[h]
-\includegraphics[trim={0cm 0.5cm 0cm 1.cm},clip,width=11.cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/Adv_2_SWEs_4.pdf}
+\begin{figure}[h!]
+\includegraphics[trim={0cm 2cm 0cm 2.cm},clip,width=15.cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/Adv_2_SWEs_3.pdf}
 \label{fig:Spherical-PEs2}
 %	%\setbeamerfont{caption name}{size=\tiny}
-\caption{\label{fig:blue_rectangle} \tiny PEs on the Sphere}
+\caption{\label{fig:blue_rectangle} SWEs with staggering in 1D}
+\end{figure}
+
+\begin{figure}[h!]
+\includegraphics[trim={0cm 0.5cm 0cm 1.cm},clip,width=15.cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/Adv_2_SWEs_4.pdf}
+\label{fig:Spherical-PEs2}
+%	%\setbeamerfont{caption name}{size=\tiny}
+\caption{\label{fig:blue_rectangle} SWEs with staggering in 1D: the dispersion problem}
 \end{figure}
 
 \subsection{Exercise: analytical versus numerical solutions} 
@@ -538,79 +612,7 @@ Start from the two shallow water equations on the previous page. Impose the wave
 	\item Expand your thinking to Numerical Weather Prediction models that might be using such schemes: discuss what operational problems we may encounter in the presence of a $\sin$ in such numerical predictions.
 \end{enumerate}
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newpage
-
-\section{Boundary Conditions (BCs)}
-
-\subsection{Dirchlet, Neuman}
-\subsection{Different types of BC: what they are and what they do}
-
-The \textbf{Dirichlet (or first-type) boundary condition }is a type of boundary condition, named after Peter Gustav Lejeune Dirichlet (1805–1859). When imposed on an ordinary or a partial differential equation, it specifies the values that a solution needs to take on along the boundary of the domain. For example, for an ODE:
-
-\begin{equation}
-	y''+y=0
-\end{equation}
-we could specify $y(a)=\alpha; y(b)=\beta$ on the interval $[a,b]$, where $\alpha$, $\beta$ are given numbers.
-
-\medskip
-
-The \textbf{Neumann (or second-type) boundary condition} is a type of boundary condition, named after Carl Neumann. When imposed on an ordinary or a partial differential equation, the condition specifies the values in which the derivative of a solution is applied within the boundary of the domain. For example, for the same ODE above:
-
-we could specify $y'(a)=\alpha; y'(b)=\beta$ on the interval $[a,b]$, where $\alpha$, $\beta$ are given numbers.
-
-
-\subsection{Robin, mixed}
-
-
-The \textbf{Robin boundary condition, or third type boundary condition}, is a type of boundary condition, named after Victor Gustave Robin (1855–1897). When imposed on an ordinary or a partial differential equation, it is a specification of a linear combination of the values of a function and the values of its derivative on the boundary of the domain. For instance:\\
-
-\begin{equation}
-	au+b\frac{\partial u}{\partial n}y=g \textrm{ on } \partial \Omega
-\end{equation}
-
-
-\begin{figure}
-	\begin{center}
-		\includegraphics[width=0.2\textwidth]{Figures/440px-Mixed_boundary_conditions.png}
-	\end{center}
-	\caption{Mixed boundary conditions}
-\end{figure}
-
-
-In 1-D, on the interval $\Omega=[0,1]$ we could for instance have:
-
-\begin{eqnarray}
-	au(0)-Bu'(0)=g(0) \\
-	au(1)+Bu'(1)=g(1)
-\end{eqnarray}
-
-This contrasts with \textbf{mixed boundary conditions}, which are boundary conditions of different types specified on different subsets of the boundary.
-
-\section{Real world applications: variable staggering in W \& C models}
-\subsection{Unified Model: New Dynamics vs EndGame grids} 
-
-The choice of grid stagger makes a difference even in very complex GCMs. Here is an example of simply switching the variables defined at the poles.
-
-	\begin{tabular}{cc}
-			\centering
-			\includegraphics[width=0.75\textwidth]{Figures/New_Dynamics_vs_EndGame_grids.pdf}
-		\end{tabular}
-
-This is, in fact, not at all a simple matter: implementation took years, but the consequences were profound in terms of scalability and numerical stability.
-
-\subsection{Unified Model DynCore evolution: stability and scalability} 
-	
-	The evolution from New Dynamics (2002) to EndGame (2014) meant greater scalability, so that we can use up to 12'000 cores efficiently, as well as numerical stability, which makes long climate simulations at high-resolution (up to N2560, 5km) feasible.
-	
-			\begin{tabular}{cc}
-					\centering
-					\includegraphics[width=0.5\textwidth]{Figures/EndGame_stability.pdf}
-					\includegraphics[width=0.5\textwidth]{Figures/EndGame_scalability_2.png}
-				\end{tabular}
-				
-				
+\clearpage
 
 \section{Time integration for 2D SWE}
 \subsection{Staggered time integration schemes for the SWE}
@@ -619,10 +621,7 @@ The advection-diffusion equation in one dimension is a useful prototype with whi
 
 \vspace{0.2cm}For equations that support more than one type of process, {\bf the stability criterion will depend on the fastest propagating processes}. However, the fastest propagating phenomena might be of little physical importance and therefore the stability condition might be too constraining. For instance, the linear shallow water equations allow the existence of inertia-gravity and Rossby waves. The propagation speed of the former is about $\sqrt{gH} \approx 100 $ ms$^{-1}$, which is quite large. For Rossby waves, the propagation is of the order of $\beta R_D^2$, which is much smaller. The time integration scheme will therefore greatly depend on the physical processes of interest. 
 
-\hspace{2cm}
-
-
-\subsection{Reminder from Lecture 5: a semi-implicit scheme for SWEs}
+\subsection{A preview of Lecture 5: a Semi-Implicit (SI) scheme for SWEs}
 
 The shallow water equations linearised about a state of rest are below
 discretised using a leapfrog scheme for Coriolis terms but a
@@ -759,3 +758,35 @@ It can be seen that for each set of equations, the Coriolis term is first discre
 \begin{center}	
 	\includegraphics[width=0.8\textwidth]{Figures/TC-precipitation}
 \end{center}
+
+
+\section{Real world applications: variable staggering in W \& C models}
+\subsection{Unified Model: New Dynamics vs EndGame grids} 
+
+The choice of grid stagger makes a difference even in very complex GCMs. Here is an example of simply switching the variables defined at the poles.
+
+\begin{tabular}{cc}
+	\centering
+	\includegraphics[width=0.75\textwidth]{Figures/New_Dynamics_vs_EndGame_grids.pdf}
+\end{tabular}
+
+This is, in fact, not at all a simple matter: implementation took years, but the consequences were profound in terms of scalability and numerical stability.
+
+\subsection{Unified Model DynCore evolution: stability and scalability} 
+
+The evolution from New Dynamics (2002) to EndGame (2014) meant greater scalability, so that we can use up to 12'000 cores efficiently, as well as numerical stability, which makes long climate simulations at high-resolution (up to N2560, 5km) feasible.
+
+\begin{figure}[h!]
+	\centering
+	\begin{subfigure}[b]{0.9\textwidth}
+		\includegraphics[width=1.\textwidth]{Figures/EndGame_stability.pdf}
+		\caption{}
+		\label{fig:UM-Instabilities} 
+	\end{subfigure}
+	\begin{subfigure}[b]{0.9\textwidth}
+		\includegraphics[width=1.\textwidth]{Figures/EndGame_scalability_2.png}
+		\caption{}
+		\label{fig:UM-scalablity}
+	\end{subfigure}
+	\caption{(a) Numerical solutions for the Unified model around the South Pole, using the New Dynamics and EndGame dynamical cores; (b) the parallel scalability of the two DCs.}
+\end{figure}

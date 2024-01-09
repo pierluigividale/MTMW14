@@ -1,0 +1,708 @@
+% ----------------------------------------------------------------------------------------
+% 	APPENDICES
+% ----------------------------------------------------------------------------------------
+
+\appendix
+\chapter{Stability analysis in 1D}
+
+\section{Simple advection}
+
+
+\section{Finite Difference Methods: 1D Examples}
+\subsection{The Advection Equation}
+\textsl{Partial differential equations, order of approximation, von
+	Neumann stability analysis, computational modes, numerical
+	dispersion, numerical dissipation.}
+
+In many cases we need to solve equations containing
+derivatives with respect to \emph{more than one} variable (e.g.~time,
+$t$, and space, $x$).  These are called \emph{partial} differential
+equations (PDEs). The solution of partial differential equations using
+numerical methods is probably the most important and also the most
+complex part of numerical analysis.
+
+A quick point about notation before we begin.  Derivatives in ODEs are
+written with the `straight~d',
+\BEQ \frac{\mathrm{dT}}{\mathrm{d}t}  \;\;\; , \EEQ
+but {\em partial derivatives} in PDEs are written with the `curly~d',
+\BEQ \frac{\partial T}{\partial t} \;\;\; , \;\;\; \frac{\partial T}{\partial x} . \EEQ
+The first means the derivative of $T$ with respect to time at a fixed
+location ($x$) and the second means the derivative of $T$ with respect
+to $x$ at a fixed time.
+
+In atmosphere or ocean science we often consider quantities that are
+carried with the flow without changing. Examples include the mixing
+ratio of an unreactive trace gas or potential temperature. Such
+quantities can be used to mark air parcels and follow them and
+therefore they are called {\em tracers}. If the wind field ${\bf
+	u}({\bf x}, t)$ is known the {\em trajectories} of air parcels can be
+found by numerically integrating the ODE:
+\begin{equation}
+	\frac{D{\bf x}}{Dt}={\bf u}({\bf x}, t)
+\end{equation}
+where ${\bf x}$ is the position of an air parcel and the capital
+$D/Dt$ is used to mean rate of change following an air parcel. 
+The tracer value, $\theta_j$, does not change following parcel $j$ so
+if we know the values $\theta_j$ for all parcels at time $t_i$ and
+their initial positions, we can use their trajectories
+to infer the new distribution of tracer at a later time $t_f$. A model
+based on following fluid parcels is called a {\em Lagrangian model}.
+
+However, many atmospheric processes occur relative to a fixed
+position. Examples include a pollution source from a city and
+temperature fluxes from the land or ocean. Sometimes it is better
+devise a model which considers atmospheric changes relative to fixed
+points. These are called {\em Eulerian
+	models}. What happens when air masses carrying tracers pass over a
+point?
+
+\begin{figure}
+	\begin{center}
+		\scalebox{0.5}{\includegraphics{Figures/advection.pdf}}
+	\end{center}
+	\caption{\textsl{Temperature at a point increases when wind blows from warm side.}}
+	\label{fig:ken}
+\end{figure}
+
+In Figure~\ref{fig:ken}, the wind is bringing air from the $-x$
+direction. If the air `upstream' is warmer than the air `downstream',
+the observer will see the temperature increasing. The rate of change of
+temperature observed must depend on both the magnitude of this
+gradient and the speed at which the air is moving, {\em i.e.,}
+\begin{equation}
+	\frac{\partial T}{\partial t} =- u \frac{\partial T}{\partial x}.
+	\label{advectioncont}
+\end{equation}
+where the left hand side means the rate of change at a given position
+$x$ and the right hand side is called the {\em advection term}. $u$ is
+the wind component and $\partial T/\partial x$ means the gradient in
+the $x$-direction at a given time. 
+
+\subsubsection{Order of approximation in finite differences}
+
+In the special case of uniform velocity we can find a solution of the
+form $T(x,t)=F(x-ut)$, but for general flows we cannot find an analytic
+solution. Perhaps the simplest numerical solution is obtained using a
+finite difference method where derivatives are replaced by finite
+differences. Time and space are divided into finite segments, the time
+step $\Delta t$ and a space step $\Delta x$, and the points between
+steps are denoted $t_n=n\Delta t$ and $x_i=i\Delta x$.  We will use
+the shorthand: 
+\BEQ T(x_i,t_n) = T_i^n . \EEQ 
+where superscript $n$ in
+$T_i^n$ refers to the $n$th timestep.  It does \emph{not} mean $T_i$
+to the power of $n$.
+
+The advection equation contains $\partial T / \partial t$ and
+$\partial T / \partial x$. There are three obvious ways of
+discretizing $\partial T / \partial t$ at the $n$th timestep and $i$th
+spatial point:
+\BEQ \frac{T_i^{n+1} - T_i^n}{\Delta t} \;\;\; , \;\;\; 
+\frac{T_i^n - T_i^{n-1}}{\Delta t} \;\;\; , \;\;\;
+\frac{T_i^{n+1} - T_i^{n-1}}{2\Delta t} . \EEQ
+
+These are called the forward difference, backward difference and
+centred difference in time, respectively.  Similarly, there are three
+obvious ways of discretizing $\partial T / \partial x$ at the $n$th
+timestep and $i$th spatial point:
+\BEQ \frac{T_{i+1}^n - T_i^n}{\Delta x} \;\;\; , \;\;\; 
+\frac{T_i^n - T_{i-1}^n}{\Delta x} \;\;\; , \;\;\; 
+\frac{T_{i+1}^n - T_{i-1}^n}{2\Delta x} . \EEQ
+
+By combining these possible discretizations --- three for $\partial T
+/ \partial t$ and three for $\partial T / \partial x$ --- we could
+write down \emph{nine} possible numerical schemes for the advection
+equation.  At first sight the nine schemes all seem equally
+reasonable, but they are not. 
+
+Firstly, the centred scheme has a higher {\em order of
+	approximation}. This can be seen by expressing temperature at position
+$x+\Delta x$ in terms of a Taylor expansion about position $x$:
+\BEQ T(x+\Delta x) = T(x) + T'(x)\Delta x + \frac{1}{2} T''(x) (\Delta x)^2 + 
+\frac{1}{6} T'''(x) (\Delta x)^3 +O(\Delta x^4) \EEQ
+
+where $T'=\partial T/\partial x$, $T''=\partial^2 T/\partial x^2$ and so on.
+Re-arrangement shows that:
+\BEQ
+T'(x)=\frac{ T(x+\Delta x)-T(x)}{\Delta x}-\frac{1}{2} T''(x) \Delta x+...
+\EEQ
+
+so the error in approximating the first derivative by a forward
+difference is proportional to $\Delta x$ or {\em first order} assuming
+that temperature variations have a characteristic lengthscale much
+longer than the grid-scale ($\Delta x/L\ll 1$)\footnote{Scaling
+	arguments assume wavelike structure and $\partd{}{x}\sim
+	\frac{1}{L}=k$.}.
+
+The order of approximation for the centred difference is obtained by subtracting the expansion for $T(x-\Delta x)$:
+\BEQ T(x-\Delta x) = T(x) - T'(x)\Delta x + \frac{1}{2} T''(x) (\Delta x)^2 - 
+\frac{1}{6} T'''(x) (\Delta x)^3 +O(\Delta x^4) \EEQ
+
+from $T(x+\Delta x)$ giving a second order leading error $\sim
+\frac{1}{3}T'''(x)\Delta x^2$. If the temperature variations are
+smooth, the higher order scheme will be more accurate.
+
+\subsubsection{Numerical stability: The FTCS advection scheme}
+
+Let us try using the forward difference in time and the
+centred difference in space (FTCS for short).
+The scheme is:
+\BEQ \frac{T_{i}^{n+1}-T_{i}^{n}}{\Delta t} + u \frac{T_{i+1}^{n} - T_{i-1}^{n}}{2\Delta x} = 0 \EEQ
+We can rewrite this equation to get:
+\BEQ T_{i}^{n+1} = T_{i}^{n} - \frac{u\Delta t}{2\Delta x} \left[ T_{i+1}^{n} - T_{i-1}^{n} \right]
+\label{ftcsadvection}\EEQ
+
+At each time step, $n$, we apply this equation at each spatial point,
+$i$.  A computer program to do this would therefore have a loop over
+$i$ \emph{within} a loop over $n$.
+
+A possible way of examining the stability of this scheme is the
+\emph{von Neumann stability analysis}.
+To understand how this works, first note that a particular solution
+of the continuous advection equation (\ref{advectioncont}) is
+\BEQ T(x,t)=\cos k(x-ut) .\EEQ
+{\em Exercise: Show that this is indeed a solution.}
+
+The von Neumann method starts with a {\em trial} solution:
+\BEQ T_i^n = \cos kx_i , \EEQ
+and considers what the numerical scheme does over one time step.
+We know that the numerical scheme is just an approximation:
+it might change the amplitude of the cosine
+wave and the phase shift might be wrong.  Let us write 
+the outcome from the numerical scheme after one time step as:
+\BEQ T_i^{n+1} = A\cos (kx_i-\phi),\EEQ
+where $A$ and $\phi$ are unknowns that we want to work out.  If our
+numerical scheme were exact, we would find $A=1$ and $\phi=k u \Delta
+t$.  When we substitute the above equations for $T_i^n$ and
+$T_i^{n+1}$ in the numerical scheme (\ref{ftcsadvection}) we find:
+\BEQ A\cos (kx_i-\phi) = \cos kx_i - \frac{u \Delta t}{2\Delta x}\left( \cos kx_{i+1} - \cos kx_{i-1} \right). \EEQ
+Remembering that $x_{i+1}=x_i+\Delta x$ and $x_{i-1}=x_i-\Delta x$,
+and using the fact that $\cos (a+b) = \cos a\cos b -\sin a\sin b$,
+we can rearrange this equation to find:
+\BEQ A (\cos kx_i\cos\phi +\sin kx_i\sin\phi) = \cos kx_i + \frac{u\Delta t}{\Delta x}\sin kx_i\sin k\Delta x. \EEQ
+This equation should be valid for all $x_i$.
+Equating the terms in $\cos kx_i$ and $\sin kx_i$ we find, respectively:
+\begin{eqnarray}
+	A \cos \phi & = & 1 \\
+	A \sin \phi & = & \frac{u\Delta t}{\Delta x}\sin k\Delta x .
+\end{eqnarray}
+By adding the squares of these equations we find that
+\BEQ A^2 = 1+\left(\frac{u\Delta t}{\Delta x}\sin k\Delta x\right)^2. \EEQ 
+We see that the amplification factor $A$ is always bigger than one: in this
+sense the scheme is \emph{unconditionally unstable} and the solutions
+will amplify every timestep.
+
+\subsubsection{Computational modes: The CTCS advection scheme}
+
+So it's back to the drawing board. Let us try using the centred difference in time and the
+centred difference in space (CTCS for short):
+\BEQ \frac{T_{i}^{n+1}-T_{i}^{n-1}}{2\Delta t} + u \frac{T_{i+1}^{n} - T_{i-1}^{n}}{2\Delta x} = 0 \EEQ
+We can rewrite this equation to get:
+\BEQ T_{i}^{n+1} = T_{i}^{n-1} - \frac{u\Delta t}{\Delta x} \left[ T_{i+1}^{n} - T_{i-1}^{n} \right] \label{ctcsmodel} \EEQ
+The quantity $u\Delta t / \Delta x$ is dimensionless.  It appears so often in
+numerical schemes for the advection equation that it has its own name --- the
+\emph{Courant number}:
+\BEQ \alpha = \frac{u\Delta t}{\Delta x} .\EEQ
+
+The von Neumann stability analysis for the CTCS scheme is most easily
+done using complex notation for the trial solution, 
+\BEQ T_i^n=e^{ikx_i}\;\; ; \;\;\;\; T_i^{n+1}=ST_i^n \EEQ
+where $S=Ae^{i\phi}$ expresses 
+the change in amplitude and phase over one time-step.
+Plugging the trial solution into the model (\ref{ctcsmodel}) yields:
+\BEQ
+S=S^{-1}-\alpha\left[ e^{ik\Delta x}-e^{-ik\Delta x} \right]
+\EEQ 
+
+which can be re-arranged as a quadratic equation
+for the complex factor, $S$: 
+\BEQ
+S^2+S\alpha 2i\sin k\Delta x -1=0
+\EEQ
+
+which has two roots:
+\BEQ
+S_{\pm}=-i \alpha \sin k\Delta x\pm \sqrt{1-\alpha^2 \sin^2 k\Delta x}
+\label{asoln}
+\EEQ
+
+If the Courant number $|\alpha | \le 1$, the number under the root must
+be positive since $\sin^2 k\Delta x \le 1$. 
+
+{\em Exercise: Show that when $|\alpha | \le 1$ the magnitude of the
+	amplification factor $|S|^2=S^* S=1$, meaning that the scheme is
+	stable. However, when $|\alpha | > 1$ the $S_{-}$ solution is
+	unstable.}
+
+This is an improvement on the FTCS scheme, which was unconditionally
+unstable. This is the single most important result in the numerical
+modelling of fluid flows.  It is called the Courant-Friedrichs-Lewy
+(CFL) condition.  What it boils down to is that, for a given
+grid-spacing $\Delta x$, the time step must satisfy \BEQ \Delta t <
+\frac{\Delta x}{u} . \EEQ The physical interpretation of this condition
+is that \emph{the scheme is unstable if fluid parcels move more than
+	one gridbox in one timestep}.
+
+The solution with +ve real part in (\ref{asoln}) does not change sign
+every timestep and is called the {\em physical mode}. However, the
+solution with the -ve square root alternates sign every step which is
+unphysical behaviour and is called the {\em computational mode}. The
+relative amplitudes of the two modes is determined by projection from
+the initial conditions. The implication is that although the CTCS
+scheme is stable for $|\alpha | \le 1$ we can expect unphysical
+oscillations that are worst at the grid-scale (where $\sin k\Delta
+x=1$).
+
+\begin{figure}
+	%\begin{center}
+	\mbox{\scalebox{0.1}{\includegraphics{Figures/adv-ctcs.png}}
+		\scalebox{0.1}{\includegraphics{Figures/adv-upstream.png}}}
+	%\end{center}
+	\caption{\textsl{Comparing numerical solutions for the advection of a top-hat distribution by uniform flow. Left: CTCS solution exhibits unphysical undershoots and overshoots. Right: Upstream scheme remains monotonic.}}
+	\label{fig:ctcs}
+\end{figure}
+
+
+\subsubsection{Numerical dispersion}
+
+The phase shift in one time-step for a wave moving with speed $c$
+would be $\phi=-kc\Delta t$. By comparing the imaginary part of
+$e^{i\phi}$ with (\ref{asoln}) we obtain the phase speed as
+represented by the numerical scheme: 
+\BEQ kc\Delta t=\sin^{-1}\left\{
+\alpha \sin k\Delta x \right\} \EEQ
+
+While for the exact solution the tracer pattern must move with the
+uniform velocity $u$, irrespective of its shape or lengthscale, the
+numerical solution moves with a phase speed dependent on the
+wavenumber of the tracer pattern, $k$. The ratio of numerical to exact speed, $\alpha^*/\alpha$ is plotted in Figure \ref{fig:disperse}, which shows that long waves ($k\Delta x \ll 1$) move almost at the flow speed, but short waves move much more slowly.\\
+Waves in the CTCS numerical model are {\em
+	dispersive}, even though they should not be. Note also that the
+computational mode moves with the same phase speed as the physical
+mode but in the opposite direction to the flow. The net effect is
+severe for sharp features where small scale waves propagate out behind
+the leading edge of tracer.
+
+%\begin{figure}
+\begin{figure}
+	%\centering
+	\scalebox{0.19} {\includegraphics{Figures/alphastar-vs-kdx.png}}
+	\caption{\textsl{Ratio of numerical speed to flow speed as a function of wavenumber, $k\Delta x$, for the CTCS numerical scheme.}}
+	\label{fig:disperse}
+\end{figure}
+%\end{figure}
+
+
+\subsubsection{Numerical dissipation}
+
+The CTCS scheme maintained wave amplitude for all
+wavenumbers. However, many schemes result in a decay of amplitude with
+time which is faster at short wavelengths. One example is the {\em
+	first order upstream scheme}:
+\BEQ
+\frac{q_i^{n+1}-q_i^n}{\Delta t}+u\frac{q_{i}^n-q_{i-1}^n}{\Delta x}=0
+\EEQ
+
+which is ``upstream'' for $u>0$ since the interval $x_{i-1}\rightarrow
+x_i$ is upstream of point $x_i$. 
+
+{\em Exercise: Show using von Neumann stability analysis that the
+	upstream scheme results in a wave amplitude $|S|$ that decays with
+	time.}
+
+In the model, short waves decay more rapidly than long waves, with the
+net result that the tracer distribution becomes smoother with
+time. This effect is called {\em numerical dissipation} or {\em
+	numerical diffusion}. The advantage is that unphysical overshoots are
+eliminated (Fig.~\ref{fig:ctcs}).
+
+\subsection{The Diffusion Equation}
+
+\textsl{Diffusion, partial differential equations, 
+	von Neumann stability analysis, boundary conditions.}
+
+A second major transport process operating in gases, liquids and
+solids is diffusion. As an example, think of the layers of soil near
+the surface of the Earth. In the top layers soil temperature varies
+with air temperature, but deep down below the surface, the temperature
+is more-or-less constant. Over time, heat is transferred between the
+surface and lower levels.
+
+There is a {\em flux} of heat (denoted by $F$) through the surface
+of the Earth defined so that $F>0$ implies a flow of heat in the
+direction of increasing depth ($z$). Each layer of soil will have a
+flux of heat in from above and a flux of heat out from below. If
+the flux in and the flux out are equal, the temperature of the layer
+will remain constant. The temperature will only change if there is a
+{\em flux gradient}. We can define $F$ so that the rate of change of
+temperature $T$ is equal to minus the gradient of $F$,
+\begin{equation}
+	\partd{T}{t} = -\partd{F}{z}.
+	\label{eq:flux-tend}
+\end{equation}
+{\em i.e.}, if more heat flux enters than leaves a slab of soil,
+the temperature of the slab must increase.
+
+When an object is placed into contact with an environment with lower
+temperature, heat can flow from hot to cold, as with the cup of tea
+example. In a solid, molecules in hot regions jiggle more than in cold
+regions and the heat is transferred as the jiggling molecules push and
+pull their neighbours through intermolecular forces. In a fluid,
+molecules can move and collide with each other resulting in a {\em
+	random walk}. If a molecule travels from a hot region and collides
+with a molecule in a neighbouring colder region it will transfer some
+energy from hot to cold. Here we
+assume that all these physical processes result in a flux that is {\em
+	proportional} to the temperature gradient locally, {\em i.e.,} giving
+the {\em flux-gradient relation}:
+\begin{equation}
+	F = -D(z) \partd{T}{z}.
+	\label{eq:flux-val}
+\end{equation}
+The {\em diffusion coefficient} $D(z)$ is positive and the `--' sign
+shows us that the flux is {\em down-gradient} from hot to cold.
+
+Plugging eqn~(\ref{eq:flux-val}) into eqn~(\ref{eq:flux-tend})
+gives:
+\begin{eqnarray}
+	\partd{T}{t} & = & \partd{}{z} \left(
+	D(z) \partd{T}{z}
+	\right)		\\
+	& = & D \partd{^{2}T}{z^2}
+	~~\mbox{if $D$ is constant}
+	\label{diffeqn}
+\end{eqnarray}
+Physically, the diffusion equation can be interpreted as describing
+the way heat travels from warm areas to cold areas. The diffusion
+equation will take an initial temperature distribution $T(z)$ and
+`smear it out' over time, eventually leaving a constant temperature
+gradient $\partial T/\partial z$.
+
+This is a \emph{second-order} partial differential
+equation, because $T$ is differentiated twice with respect to $z$ on the 
+right-hand side.  Compare this with the advection equation from the previous 
+chapter, which was a \emph{first-order} partial differential equation.
+The diffusion equation is therefore slightly more complicated.
+
+{\em Exercise: Show that $T(z,t) = \mathrm{e}^{-D k^2 t} \cos kz$ is a
+	solution of the diffusion eqn~(\ref{diffeqn}).}
+
+\subsubsection{Numerical schemes for the diffusion equation}
+
+Let us look at how we might solve the diffusion equation on a
+computer. One way forward is again to replace the derivatives with
+finite differences. As before, we can consider a series of {\em
+	snapshots} of the temperature $T$ each separated by the time-step
+$\Delta t$. The depth $z$ can be similarly {\em discretised}: we can divide
+the distance between the surface and bottom of the soil at $z=H$ into
+$J$ slabs of depth $\Delta z=H/J$ and consider the characteristic
+temperature of each slab (Fig.~\ref{soil}).
+
+\begin{figure}
+	\begin{center}
+		\scalebox{0.15}{\includegraphics{Figures/temp-diffuse.png}}
+	\end{center}
+	\caption{\textsl{Diffusion of heat through soil near the Earth's surface.}}
+	\label{soil}
+\end{figure}
+
+As in the previous chapter, to shorten the equations we define
+\BEQ T(z_i,t_n) = T_i^n . \EEQ
+To discretize the right-hand side of the diffusion equation, 
+consider the following two Taylor expansions:
+\BEQ T(z+\Delta z) = T(z) + T'(z)\Delta z + \frac{1}{2} T''(z) (\Delta z)^2 + 
+\frac{1}{6} T'''(z) (\Delta z)^3 +O(\Delta z^4) \EEQ
+\BEQ T(z-\Delta z) = T(z) - T'(z)\Delta z + \frac{1}{2} T''(z) (\Delta z)^2 - 
+\frac{1}{6} T'''(z) (\Delta z)^3 +O(\Delta z^4) \EEQ
+Adding these two expansions together we find that
+\BEQ T(z+\Delta z) + T(z-\Delta z) = 2T(z) + T''(z) (\Delta z)^2 +O(\Delta z^4), \EEQ
+which we can re-arrange to give
+\BEQ T''(z) = \frac{T(z+\Delta z) - 2T(z) + T(z-\Delta z)}{(\Delta z)^2}+O(\Delta z^2) .\EEQ
+Our discretization of the second derivative $\partial^2 T / \partial z^2$ is therefore a {\em second order approximation} and 
+at the $i$th grid-point and the $n$th time-point can be written:
+\BEQ \frac{T_{i+1}^n-2T_i^n+T_{i-1}^n}{(\Delta z)^2} . 
+\label{d2t}
+\EEQ
+To discretize the left-hand side of the diffusion equation, we could choose
+a forward in time, backward in time, or centred in time scheme.  Here, we will
+only study the first of these three possible choices, the FTCS scheme:
+\BEQ \frac{T_i^{n+1}-T_i^n}{\Delta t} = D \; \frac{T_{i+1}^n-2T_i^n+T_{i-1}^n}{(\Delta z)^2} 
+\label{ftcs:diff}
+\EEQ
+which can be re-arranged to give
+\BEQ T_i^{n+1} = T_i^n + \gamma ( T_{i+1}^n -2T_i^n + T_{i-1}^n ) \label{diffusionscheme}\EEQ
+where we have defined a dimensionless model parameter
+\BEQ \gamma = \frac{D\Delta t}{(\Delta z)^2} . \EEQ
+
+\subsubsection{Stability analysis}
+
+As for advection, the stability of our numerical scheme can
+be assessed using von Neumann stability analysis.  Remember that an
+exact solution of the continuous diffusion equation (\ref{diffeqn}) is
+$T(z,t) = \mathrm{e}^{-D k^2 t} \cos kz$.  As $t$ increases, the phase
+of the cosine wave does not change but its amplitude is reduced.  We
+must determine if our numerical scheme also has these properties.
+Once again we begin with the {\em trial solution}:
+\BEQ T_i^n = \cos kz_i , \EEQ
+and examine the outcome from the numerical scheme after one time step:
+\BEQ T_i^{n+1} = A\cos (kz_i-\phi),\EEQ
+where $A$ and $\phi$ are the unknown amplitude and phase that we want
+to work out.  When we substitute these expressions for $T_i^n$ and
+$T_i^{n+1}$ into the numerical scheme (\ref{diffusionscheme}) we find:
+\BEQ A\cos (kz_i-\phi) = \cos kz_i + \gamma ( \cos kz_{i+1} - 2\cos kz_i + \cos kz_{i-1} ). \EEQ
+Remembering that $z_{i+1}=z_i+\Delta z$ and $z_{i-1}=z_i-\Delta z$,
+we find:
+\BEQ A (\cos kz_i\cos\phi +\sin kz_i\sin\phi) = \cos kz_i + 2\gamma (\cos k\Delta z -1) \cos kz_i . \EEQ
+Since this equation must be valid for all $z_i$, we can equate
+the terms in $\cos kz_i$ and $\sin kz_i$ to find, respectively:
+
+\begin{eqnarray}
+	A \cos \phi & = & 1 + 2\gamma (\cos k\Delta z -1) \\
+	A \sin \phi & = & 0 .
+\end{eqnarray}
+
+Since we are not interested in the case when $A=0$, the second of
+these equations tells us that $\phi=0$.  In other words, the phase of
+the cosine wave is not changed by our numerical scheme.  This is good
+news because it agrees with the true solution.  Substituting $\phi=0$
+into the first equation, and remembering that $\cos 0=1$,
+we obtain a formula for the amplification factor:
+\BEQ A = 1 + 2\gamma (\cos k\Delta z -1) \EEQ
+If our numerical scheme is to be stable for a general diffusion
+problem, then it must be stable for all possible values of $k$.  There
+will always be a value of $k$ for which $\cos k\Delta z = -1$, and it
+is this extreme value of $k$ that will determine the stability.  For
+this value of $k$ the amplification factor becomes
+\BEQ A = 1 -4 \gamma .\EEQ
+The stability of the numerical solution depends solely on the value of
+$\gamma$.  There are three cases we need to consider:
+
+\begin{tabbing}
+	$0<\gamma < \frac{1}{4}$~~~~ \= Implies $0< A<1$: the solution decays monotonically like the exact solution \\
+	$\frac{1}{4}<\gamma < \frac{1}{2}$ \> Implies $-1< A<0$: the solution decays but oscillates unphysically \\
+	$\gamma > \frac{1}{2}$ \> Implies $A<-1$: the solution is unstable and oscillates with growing amplitude
+\end{tabbing}
+
+We conclude that the FTCS numerical scheme for the diffusion equation is
+\emph{conditionally stable}.  The condition for realistic behaviour is
+$\gamma<1/4$ or equivalently:  
+\BEQ \Delta t < \frac{(\Delta z)^2}{4D} . \EEQ
+
+\subsection{Boundary conditions}
+
+We need to consider \emph{boundary conditions} when solving the
+diffusion equation or the advection equation.  For example, to apply
+the spatial discretization (\ref{d2t}) to a soil layer we require
+model layers above and below it (see Figure~\ref{soil}). We run into
+problems with the top model layer, because there is no layer above and
+we must employ a {\em boundary condition}.
+
+These are commonly-used boundary conditions:
+
+\paragraph{No flux boundary conditions} 
+
+assume that the fluxes across the top and bottom of the domain are
+zero. We can discretise eqn~(\ref{eq:flux-tend}) as follows:
+
+\begin{equation}
+	\frac{T^{n+1}_i-T^n_i}{\Delta t} \approx 
+	-\frac{F_{i+1/2}-F_{i-1/2}}{\Delta z} 
+	\label{fluxdiff}
+\end{equation}
+
+where the flux gradient has been estimated by a finite difference
+between the top and bottom interface of each layer. The flux at the
+interface $z_{i+1/2}$ midway between levels $z_i$ and $z_{i+1}$ is
+also defined by centred difference of eqn~(\ref{eq:flux-val}):
+\BEQ F_{i+1/2}\approx -D
+\frac{(T^n_{i+1}-T^n_i)}{\Delta z}.
+\label{flux-cen}  
+\EEQ 
+The no flux boundary condition is implemented in the top layer ($i=1$) using
+$F_{1/2}=F(0)=0$ in eqn.(\ref{fluxdiff}) giving:
+\begin{eqnarray}
+	\frac{T^{n+1}_1-T^n_1}{\Delta t} & = & 
+	-\frac{F_{3/2}}{\Delta z} \\\nonumber
+	& = & D\frac{T^n_2-T^n_1}{(\Delta z)^2}
+\end{eqnarray}
+and similarly $F_{J+1/2}=F(H)=0$ is used in the equation for the
+bottom layer. 
+
+{\em Exercise: Show that the numerical scheme for the diffusion
+	equation at any level-$i$ (away from the boundaries) obtained by
+	substituting eqn~(\ref{flux-cen}) into eqn~(\ref{fluxdiff}) is
+	identical to eqn~(\ref{ftcs:diff}).}
+
+\paragraph{Fixed value boundary conditions} 
+
+assume that the temperature at the boundaries is specified. In the
+soil example, the top boundary is at air temperature and the lower
+boundary is at the underlying rock temperature. In our numerical
+scheme the boundary conditions are best included when the fluxes at
+the boundaries are estimated using eqn.(\ref{flux-cen}). For example,
+at the top boundary:
+\BEQ
+F_{1/2}=F(0)\approx -D \frac{(T^n_1-T_{AIR})}{\frac{1}{2}\Delta z}
+\EEQ
+and then this is plugged into eqn.(\ref{fluxdiff}).
+
+The boundary conditions have a profound effect on the physics of the
+solution and the equilibrium temperature profile that the soil tends
+towards. With no flux boundary conditions, the vertical average of
+temperature must stay constant with time because no heat enters or
+leaves the soil. However, the temperature at the top and bottom of the
+soil layer can change. With fixed value boundary conditions, the
+temperature at the boundaries cannot change but the vertical average
+can, implying a net warming or cooling of the soil.
+
+\paragraph{Periodic boundary conditions}
+
+\begin{figure}
+	\begin{center}
+		\scalebox{0.8}{\includegraphics{Figures/adv-grid.png}}
+	\end{center}
+	\caption{\textsl{Model grid-points around latitude circle.}}
+	\label{adv-grid}
+\end{figure}
+
+In many advection problems we assume that the domain is {\em
+	periodic}. For example, we might consider advection by a jet blowing
+around a latitude circle. If the jet does not deviate to the north or
+south, then a tracer leaving Reading will return to Reading after
+circulating the globe. In Figure~\ref{adv-grid}, a tracer value crossing $x=L$
+will re-appear at $x=0$. The discretised {\em periodic boundary
+	conditions} can be written:
+
+\begin{equation}
+	T(x_1-\Delta x)=T(x_J)~~~ ; ~~~T(x_J+\Delta x)=T(x_1)
+\end{equation}
+
+where there are $J$ grid-points across the domain with regular spacing
+$\Delta x=L/J$. The two temperature values above, at points outside the
+domain $0<x<L$, can be used to find the temperature gradient at the
+boundaries.
+
+\paragraph{Kinematic BCs}
+
+The fluid moves with the boundary in the direction normal to the boundary.
+\BEQ
+{\bf u.n}={\bf u}_b.{\bf n}
+\EEQ
+
+\paragraph{Dynamic BCs}
+
+There is a balance of internal fluid forces normal to the boundary. If
+the boundary is not rigid and there is fluid on both sides this
+amounts to pressures being equal on both sides of the boundary: 
+\BEQ
+p_1=p_2 
+\EEQ
+
+\paragraph{Flow parallel to boundaries}
+
+The {\bf no slip} condition is that the fluid moves with the boundary
+\BEQ
+{\bf u}={\bf u}_b
+\EEQ
+in contrast to {\bf free slip} where the fluid is free to move along
+the boundary as if no friction were acting. This is unrealistic at
+finescales but is used when the fluid away from boundaries
+is being modelled without dealing with the {\em boundary layer}. 
+
+\vspace{1em} 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+
+\chapter{Vorticity equation derivation}
+
+\section{What is PV?}
+
+\section{Excursus}
+\subsection{Derivation of an important conservative quantity: PV}
+
+We saw in Lecture 4 how we can derive the Shallow Water Equations (SWEs). There are three independent variables: $u,v,p$ in that system:
+\begin{eqnarray}
+	\partd{u}{x}+\partd{v}{y}+\partd{w}{z} & = & 0 \\
+	\lagd{u}{t}-fv & = & -\frac{1}{\rho_o}\partd{p}{x} \\
+	\lagd{v}{t}+fu & = & -\frac{1}{\rho_o}\partd{p}{y}
+\end{eqnarray}
+
+Using the vertically integrated hydrostatic balance: $-\frac{1}{\rho_o} \partd{p}{x} = -g \partd{h}{x}$, we can write: 
+\begin{eqnarray}
+	\lagd{u}{t} & = & -g\partd{h}{x} +fv\\
+	\lagd{v}{t} & = & -g\partd{h}{y} -fu
+\end{eqnarray}
+
+
+\subsection{Derivation of an important conservative quantity: PV}
+
+It is possible to combine the three governing equations into a single one by cross-differentiation of the two momentum equations and substitution of mass continuity:
+\begin{eqnarray}
+	&&\frac{\partial}{\partial y} \left( \lagd{u}{t} = -g\partd{h}{x} +fv \right) \\
+	&&\frac{\partial}{\partial x} \left( \lagd{v}{t} = -g\partd{h}{y} -fu \right) 
+\end{eqnarray}
+
+Subtract the second from the first equation; use the definition of relative vorticity: $\zeta = \frac{\partial v}{\partial x} - \frac{\partial u}{\partial y}$:
+
+\begin{eqnarray}
+	&&\frac{D_h}{Dt}\left({\zeta+f}\right) = -(\zeta+f) \left( \frac{\partial u}{\partial x} + \frac{\partial v}{\partial y} \right);\\
+	&&\lagdh{h}{t} = -h \left( \frac{\partial u}{\partial x} + \frac{\partial v}{\partial y} \right)
+\end{eqnarray}
+to yield:
+\begin{eqnarray}
+	\frac{D_h}{Dt}\left[\frac {\zeta+f}{h} \right]=0
+	\label{PVcons}
+\end{eqnarray} 
+
+\subsection{Dispersion relation for Rossby waves on $\beta$-plane}
+
+To derive the dispersion relation for Rossby waves we revert to the use of basic state and perturbations: $u=\bar{u}+u'; v=v'; \zeta = \bar{\zeta}+\zeta'$ on a $\beta$-plane: $f=f_0+\beta y$ in the barotropic vorticity equation: $\frac{D_h}{Dt}\left({\zeta+f} \right)=0$
+and making use of a streamfunction $\psi$ to define: $u'=-\partd{\psi'}{y}; v'=-\partd{\psi'}{x}$ to yield:
+\begin{eqnarray}
+	\zeta'&=&\nabla^2\psi'\\
+	\left(\partd{}{t}+\bar{u}\partd{}{x}\right)\nabla^2\psi'+\beta \partd{\psi'}{x}&=&0
+\end{eqnarray}
+
+and inserting a solution of this type: $\psi'=Re[\Psi exp(i\phi)]$, where $\phi=kx+ly-\omega t$ results in:
+
+\begin{eqnarray}
+	(-\omega + k\bar{u})(-k^2-l^2)+k \beta & = & 0\\
+	c_x-\bar{u} & = & -\frac{\beta}{K^2}
+\end{eqnarray}
+
+where: $\omega=\bar{u}k-\frac{\beta k}{K^2}$ and $K^2=k^2+l^2$.\\
+
+
+\vspace{1em} 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\chapter{Eigenvalues and eigenvectors}
+
+\section{What is stability in 2D?}
+
+\vspace{1em} 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\chapter{The Lorenz Model}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{What is chaos?}
+
+\vspace{1em} 
+
+% ----------------------------------------------------------------------------------------
+% 	BIBLIOGRAPHY
+% ----------------------------------------------------------------------------------------
+
+\begin{thebibliography}{9}
+	
+	\printbibliography[%
+	heading=bibempty
+	]
+	
+\end{thebibliography}
+
