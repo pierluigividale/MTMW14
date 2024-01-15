@@ -3,17 +3,420 @@
 \chapter{Time Schemes}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-The fundamental ideas in this chapter is that there is no generally good time scheme: all depends on what equation we are trying to solve.
+The fundamental idea in this chapter, as in the chapter discussing advection, is that there is no generally good time scheme: all depends on what equation we are trying to solve.
+
+\section{Reasons for developing time schemes}
+
+No matter the application, time is a crucial dimension, e.g. in:
+\begin{itemize}
+	\item Weather prediction: always going to the future, one step at a time
+	\item Climate simulation: simplistically, just an extension of weather prediction
+	\item Re-analysis: similar to a climate prediction, but we assimilate observations
+\end{itemize}
+
+\paragraph{The meaning of a derivative in time}
+
+Durran starts with the definition of a derivative, and shows what is meant by order of accuracy.
+
+\begin{figure}[h!]
+	\includegraphics[width=1.\textwidth]{TimeSchemes-Pictures/TimeDerivative}
+	\caption{Durran's finite differences from the definition of a differential}
+	\label{TimeDerivative}
+\end{figure}
+
+\paragraph{Integrating in time}
+Two figures from Durran's book illustrate what we are trying to do.
+
+Figure \ref{TimeProgression} illustrates the concept of sampling a continuous function in time, with finite difference shown graphically.
+
+\begin{figure}[h!]
+	\includegraphics[width=1.\textwidth]{TimeSchemes-Pictures/TimeProgression}
+	\caption{Durran's Figure 1-12: how we move along the time axis.}
+	\label{TimeProgression}
+\end{figure}
+
+\begin{figure}[h!]
+	\includegraphics[width=1.\textwidth]{TimeSchemes-Pictures/ShortLongTimeSteps}
+	\caption{Durran's Figure 1-13: choices between computational resources and fidelity.}
+	\label{ShortLongTimeSteps}
+\end{figure}
+
+Figure \ref{ShortLongTimeSteps} illustrates some of the choices we can make in choosing the time step, and the tradeoff is between accuracy and efficiency, as well as granularity of the information we produce (think for instance of the lifetime of a convective event, or wind gusts inside a hurricane).
+
+We want to be efficient, so we want to use as long a time step as possible, but there are limitations:
+\begin{itemize}
+	\item Accuracy
+	\item CFL (stability) criterion says that we cannot use arbitrarily long time steps: it depends on the fluid velocity and on the spatial resolution. 
+	\item Remember that {\bf doubling spatial resolution means roughly a factor 8 in computational costs}, but often even a factor of 1), and part of this is the time step.
+\end{itemize}
 
 
-\subsection{Real world applications: hurricane and Typhoon simulation in climate GCMs}
+\section{Integrating in time}
+If we are to predict the future, which is what we are in the business of doing, we must integrate in time. We move along the time axis: no matter how long the integration is, we must carry out this integration step by step: it is not possible to parallelise in time, except for very particular applications.
+
+We start from a first order differential equation.
+
+\begin{equation}
+	\frac{dq}{dt}=f[q(t),t]
+\end{equation}
+
+which we integrate in time from $(n-m)\Delta t$, \emph{the past}, to $(n+1)\Delta t$, \emph{the future}. Then:
+
+\begin{equation}
+	q[(n+1) \Delta t] - q[(n-m)\Delta t] = \int_{(n-m)\Delta t}^{(n+1)\Delta t} f(q,t) dt
+	\label{time-integral-Randall2}
+\end{equation}
+
+In practice we are approximating an integral by sampling our function $f$ at discrete time intervals, $\Delta t$ and summing up these estimates. This is shown in the next figure, which is extracted from Dave Randall's notes.
+
+\begin{figure}[h!]
+	\includegraphics[width=1.\textwidth]{TimeSchemes-Pictures/TimeJump}
+	\caption{David Randall's illustration (his Fig 4.1) of integrating $f$ from the remotest past to the future.}
+	\label{TImeJump}
+\end{figure}
+
+Even more practically, we approximate the integral on the left-hand-side of eqn. \ref{time-integral-Randall2} by sampling the values of function $f$ at discrete intervals $\Delta t$. We use the shorthand $q^{n+1}$ in place of $q[(n+1) \Delta t]$ and $f^{n+1}$ in place of $f(q[(n+1) \Delta t], (n+1) \Delta t)$. Next we divide eqn.  \ref{time-integral-Randall2} by $(1+m) \Delta t$ and we obtain an equation that summarises all possible time schemes:
+
+\vspace{1em}
+\fcolorbox{ocre}{lightgray}{\parbox{\dimexpr \linewidth-2\fboxsep-2\fboxrule}{
+	\textbf{A family of time schemes}
+\begin{equation}
+	\frac{q^{n+1}-q^{n-m}}{(1+m)\Delta t}  \cong \beta f^{n+1} + \alpha_n f^n + \alpha_{n-1} f^{n-1} + \alpha_{n-2} f^{n-2}+ ...  + \alpha_{n-l} f^{n-l}
+	\label{all-time-schemes}
+\end{equation}
+}}
+\vspace{1em}
+
+the lhs of which represents a \emph{time step} in a typical numerical model. As a preview of what we are going to discuss in later sections, and throughout the module, any time scheme for which $\beta \ne 0$ will have \emph{implicit} nature (it can be purely implicit, else a mix, like the trapezoidal scheme). If $\beta = 0$, the scheme is \emph{explicit}
+
+\paragraph{Mimetic aspects and accuracy}
+
+If we now substitute the true solution $f[q(t),t]$ into \ref{all-time-schemes} and expand a Taylor series around $t=n \Delta t$, we obtain:
+
+\begin{multline}
+\frac{1}{(1+m) \Delta t}
+       \{ \left[ q +     ( \Delta t) q' +  \frac{( \Delta t)^2}    {2!} q'' +  \frac{(    \Delta t)^3}{3!} q''' + ... \right] \\
+	- \left[ q - (m \Delta t) q'  + \frac{(m \Delta t)^2}{2!} q'' -    \frac{(m \Delta t)^3}{3!} q'''  + ...  \right] \}
+	    \\
+	= \beta \left[ f +  (\Delta t) f'   + \frac{(\Delta t)^2}{2!} f'' +  \frac{(\Delta t)^3}{3!} f'''            + ... \right]  \\    
+	+ \alpha_n f \\
+	+  \alpha_{n-1}  \left[ - (\Delta t) f'      +    \frac{(\Delta t)^2}   {2!} f'' -        \frac{( \Delta t)^3}{3!} f'''    + ... \right]    \\
+	+  \alpha_{n-2}  \left[ - (2 \Delta t) f'  +    \frac{(2 \Delta t)^2}{2!} f'' -    \frac{(2 \Delta t)^3}{3!} f'''  + ...   \right]    \\
+	+  \alpha_{n-3}  \left[ - (3 \Delta t) f'  +    \frac{(3 \Delta t)^2}{2!} f'' -    \frac{(3 \Delta t)^3}{3!} f'''  + ...  \right]    \\
+	+ ... \\
+	+  \alpha_{n-l}  \left[ - (l \Delta t) f'  +    \frac{(l \Delta t)^2}{2!} f'' -    \frac{(l \Delta t)^3}{3!} f''' + ...  \right]    \\	
+	+  \epsilon \\
+\end{multline}
+
+where $\epsilon$ is the truncation error.
+
+Now multiply by $(1+m) \Delta t$, collect all powers of $\Delta t$ and use our initial definition to match: $q'=f$; $q''=f'$ and so on:
+
+%\frac{1}{2}\left(\frac{1-m^2}{1+m}\right)-\beta +\alpha_n +\alpha_{n-1}+2\alpha_{n-2}+3\alpha_{n-3}+ ... +l\alpha_{n-l}
+
+\begin{multline}
+q' \left\{1-(\beta +\alpha_n +\alpha_{n-1}+\alpha_{n-2}+\alpha_{n-3}+ ... +\alpha_{n-l})\right\}\\
++\Delta t q'' \left\{\frac{1}{2}\left(\frac{1-m^2}{1+m}\right)-\beta  +\alpha_{n-1}+\alpha_{n-2}+\alpha_{n-3}+ ... +l\alpha_{n-l}\right\} \\
++\frac{(\Delta t)^2}{2!} q''' \left\{\frac{1}{3}\left(\frac{1-m^3}{1+m}\right)-\beta  -\alpha_{n-1}-4\alpha_{n-2}-9\alpha_{n-3}- ... -l^2\alpha_{n-l}\right\}  \\
++\frac{(\Delta t)^3}{3!} q'''' \left\{\frac{1}{3}\left(\frac{1-m^4}{1+m}\right)-\beta  +\alpha_{n-1}+8\alpha_{n-2}+27\alpha_{n-3}+ ... +l^3\alpha_{n-l}\right\}  \\
++ ... \\
++  \epsilon \\
+\label{discretisation-error}
+\end{multline}
+
+Each line in this equation must go to zero automatically as $\Delta t \rightarrow 0$, except for the very first line. But, in order to force the truncation error to be zero (for maximum accuracy), we must also force the first line to be $0$, which leads us to the \emph{consistency condition}.
+
+\vspace{1em}
+\fcolorbox{ocre}{lightgray}{\parbox{\dimexpr \linewidth-2\fboxsep-2\fboxrule}{
+\textbf{The consistency condition}
+\begin{equation}
+1=\beta +\alpha_n +\alpha_{n-1}+\alpha_{n-2}+\alpha_{n-3}+ ... +\alpha_{n-l}
+\label{consistency-equation}
+\end{equation}
+}}
+
+This is a very important condition, telling us that we are not free to set the coefficients $\beta$ and $\alpha$ in a random way, unless we want to end up with a very inaccurate (and/or unstable) time scheme. When \ref{consistency-equation} is satisfied, the expression for $\epsilon$ reduces to:
+
+\begin{equation}
+	\epsilon = \Delta t q'' \left\{\frac{1}{2}\left(\frac{1-m^2}{1+m}\right)-\beta  +\alpha_{n-1}+\alpha_{n-2}+\alpha_{n-3}+ ... +l\alpha_{n-l}\right\} +O\left[(\Delta t)^2\right]
+	\label{consistency-truncation}
+\end{equation}
+
+which means that our scheme will be \underline{at least} first order accurate. Because we are still free to choose $l+1$ coefficients and the value of $l$, which can be $\ge0$ we can make the scheme second order accurate, but we can go further than that.
+
+	\begin{theorem}[Order of accuracy of a time scheme]		
+	The accuracy of a time scheme can be \emph{at least} $l+2$, but, remembering that one of the coefficients is $\beta$, the accuracy of an \underline{explicit} time scheme can be \emph{at least} $l+1$.
+	\end{theorem} 
+
+\section{A few favourite explicit time schemes}
+\subsection{$m=0$, $l=0$, Euler}
+The simplest, most intuitive scheme is Euler (Forward in Time). The only non-zero coefficient is $\alpha_n$. Because of the \emph{consistency condition}, $\alpha_n=1$ and therefore:
+
+\begin{equation}
+	\frac{q^{n+1}-q^n}{\Delta t} = f^n
+	\label{Euler}
+\end{equation}
+
+Looking back at eqn. \ref{discretisation-error}, we end up with this error: $\epsilon = q''\frac{\Delta t}{2} + O({\Delta t}^2)$, so the scheme is first-order accurate. 
+
+\subsection{$m=0$, $l>0$, Adams-Bashforth schemes}
+We can achieve higher accuracy by accurately choosing our $\alpha$s. For example, with $l=1$, we form this scheme: 
+
+\begin{equation}
+	\frac{q^{n+1}-q^n}{\Delta t} = \alpha_n f^n + \alpha_{n-1} f^{n-1}
+	\label{2nd-order-BA}
+\end{equation}
+
+Remember that the \emph{consistency condition} must be respected, so $\alpha_n + \alpha_{n-1}=1$. If we choose $\alpha_{n-1} = -\frac{1}{2}$, then we must have $\alpha_{n} = \frac{3}{2}$, which is the second-order Adams-Bashforth scheme, so called because substition into eqn. \ref{discretisation-error} yields: 
+
+\begin{equation}
+	\epsilon = q'' \left( \alpha_{n-1} + \frac{1}{2} \right) \Delta t + O({\Delta t}^2)
+\end{equation}
+and the only term left is $O({\Delta t}^2)$.
+
+Note that it may look like we are forced to compute the function $f$ twice, but in fact we can keep the old value from the previous time step, something that will save computation, except at the very start, when we do not have two time levels yet.
+
+It is possible to obtain a family of Adams-Bashforth time schemes, by adding more and more time levels. We could even think of the ( $l=0$ ) Euler scheme as a first-orderAdams-Bashforth scheme.
+
+\begin{figure}
+	includegraphics{}
+	\caption{A family of Adams-Bashforth schemes}
+	\label{Fig:Adams-Bashforth}
+\end{figure}
+
+\subsection{$m=1$, $l=0$, Leapfrog scheme}
+This is a famous scheme, and it looks like this: 
+
+\begin{equation}
+	\frac{q^{n+1}-q^{n-1}}{2 \Delta t} = f^n
+	\label{Leapfrog}
+\end{equation}
+
+Substition into eqn. \ref{discretisation-error} yields $\epsilon = q'''\frac{(\Delta t)^2}{6} + O({\Delta t}^4)$, so the scheme is second-order accurate, which is very attractive, and looks like an exception to the general rule that accuracy $=l+1$. But there are some very serious disadvantages, which will be discussed later.
+
+\subsection{$m=1$, $l>1$, Nystrom schemes}
+By careful selection of the $\alpha$ coefficients, it is again possible to obtain higher accuracy schemes, similar to Leapfrog.
+
+\section{A few implicit time schemes}
+With implicit schemes, it is immediately possible to obtain accuracy at least as high as $l+2$.
+
+\subsection{$m=0$, $l=0$, Backward and Trapezoidal schemes}
+
+\begin{equation}
+	\frac{q^{n+1}-q^{n}}{\Delta t} = \beta f^{n+1} + \alpha f^n
+	\label{Implicit}
+\end{equation}
+
+The \emph{consistency condition} imposes $\alpha_n + \beta =1$, and the discretisation error will be $\epsilon = q'' \left( \frac{1}{2} -\beta \right) \Delta t + O({\Delta t}^2)$.
+
+Two cases: 
+\begin{enumerate}
+\item the special $\beta = 1$, $\alpha=0$ is called "Backward" and is only first-order accurate, but 
+\item $\beta = \alpha=\frac{1}{2}$ is second-order accurate and is called the "Trapezoidal" scheme.
+\end{enumerate}
+
+\subsection{$m=0$, $l>0$, Adams-Moulton schemes}
+These are analogous to Adams-Bashforth, except that $\beta \ne 0$, so they are implicit, with accuracies shown in the table below. Notice that for the special case $l=0$ this reduces to the Leapfrog scheme.
+
+\subsection{$m=1$, $l=1$, Milne corrector}
+
+This is quite an interesting scheme \footnote{if this is a corrector stage, then there must be a companion predictor stage, see the next section}:
+
+\begin{equation}
+	\frac{q^{n+1}-q^{n-1}}{\Delta t} = \beta f^{n+1} + \alpha f^n + \alpha_{n-1} f^{n-1}
+	\label{Milne-corrector}
+\end{equation}
+
+\paragraph{Exercise on Milne corrector}
+Try to substitute $m=1$, $l=1$ into eqn. \ref{discretisation-error} and write out the expression for $\epsilon$.
+
+Show that judicious choice of the coefficients ($\beta = \frac{1}{6}$, $\alpha_n = \frac{4}{6}$, $\alpha_{n-1} = \frac{1}{6}$) will yield fourth-order accuracy!
+	
+\section{Iterative time schemes (e.g. Matsuno and Heun)}
+These schemes are also called "predictor-corrector" schemes (thus the note on the Milne corrector scheme). The idea is to obtain our estimate of the value of $q^{n+1}$ through an iterative, multi-step procedure, involving multiple evaluations of our function $f$. In a two-step iterative scheme, the first step is called "predictor", and the second step is called "corrector". This seems complicated, but an advantage is that it is possible to obtain higher accuracy without involving many time steps. It is also often possible to use longer time steps than with the non-iterative schemes seen so far. With that, it is necessary to evaluate $f$ several times, which could be expensive, which is not required with non-iterative schemes.
+
+
+Consider eqn \ref{Implicit}, but replace $f^{n+1}$, which by definition should be assessed at time $t=n+1$ by: $\left(f^{n+1}\right)^* \equiv f \left[\left(q^{n+1}\right),\left(n+1\right)\Delta t\right]$, where our estimate of $\left(q^{n+1}\right)^*$ is obtained by using the Euler scheme:
+
+\begin{equation}
+	 \frac{ (q^{n+1})^*-q^n}{\Delta t} = f^n
+	\label{Euler-predictor}
+\end{equation}
+
+We can think of the term $(q^{n+1})^*$ as a provisional value for $(q^{n+1})$.
+Next, we complete the time step by computing the final value of $(q^{n+1})$, using:
+	
+\begin{equation}
+	\frac{q^{n+1}-q^{n}}{\Delta t} = \beta^* \left(f^{n+1}\right)^* + \alpha f^n
+	\label{corrector-Implicit}
+\end{equation}
+	
+The simplest iterative scheme, when $\beta^*=1$, $\alpha=0$ is an imitation of the backward (implicit) scheme, but is is in fact based on the Euler scheme, so it is in fact explicit, only \underline{mimics the backward scheme}, without being implicit, and is called the Matsuno scheme, as Prof Matsuno was one of its early proponents in 1966. 
+
+When $\beta^*=\frac{1}{2}$, $\alpha=\frac{1}{2}$, the scheme is an imitation (so, explicit) of the trapezoidal (implicit) scheme, and it is called the Heun scheme:
+
+\begin{equation}
+	\frac{q^{n+1}-q^{n}}{\Delta t} = \frac{1}{2} \left(f^{n+1}\right)^* + \frac{1}{2} \alpha f^n
+	\label{Heun}
+\end{equation}
+
+Matsuno is f.o.a., while Heun is s.o.a.; what is important about Heun is that it does not require past history (does not require $l>0$), but despite this it is s.o.a., a demonstration that iteration can increase the order of accuracy.
+
+\subsection{The most famous iterative scheme, Runge-Kutta}
+The most famous member of the family of iterative schemes is Runge-Kutta, which is fourth-order accurate.
+
+The scheme is given by:
+
+\begin{equation}
+	q^{n+1} = q^n + {\Delta t} \frac{1}{6} \left( k_1 + 2 k_2 + 2 k_3 + k_4 \right)
+	\label{Runge-Kutta}
+\end{equation}
+
+where:
+\begin{eqnarray*}
+	k_1 = f \left( q^n, n \Delta t\right)\\
+	k_2 =  f \left[ q^n +\frac{k_1 \Delta t }{2} , \left( n + \frac{1}{2}  \right) \Delta t \right]\\
+	k_3 = f \left[ q^n +\frac{k_2 \Delta t }{2} , \left( n + \frac{1}{2}  \right) \Delta t \right]\\
+	k_4 = f \left[ q^n +\frac{k_3 \Delta t }{2} , \left( n + 1  \right) \Delta t \right]
+	\label{Runge-Kutta-ks}
+\end{eqnarray*}
+
+Each of the $k$ coefficients can be interpreted as an incremental approximation to the true $f$. Unfortunately this must be done in a sequence, and the $k$s cannot be re-used in a subsequent time step, which makes the scheme expensive and somewhat slow. Some researchers have tried to develop parallel schemes for very high order iterative schemes, but in general the only advantages are accuracy, and the ability to use long time steps.
+
+\paragraph{Exercises on Runge-Kutta}
+\begin{enumerate}
+	\item Think of a problem for which we are trying to predict two or more variables. How would you set up the iteration, as compared to the single-variable case in the section above?
+	\item Compare the Heun scheme with the RK scheme, albeit modified to only use $k_1$ and $k_2$, with due modifications to the weights in eqn. \ref{Heun}, while all other $k$s are zero. Do you see any similarities?
+\end{enumerate}
+	
+\section{Applications: oscillation and decay equations}
+As said at the beginning of this chapter, there is no universally good scheme: all depends on what equation we are going to solve. Three simple examples should make this clear. The two equations, oscillation and decay, are quite similar to one another, in that in both cases the rhs is proportional to $q$, but the way things evolve in time is quite different.
+
+{\bf Oscillation}, which can be applied to advection and wave propagation:
+\begin{equation}
+	\frac{dq}{dt}= i \omega q
+	\label{oscillation}
+\end{equation}
+
+{\bf Decay}, which can be applied to many physical parametrisations, e.g. radiation, turbulence, cloud microphysics, convection:
+\begin{equation}
+	\frac{dq}{dt}= - \kappa q
+	\label{decay}
+\end{equation}
+
+where $q$ and $\kappa$ are both real, and $\kappa$ is positive.
+
+\subsection{The oscillation equation: solutions and numerical stability}
+The analytical (exact) solution to \ref{oscillation} is $q(t) = \hat{q} e^{i \omega t}$, where $\hat{q}$ is the initial condition, that is, the value of $q$ at time $t=0$. The state of our oscillatory system can be characterised by its amplitude and phase.
+
+For amplitude, since, by definition (one of Euler's formulas) $e^{i\gamma} = \cos{\gamma}+i\sin{\gamma}$, where $\gamma$ is real, the norm of $e^{i\gamma}$ is 1, because  $\cos^2{\gamma}+\sin^2{\gamma} =1$. This means that amplitude can never change, and $|q|=|\hat{q}|$ for all time. Therefore a good time scheme for solving the oscillation equation must provide a solution that is time invariant.
+
+The solution to the oscillation equation is therefore:
+
+\begin{equation}
+	q [(n+1)\Delta t ] = e^{i\Omega} q(n\Delta t)
+	\label{oscillation-solution}
+\end{equation}
+
+where $\Omega \equiv \omega \Delta t$ and represents the change of phase over a time step, $\Delta t$. If we compare \ref{oscillation-solution} and \ref{oscillation}, they tell us that $\lambda_T$ the exact value of $\lambda$, must satisfy $\lambda_T=e^{i\Omega} $. Euler also tells us that  $|\lambda_T|=1$. If our numerical estimate $|\lambda|\ne1$ then we clearly have amplitude errors in our scheme. If, on the other hand, the simulated phase change per time step ($\theta$) is not exactly equal to $\Omega$, we have a phase error.
+
+To understand the phase error, we can split $\lambda$ into its real and imaginary parts: $\lambda=\lambda_r + i \lambda_i=|\lambda|e^{i\theta}$, where $\theta = \tan^{-1}\left(\frac{\lambda_i}{\lambda_r}\right)$ and $\theta$ is the simulated phase change per time step.
+
+\subsection{Using two-level non-iterative schemes to solve the oscillation equation}
+A family of schemes, which can be explicit or implicit is given by:
+
+\begin{equation}
+	q^{n+1}-q^{n} = i \omega \Delta t (\alpha q^n + \beta q^{n+1})
+	\label{oscillation-family}
+\end{equation}
+
+You can instantly see that, depending on the values we assign to $\alpha$ and $\beta$ we can generate an Euler (explicit), a backward (implicit) and a trapezoidal implicit scheme.
+
+A solution to \ref{oscillation-family} is:
+
+\begin{equation}
+	(1-\Omega\beta)q^{n+1} = (1+i\Omega\alpha) q^n 
+	\label{oscillation-family-solution}
+\end{equation}
+implying:
+\begin{equation}
+	q^{n+1} = \frac{(1+i\Omega\alpha)}{(1-\Omega\beta)} q^n \equiv \lambda q^n
+	\label{oscillation-family-solution}
+\end{equation}
+
+If we substitute the values of $\alpha$ and $\beta$ for each of the chosen schemes, we will see in practical detail what happens.
+
+For {\bf Euler}: $\lambda = 1 + i \Omega$, which gives us $|\lambda|=\sqrt{1+\Omega^2}>1$, so the scheme is \emph{unconditionally unstable}.
+
+ For {\bf backward}: $\lambda = \frac{1 + i \Omega}{1 - i \Omega}$, which gives us $|\lambda|=\frac{\sqrt{1+\Omega^2}}{1+\Omega^2}<1$, so the scheme is \emph{unconditionally stable}, albeit with amplitude decaying in time.
+
+ For {\bf trapezoidal}: $\lambda = \frac{1 + \frac{i \Omega}{2}}{1 - \frac{i \Omega}{2}} = \frac{\sqrt{1-\frac{\Omega^2}{4}+i\Omega}}{1+\frac{\Omega^2}{4}}$, which upon taking the norm gives us $|\lambda|=1$, so the scheme is \emph{unconditionally stable} with no amplitude error at all. An excellent choice for the oscillation equation.
+
+The behaviour of many more schemes, applied to the oscillation equation, is shown in Fig. \ref{fig:oscillation-allschemes}.
+
+\subsection{The decay equation}
+
+The exact solution for the decay equation \ref{decay} is $q(t) = q(0) e^{- \kappa t}$, where $q(0)$ is the initial condition, that is, the value of $q$ at time $t=0$. A good scheme should yield $q^{n+1} \rightarrow 0$ as $\kappa \Delta t \rightarrow \infty$, so that the true value of $\lambda$ is: $\lambda_T=e^{- \kappa \Delta t} < 1 $
+
+For {\bf Euler}: 
+
+\begin{equation}
+	q^{n+1} -q^n = -K q^n
+	\label{decay-solution-euler2}
+\end{equation}
+
+So that: 
+\begin{equation}
+	q^{n+1} = (1-K) q^n
+	\label{decay-solution-euler3}
+\end{equation}
+
+where $K \equiv \kappa \Delta t$ and $\lambda = (1-K)$ is a real number. If we can impose $K < 2$, the scheme will be conditionally stable, but there is a danger in the range $1< K < 2$, which produces unphysical, damped oscillations.
+
+For {\bf backward}:
+
+\begin{equation}
+	q^{n+1} -q^n = -K q^{n+1}
+	\label{decay-solution-implicit}
+\end{equation}
+In this case, $\lambda = \frac{1}{1+K}<1$ and the scheme is unconditionally stable; also, in the limit $K \rightarrow \infty$, the scheme behaves exactly like the true solution.
+
+Other schemes, applied to the decay equation, produce the behaviour shown in Fig. \ref{allschemes-decay}.
+
+There is a very big danger in using the {\bf Leapfrog} scheme in solving the decay equation, in that we will end up with an unconditionally unstable scheme, and computational modes. It is in fact a very bad choice for any equation that contains damping (so, think turbulence scheme, or the decay of radiation through a cloud, or through a vegetation canopy).
+
+ 
+\subsection{A mix: damped oscillations}
+
+\begin{equation}
+	\frac{dq}{dt}= (i\omega - \kappa) q
+	\label{decay}
+\end{equation}
+yields a damped oscillation.
+
+The solution for a forward scheme is:
+\begin{equation}
+	q^{n+1} -q^{n-1}= 2i\Omega q^n - 2K q^{n-1}
+	\label{oscill-decay-solution-forward}
+\end{equation}
+or, for a backward scheme:
+\begin{equation}
+	q^{n+1} -q^{n-1}= 2i\Omega q^n - 2K q^{n+1}
+	\label{oscill-decay-solution-forward}
+\end{equation}
+where the oscillation terms are centred, while the decay terms are uncentred.
+Both schemes are conditionally stable.
+
+\section{Real world applications: hurricane and Typhoon simulation in climate GCMs}
+
+\subsection{Sensitivity to time scheme choices in GCMs}
 
 \begin{center}	
-	\includegraphics[width=0.8\textwidth]{Figures/TC-structures}
+	\includegraphics[width=1.\textwidth]{Figures/TC-structures}
 \end{center}
 
 \subsection{Why the differences}
 These GCMs are very different in terms of dynamical core, parameterizations etc., but they are also quite different in terms of the use of the time step. I have been experimenting with our UK model (HadGEM3), and Colin Zarzycki has been experimenting with the NCAR model, managing to double the number of hurricanes with a time step of 1/4, but I have also tested the same ideas in the ECMWF model, since it is the one that uses very long time steps.
 \begin{center}	
-	\includegraphics[width=0.8\textwidth]{Figures/tden_PRESENT_TC_map_STD}
+	\includegraphics[width=1.\textwidth]{Figures/tden_PRESENT_TC_map_STD}
 \end{center}
