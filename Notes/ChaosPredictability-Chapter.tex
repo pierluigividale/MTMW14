@@ -5,6 +5,165 @@
 The fundamental ideas in this chapter revolve around chaos theory, and how it affects predictability in the Earth System.
 The key papers for you to read are: \cite{lorenz:63}, \cite{lorenz:69}, \cite{Vallis:86}, as well as the books by \cite{Gleick-book} and by Ed Lorenz himself: \cite{Lorenz-book}.
 
-\section{A bit of history of Chaos Theory}
+\begin{definition}
+The key characteristic of chaos is "sensitivity to initial conditions", that is, there is a range of natural phenomena for which infinitesimally small changes in initial conditions grow exponentially and will cause future states of the system to diverge significantly from one another, despite being indistinguishable at the time they emerge.
+\end{definition}
 
+For example, neighbouring air parcels separate at exponential rate on average: in Fig. \ref{fig:diverging-trajectories} we can see how trajectories of air parcels, originating from nearly identical location, end up separating rapidly, forming tracer filaments. This happens despite the fact that the winds causing the advection of these tracers seem to be governed by the large scale flow.
+
+\begin{figure}[h!]
+	\includegraphics[width=1.\textwidth]{Chaos-Pictures/diverging-trajectories}
+	\caption{Simulation of photochemical evolution of a polluted air mass: ozone back-trajectories for air parcels originating on the East coast of the USA.}
+	\label{fig:diverging-trajectories}
+\end{figure}
+
+In practice, the strong sensitivity to initial conditions limits how predictable, in the deterministic sense, these natural systems are, and this fact poses a challenge to predictive models, e.g. NWP/climate, particularly the need for ensembles, because a single deterministic prediction becomes quickly useless after a given time horizon $\tau$. Please note that {\bf chaos is a characteristic of a class of natural systems}; it is \underline{not the consequence of errors stemming from numerical approximations}. Do not confuse the two: we do make use of numerical methods to reveal chaos, and even to exploit it for meaningful prediction, but numerical methods are not, in essence, the source of chaos.
+
+
+\section{A bit of history of Chaos Theory}
+One of the best introductions to these ideas is in \href{https://www.youtube.com/watch?v=w-IHJbzRVVU}{Prof Tim Palmer's public lecture}, where Tim explains how "climate change is a problem in theoretical physics", and where he recounts how the ensemble prediction system was pioneered at ECMWF.
+
+
+\subsection{Newton, Darwin and determinism}
+"Natura non facit saltus": Latin for "Nature does not make jumps", originally in Gottfried Leibniz (New Essays, IV, 16:[2]) "La nature ne fait jamais des sauts".
+
+Charles Darwin, 1879, said this when writing about the “abominable mystery” of the sudden emergence of angiosperms on Earth.
+What worried Darwin was that the very earliest samples in the fossil record all dated back to the middle of the Cretaceous period, around 100 million years ago, and they came in a bewilderingly wide variety of shapes and sizes. This suggested flowering plants (angiosperms) had experienced an explosive burst of diversity very shortly after their origins – which, if true, threatened to undermine Darwin's entire model of gradual evolution through natural selection.
+In fact recently published research has revealed that angiosperms evolved relatively gradually after all. Yet this still leaves a number of key questions. The roughly 350,000 known species of flowering plants make up about 90\% of all living plant species. Without them, we would have none of our major crops including those used to feed livestock, and one of the most important carbon sinks that mop up our carbon dioxide emissions would be missing. 
+
+Darwin was not alone in finding such ideas disturbing: we are used to a deterministic world. We can fire a cannonball with very high precision, we can send a rocket to the Moon, or to Mars... as long as we do not mix up the metric and imperial measurement systems.
+
+In practice, for our science, and for our predictions, we saw in previous lectures that, following Newtonian determinism, and given a theory, we could use a differential equation of this kind:
+
+\begin{equation}
+\frac{dq}{dt}=f[q(t),t]
+\end{equation}
+
+This is all we need to predict the future, subject to:
+
+\begin{enumerate}
+\item boundary conditions and 
+\item initial conditions.
+\end{enumerate}
+
+A modeller’s life is good and easy… leaving aside poor numerical methods and unstable supercomputers. In fact, weather and climate models are founded upon what Tim calls the "primitive" equations of physics: Newton's second law ($\mathbf{F}=m\mathbf{a}$), Planck's relation (for the energy of a photon, $E=\hslash \omega$) and Clausius equation ($\delta Q=TdS$), of which Tim argues that Newton's second law is the hardest to solve.
+
+
+
+\subsection{Ed Lorenz and the Royal McBee}
+	In 1961, Lorenz was using a simple digital computer, a Royal McBee LGP-30, to simulate weather patterns by modeling 12 variables, representing things like temperature and wind speed. 
+	
+	He wanted to see a sequence of data again, and, to save time, he started the simulation in the middle of its course. He did this by entering a printout of the data that corresponded to conditions in the middle of the original simulation. To his surprise, the weather that the machine began to predict was completely different from the previous calculation. 
+	
+	The culprit: a rounded decimal number on the computer printout. The computer worked with    6-digit precision, but the printout rounded variables off to a 3-digit number, so a value like 0.506127 printed as 0.506. This difference is tiny, and the consensus at the time would have been that it should have no practical effect. 
+	
+	He states in his 1963 paper "Deterministic Nonperiodic Flow" in JAS:
+	"Two states differing by imperceptible amounts may eventually evolve into two considerably different states ... If, then, there is any error whatever in observing the present state—and in any real system such errors seem inevitable—an acceptable prediction of an instantaneous state in the distant future may well be impossible....In view of the inevitable inaccuracy and incompleteness of weather observations, precise very-long-range forecasting would seem to be nonexistent."
+	His description of the butterfly effect, the idea that small changes can have large consequences, followed in 1969.
+	
+	\fcolorbox{ocre}{lightgray}{\parbox{\dimexpr \linewidth-2\fboxsep-2\fboxrule}{
+			\textbf{Lorenz's own narrative}
+	I started the computer again and went out for a cup of coffee. When I returned about an hour later, after the computer had generated about two months of data, I found that the new solution did not agree with the original one. [...] 
+	
+	I realized that if the real atmosphere behaved in the same manner as the model, long-range weather prediction would be impossible, since most real weather elements were certainly not measured accurately to three decimal places. }}
+	
+\subsection{The Lorenz 1963 model}
+``… one flap of a sea-gull’s wing may forever change the future course of the weather” (Lorenz, 1963)''
+\medskip
+
+System with 3 variables $(X, Y, Z )$, evolution of highly simplified convective dynamics is described by 3 simple ODEs; has nonlinear terms.
+	
+	\begin{eqnarray}
+		\frac{dX}{dt} &=& - \sigma(X-Y) \nonumber \\
+		\frac{dY}{dt} &=& \rho X -Y -XZ\\
+		\frac{dZ}{dt} &=& XY - \beta Z \nonumber
+	\end{eqnarray}
+	
+	where $X$ is proportional to convective intensity; $Y$ is proportional to temperature difference between ascending and descending currents; $Z$ is the difference in vertical temperature profile from linearity; $\sigma$ is the Prandtl number: ratio of momentum diffusivity (Kinematic viscosity) and thermal diffusivity; $\rho$ is the Rayleigh number: determines whether the heat transfer is primarily in the form of conduction or convection; $\beta$ is a geometric factor.
+
+This \href{https://www.youtube.com/watch?v=CeCePH_HL0g}{Visulisation of the Lorenz system} shows a number of animations, with different types of regime, dependent on the choice of the control parameters listed in the previous paragraph (with the $R$ in the animations equivalent to $\rho$ in the system defined above).
+
+	
+	Lorenz's model helps to reveal a few key facts about chaos in the natural world:
+	\begin{enumerate}
+		\item Exhibits sensitivity to initial conditions.
+		
+		\item Trajectories from nearby points diverge exponentially on average until separated by scale of attractor
+		
+		\item Time series initially track together but eventually become uncorrelated (as if random) 
+		
+		\item Nonlinearity is necessary for chaos.
+	\end{enumerate}
+		
+\section{Types of predictability}
+We can distinguish two types of predictability, and we can establish what they are sensitive to. Figure \ref{Fig:TypesofPredictability} illustrates the main concepts. 
+
+\emph{Predictability} is a property of the physical system being examined.
+Predictability of the first kind refers to the degree to which trajectories from neighbouring initial conditions stay coherent.    
+Associated with the average rate of separation of trajectories.
+Limit of predictability refers to a notion that at some point in the future trajectories that started as neighbours will eventually be uncorrelated,   no matter how good the forecast.
+
+\emph{Predictive skill} measures the quality of forecasts produced by a model. 
+It quantifies the ability of an ensemble system to predict the probabilities of events.
+Expect predictive skill to be lower when predictability is lower.
+CANNOT measure predictive skill from a single forecast or event.
+
+\begin{figure}[h!]
+\includegraphics[width=1.\textwidth]{Chaos-Pictures/TypesofPredictability}
+\caption{Two types of predictability involved in weather and climate prediction}
+\label{Fig:TypesofPredictability}
+\end{figure}
+
+		
 \section{Can we predict the predictions?}
+The use of ensembles is currently preminent in prediction at all time scales: NWP, seasonal, decadal, climate.
+
+Atmospheric flow is chaotic: we know that however good the estimate of ICs, forecasts (even using a perfect model) will diverge from reality
+This imposes a time limit to predictability (of the first kind).
+
+Aim of ensembles: span the range of outcomes for atmosphere at a given lead time. That is, we forecast the uncertainty in forecasts!
+
+Issues with ensembles:
+\begin{itemize}
+\item State space is huge, but number of ensemble members is limited
+\item Constrain initial spread to match uncertainty in initial state estimate
+\item Calculate structures growing fastest (in chosen metric)
+\item Hope that rapidly growing perturbations will capture range of outcomes
+\end{itemize}
+
+\subsection{How to spawn ensemble members}
+Control forecasts start from an analysis – the best estimate of the current atmospheric state.
+
+Analyses are obtained through data assimilation
+most recent model forecast is compared with latest observations and pulled towards them.
+forecast-obs (least squares) is minimised, weighting by uncertainties.
+
+Other members of the ensemble are created by:
+modifying the initial conditions with fast growing perturbations
+perturbing model parameters 
+adding stochastic noise to the outputs of model processes
+
+Crucially, perturbation magnitude is scaled so the average ensemble spread matches the statistics of forecast error  (at an optimisation lead time, usually 2 days) 
+
+\subsubsection{Overconfident prediction systems}
+A good prediction system should produce an ensemble spread good enough to cover improbably, albeit possible events, that is, if a cyclone such as the one that hit the UK in 1987, or across Europe (2020, "Lothar"), at least one ensemble member should flag such a possibility. Also, on average, the ensemble spread should be larger than the known model bias, else the prediction system is deemed "overconfident". This is seen quite well in Fig. \ref{Fig:Overconfident}, from Buizza et al. (2004). In this forecast, RMS error grows faster than the spread; 
+the ensemble is under-dispersive; the ensemble forecast is over-confident; the ensemble spread increased by identifying initial perturbations (singular vectors) that give maximum error growth.   
+
+\begin{figure}[h!]
+	\includegraphics[width=1.\textwidth]{Chaos-Pictures/Overconfident}
+	\caption{An example of overconfident predictions after a short prediction horizon: the continuous lines show the model error, the dashed lines show the ensemble spread.}
+	\label{Fig:Overconfident}
+\end{figure}
+
+Stochastic physics is one way to mitigate the problem of overconfidence, by injecting uncertainty that should project onto the most important characteristics of the flow we are trying to simulate.
+
+\paragraph{But is stochasticity not just adding noise, thus degrading the forecast?}
+It turns out that the addition of SP is actually beneficial, reducing errors in NWP, seasonal, as well as climate models: this is likely because it "shakes the model out of its deterministic complacency", which, in part, comes from the fact that many parametrisations are written in very deterministic ways, without recognising the fundamental limitations of how they were derived, but also failing to recognise that our models have limited resolution and cannot represent all scale interactions. Figure \ref{Fig:SPImprovements} shows an example from the Athena campaign.
+
+\begin{figure}[h!]
+	\includegraphics[width=1.\textwidth]{Chaos-Pictures/SPImprovements}
+	\caption{How SP improves weather predictions and can be seen as a surrogate for high-resolution.}
+	\label{Fig:SPImprovements}
+\end{figure}
+
+

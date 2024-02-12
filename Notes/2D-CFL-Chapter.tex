@@ -93,10 +93,10 @@ If our information "leapfrogs", very bad things will happen.
 		\label{adv-CTCS-1D}
 	\end{equation}
 	
-	We can substitute a (Von Neumann) solution of this type: ${A_j^{n}=B^{n \Delta t} e^{i \mu m \Delta x}}$, where $\mu$ is the horizontal wavenumber and $m \Delta x$ is the distance along the $x$ axis. $B$ can be any complex number. If we substitute into our finite difference (CTCS) scheme above we obtain:
+	We can substitute a (Von Neumann) solution of this type: ${A_j^{n}=B^{n \Delta t} e^{i k m \Delta x}}$, where $k$ is the horizontal wavenumber and $m \Delta x$ is the distance along the $x$ axis. $B$ can be any complex number. If we substitute into our finite difference (CTCS) scheme above we obtain:
 	
 	\begin{equation}
-		\left ( B^{(n+1)\Delta t}-B^{(n-1) \Delta t} \right ) e^{i \mu m \Delta x} = - \frac {c \Delta t}{\Delta x} B^{n \Delta t} \left( e^{i \mu (m+1) \Delta x}  - e^{i \mu (m-1) \Delta x}  \right)
+		\left ( B^{(n+1)\Delta t}-B^{(n-1) \Delta t} \right ) e^{i k m \Delta x} = - \frac {c \Delta t}{\Delta x} B^{n \Delta t} \left( e^{i k (m+1) \Delta x}  - e^{i k (m-1) \Delta x}  \right)
 		\label{adv-CTCS-1D-solution}
 	\end{equation}
 	
@@ -107,7 +107,7 @@ If our information "leapfrogs", very bad things will happen.
 		\label{adv-CTCS-1D-stability}
 	\end{equation}
 	
-	where $\sigma = \frac {c \Delta t}{\Delta x} \sin \mu \Delta x$, so that (\ref{adv-CTCS-1D-stability}) has the solution:
+	where $\sigma = \frac {c \Delta t}{\Delta x} \sin k \Delta x$, so that (\ref{adv-CTCS-1D-stability}) has the solution:
 	
 	\begin{equation}
 		B^{\Delta t} = -i \sigma \pm \left( 1 - \sigma^2 \right)^{1/2} 
@@ -123,33 +123,36 @@ If our information "leapfrogs", very bad things will happen.
 	\medskip
 	The \underline{unstable case} concerns us from the point of view of the amplitude of the signal. In fact, if $|\sigma| > 1$, then $\left( 1 - \sigma^2 \right)^{1/2}$ is imaginary and both roots will be pure imaginary:
 	
-	
 	\begin{align}
 		B_{+}^{\Delta t}  &= -i \left ( \sigma -S \right)  \mathrm{,where } | \sigma| > S \equiv \left(  \sigma^2 - 1 \right)^{1/2} \nonumber \\
 		B_{-}^{\Delta t}  &= -i \left ( \sigma +S \right)  \nonumber
 		\label{adv-CTCS-1D-unstable-solution}
 	\end{align}
 	
-	If $\sigma$ is positive, the magnitude $R=|B_{-}^{\Delta t}| > 1$ and the solution $ B_{-}^{\Delta t} = R e^{-i \pi /2 }$ will thus grow exponentially when raised to the power of $n$ across the time steps. If $\sigma$ is positive, the other root has a magnitude exceeding $1$. \\
-	In either case, the solution: $A_j^{n} = \left( M B_{+}^{n \Delta t}+ E B_{-}^{n \Delta t} \right)e^{i \mu m \Delta x}$  (with two arbitrary constants, $M,E$, to be determined later), will amplify with increasing time, which is not a desired property, since it does not correspond to the true solution of the differential equation. This phenomenon of \emph{exponential amplification of the solution} is known as \emph{computational instability} and must be avoided at all costs. 
+	If $\sigma$ is positive, the magnitude $R=|B_{-}^{\Delta t}| > 1$ and the solution $ B_{-}^{\Delta t} = R e^{-i \pi /2 }$ will thus grow exponentially when raised to the power of $n$ across the time steps. If $\sigma < -1$, the other root has a magnitude exceeding $1$. \\
+	In either case, the solution: $A_j^{n} = \left( M B_{+}^{n \Delta t}+ E B_{-}^{n \Delta t} \right)e^{i k m \Delta x}$  (with two arbitrary constants, $M,E$, to be determined later), will amplify with increasing time, which is not a desired property, since it does not correspond to the true solution of the differential equation. This phenomenon of \emph{exponential amplification of the solution} is known as \emph{computational instability} and must be avoided at all costs. 
 	
 \subsection{The Courant-Friedrichs-Levy (CFL) condition in 1D}
 
 	So, we are left with having to impose a \emph{condition for a stable solution} $|\sigma| \leq 1$, that is:
 	
 	\begin{equation}
-		\left | \frac {c \Delta t}{\Delta x} \sin \mu \Delta x \right | \leq 1
+		\left | \frac {c \Delta t}{\Delta x} \sin k \Delta x \right | \leq 1
 	\end{equation}	
 	
-	If this condition is to hold for all admissible values of the wavelength $\mu$, then:
+	If this condition is to hold for all admissible values of the wavenumber $k$, then:
 	
 	
-	\begin{theorem}[Courant-Friedrichs-Levy (CFL) condition for computational stability in 1D]		
-	The maximum value of $\sin \mu \Delta x$ will happen for the highest resolved wavenumber (that is a wavelenght $L=4 \Delta x$), which requires that:
+	\begin{definition}[Courant-Friedrichs-Levy (CFL) condition for computational stability in 1D]		
+	The maximum value of $\sin k \Delta x = 1$ will happen for the highest fully resolved wavenumber (that is, a wavelength $L=4 \Delta x$), which requires that:
 	\begin{equation}
-		\left | \frac {c \Delta t}{\Delta x}  \right | \leq 1       \textrm{  ~~  or, with the notation used later ($\Delta x = d$): ~~ } \left | \frac {V_s \Delta t}{d}  \right | \leq 1 
+		\left | \frac {c \Delta t}{\Delta x}  \right | \leq 1
+	\end{equation}
+	  or, relaxing to non-constant flow velocity $V_s$, and with the shorthand ($\Delta x = d$):
+		\begin{equation}	
+			 \left | \frac {V_s \Delta t}{d}  \right |  \leq 1
 	\end{equation}	
-	\end{theorem}
+	\end{definition}
 
 	which is commonly referred to as the \emph{\textbf{Courant-Friedrichs-Levy} condition for computational stability} (in one dimension).
 
@@ -157,9 +160,13 @@ If our information "leapfrogs", very bad things will happen.
 
 What happens in practice? What typical time step are we contending with, in the horizontal and vertical directions?
 
+\begin{exercise}[1D CFL with some numbers]
 	{\bf Horizontal example:} $\Delta x = 10km$, $c = O(100) ms^{-1}$ what $\Delta t$ can we afford?
+	{\bf Vertical example:} $\Delta z = 500m$, $c = O(1) ms^{-1}$ what $\Delta t$ can we afford?
+\end{exercise}	
 		
-	But what will happen for a contemporary grid, like the one in Figure  \ref{horizontal-grid-stretch}?	
+But what will happen for a contemporary grid, like the one in Figure  \ref{horizontal-grid-stretch}? What is the limiting factor for the time step in this case?
+
 	\begin{figure}[h!]
 			\begin{center}
 		\includegraphics[trim={0cm 0.cm 0cm 0cm},clip,width=0.8\textwidth]{Figures/horizontal-irregular-grid}
@@ -168,9 +175,8 @@ What happens in practice? What typical time step are we contending with, in the 
 			\label{horizontal-grid-stretch}
 	\end{figure}
 
-{\bf Vertical example:} $\Delta z = 500m$, $c = O(1) ms^{-1}$ what $\Delta t$ can we afford?
+... and what about a typical vertical atmospheric grid, telescoped, like the one in Figure \ref{vertical-grid-stretch} ?
 
-... and what about a typical vertical atmospheric grid, telescoped, like the one in Figure \ref{veftical-grid-stretch}?
 \begin{figure}[h!]
 	\begin{center}
 	\includegraphics[trim={0cm 0.cm 0cm 0cm},clip,width=0.5\textwidth]{Figures/vertical-telescoped-grid}
@@ -246,12 +252,12 @@ What happens to the signal along the $x$, $y$ axes and what happens along the di
 	Which is the wind direction $\theta$ that is most likely to violate CFL? Since the wave numbers $p,q$ are independent, we can choose the maximum value, $1$, for each of the two terms: $\sin pd$ and $\sin qd$, and we are left with the task of maximising the remaining sum: $\cos \theta + \sin \theta$, which is $\sqrt{2}=0.707$, corresponding to $\theta=\pi/4=45^o$.
 
 
-\begin{theorem}[CFL condition in 2D]
+\begin{definition}[CFL condition in 2D]
 	For 2D CTCS, the CFL condition that will allow us to avoid computational instability under all circumstances (even with wind blowing at an angle of $45^o$) is: 
 	\begin{equation}
 		V_s \Delta t \sqrt{2} / d \leq 1 \textrm{   ~~~~~      or     ~~~~~  } V_s \Delta t \leq 0.707 d 
 	\end{equation}
-\end{theorem}
+\end{definition}
 
 
 \begin{figure}[h!]
@@ -355,10 +361,6 @@ $D=J \Delta x$ and {\bf every time that we decrease $\Delta x$ we increase $J$, 
 	k \Delta x = \frac {k D}{J}
 \end{equation}
 
-
-\subsection{Stability analysis of the upstream advection equation}
-
-
 If you remember your Von Neuman analysis, \textbf{the amplification factor, $\lambda$} for upstream advection (equation \ref{adv-upstream})	has this form:
 
 \begin{equation}
@@ -413,7 +415,9 @@ Let us pick a wavelength half the domain size, so that $kD=4 \pi$. This causes t
 
 In lectures 4,5 we will learn about Arakawa-sensei's staggered grids, and I showed you my current C-grid configuration, for the UM's EndGame dynamical core. \\
 
-In the last row near the poles, my $\Delta x \approx 5$km GCM has a grid spacing of 3.1m. Given a "worst case scenario" for wave propagation, what should my time step be, according to the 1D ("optimistic!") CFL criterion? Please compute that now, and raise your hand as soon you have the answer.\\
+\begin{exercise}[2D CFL in a real GCM]
+The Unified Model's EndGame dynamical core uses natural coordinates (latitude/longitude) and thus presents "singularities" near the two poles. In the last row near the poles, my $\Delta x \approx 5$km GCM has a grid spacing of 3.1m. Given a "worst case scenario" for wave propagation, what should my time step be, according to the 1D ("optimistic!") CFL criterion? Please compute that now, and raise your hand as soon you have the answer.
+\end{exercise}
 
 Here is my real time step: 
 
@@ -422,18 +426,16 @@ Here is my real time step:
 	\caption{DYAMOND GCMs, with typical $\Delta x \approx 5$km, from Stevens et al., 2019}
 \end{figure}
 
-How can such magic be possible?
+How can such magic be possible? Hint: we shall learn about Semi-Lagrangian methods in Chapter 7.
 
-\subsection{Hurricane and Typhoon simulation in climate GCMs: frequency}
+\clearpage
+\subsection{Hurricane and Typhoon simulation in climate GCMs}
 
 \begin{figure}[h!]
 \begin{center}	
 	\includegraphics[width=0.8\textwidth]{Figures/Zarz1}
 \end{center}
 \end{figure}
-
-
-\subsection{Hurricane and Typhoon simulation in climate GCMs: dynamics and physics}
 
 \begin{figure}[h!]
 \begin{center}	
