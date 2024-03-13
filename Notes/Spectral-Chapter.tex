@@ -3,5 +3,246 @@
 \chapter{The Spectral Method}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-The fundamental ideas in this chapter ...
+This chapter illustrates a prominent example of alternative solution methods: the spectral method, which is part of the family of series expansion (Galerkin) methods, with some of the other ones being finite elements and spectral elements.
 
+\section{Basic definitions for the spectral method}
+The spectral method uses decomposition into waves to represent any integrable function $q(x,t)$, in this example in space (1D) and time. If the domain is periodic, with period $L$, we can express the spatial structure of $q(x,t)$ exactly by a \emph{Fourier series expansion}:
+
+\begin{definition}[The transform pair\\]
+The representation of a function depends on the combination of an infinite amount of waves:
+	
+	\begin{equation}
+	q(x,t)=\sum_{k=-\infty}^{\infty} \widehat{q_k}(t)e^{ikx}
+	\label{inverse_transform}
+	\end{equation}
+
+and the spectral coefficients (the wave characteristics) depend on sampling the function $q$ within a spatial domain of size $L$:
+
+\begin{equation}
+	\widehat{q_k}(t)=  \frac{1}{L}  \int_{x-\frac{L}{2}}^{x+\frac{L}{2}} q(x,t) e^{-ikx} dx
+	\label{fourier_transform}
+\end{equation}
+
+the two equations above form the \emph{transform pair}.
+\end{definition}
+
+\clearpage
+From the definition of the inverse transform in \ref{inverse_transform} the $x$-derivative of $q$ is simply:
+
+\begin{equation}
+	\frac{\partial	q(x,t)} {\partial x} = \sum_{k=-\infty}^{\infty} ik \widehat{q_k}(t)e^{ikx}
+	\label{exact_gradient}
+\end{equation}
+
+In practice, for a numerical model, and given limited computational resources, the actual transform pair is:
+
+\begin{equation}
+	q(x_j,t) \cong \sum_{k=-n}^{n} \widehat{q_k}(t)e^{ikx_j}
+	\label{specfunc_discrete}
+\end{equation}
+
+\begin{equation}
+	\widehat{q_k}(t) \cong  \frac{1}{M}  \sum_{j=1}^{M} q(x_j,t) e^{-ikx_j}, \qquad  \forall \quad -n \le k \le n,
+		\label{speccoeff_discrete}
+\end{equation}
+
+ where $n$ is the \emph{truncation}, with $-n \le k \le n$  and $M$ is the number of grid points, which determines the spatial resolution. The discretised transform pair (\ref{specfunc_discrete} and \ref{speccoeff_discrete}) tells us that we are computing $n$ wave numbers at each grid point $j$ and that we are using information from M grid points to compute each spectral coefficient. 
+ 
+ \subsection{Truncation, accuracy and computational costs}
+ The truncation is exactly reversible if $M$ is large. This is equivalent to model resolution in finite difference models. What are the computational costs involved? We can find out by substituting \ref{specfunc_discrete} into \ref{speccoeff_discrete}:
+ 
+ \begin{equation}
+ 	\widehat{q_k}(t) \cong  \frac{1}{M} \sum_{j=1}^{M}  \left\{  \left[   \sum_{l=-n}^{n} \widehat{q_l}(t) e^{ilx_j}  \right]  e^{-ikx_j}  \right\}  \qquad  \forall \qquad -n \le k \le n,  \quad -n \le l \le n
+ 	\label{spectral_costs}
+ \end{equation}
+
+note that both wave numbers are bound by $n$, and that we have a maximum wave number $\pm 2n$, corresponding to our truncation $n$, thus a total of $2n+1$ complex conjugates $\widehat{q_t}(t)$ (why the $+1$?) are needed. If we count those, we are dealing with $4n+2$ real numbers, but the assumption that $q$ is real means that $\widehat{q_{-k}}=\widehat{q_k^*}$, where $q^*$ is the complex conjugate, so in reality we only need carry half the real numbers (see Dave Randall's notes for a demonstration). This means that computing the Fourier representation is equivalent to discretising the function $q(x,t)$ onto $2n+1$ grid points.
+
+\begin{definition}[The relationship between spectral truncation and number of grid points\\]
+The above means that, in order to compute the transforms and then faithfully represent the function (amplitude, phase etc.) on a grid, we must make sure that the grid definition, which comprises $M$ points, obeys this relationship:
+\begin{equation}
+	M \ge 2n+1
+\end{equation}
+\end{definition}
+As a simple example, a Fourier representation of $q$, including just wave numbers 0 and 1, is equivalent to a grid-point representation of $q$ that uses only 3 grid points. Note that this is a minimal requirement, because computing terms like advection, involving more than one variable, or even non-linear term, for instance in the case of parametrisations (which are normally carried out on the grid) is likely to require an even higher number of grid points for accuracy.
+
+In summary, computing the transform, and then its inverse at each time step seems like a lot of work, and it must be carried out at every time step. Why bother doing all that?
+
+\section{Exact gradients}
+It turns out that computing gradients in wave space is both extremely easy and absolutely accurate. If we discretise \ref{exact_gradient}, bearing in mind that in the real world we are limited by computational resources, thus limited truncation and resolution, we end up with:
+
+\begin{equation}
+	\frac{\partial	q(x_j,t)} {\partial x} \cong  \sum_{k=-n}^{n}  ik \widehat{q_k}(t)e^{ikx_j}
+	\label{gradient_truncated}
+\end{equation}
+
+which reminds us that we are \underline{never} going to be able to afford infinite wave numbers, so that we can never be absolutely accurate.
+
+ \subsection{Equivalence between spectral and finite difference methods}
+Let us make use of the expression for the $x$-gradient to understand things a little more. If we substitute \ref{speccoeff_discrete} into \ref{gradient_truncated}, after re-arranging some terms we shall have: 
+
+\begin{equation}
+	\frac{\partial	q(x_l,t)} {\partial x} \cong   \sum_{k=-n}^{n} \left[  \frac{ik}{M}  q(x_j,t) e^{-ikx_j} \right] e^{ikx_l}
+	\label{spectral_costs_gradient}
+\end{equation}
+
+we can now reverse the two sums, to produce a very interesting relationship:
+
+\begin{equation}
+	\frac{\partial	q(x_l,t)} {\partial x} \cong   \frac{i}{M}  \sum_{j=1}^{M}  \alpha_j^l  q(x_j,t)
+	\label{spectral_costs_gradient_reversed}
+\end{equation}
+
+where:
+
+\begin{equation} 
+	\alpha_j^l \equiv \sum_{k=-n}^{n}  k  e^{ik (x_l-x_j)} 
+	\label{gradient_coefficients}
+\end{equation}
+
+do spend a little time in observing how \ref{spectral_costs_gradient_reversed} is very much the definition of a general finite difference scheme, in which the coefficients $\alpha_j^l$ are the weights of individual grid points. It so happens, however, that this finite difference scheme involves all point on the domain, rather than the neighbourhood of the arrival point of interest. Somewhat overkill, but it works.
+
+\section{A simple advection model with the spectral method}
+Let us go back to one of our favourite problems in 1D:
+
+\begin{equation}
+	\frac{\partial q}{\partial t} + c 	\frac{\partial q}{\partial x} = 0
+\end{equation}
+
+when transformed into wave space:
+
+\begin{equation}
+  \sum_{k=-n}^{n} 	\frac{d \widehat{q_k}}{d t}  e^{ikx_j}+ c  \sum_{k=-n}^{n} 	ik \widehat{q_k} e^{ikx_j}= 0
+\end{equation}
+
+Because we have used basis functions that are orthogonal by design, we can invoke linear independence to write this:
+
+\begin{equation}
+	\frac{d \widehat{q_k}}{d t}  + ikc   \widehat{q_k} = 0  \qquad  \forall -n \le k \le n
+	\label{spectral_linear_advection}
+\end{equation}
+
+which is our linear prognostic model in wave space. Do remember that $\frac{dq_0}{dt} \equiv 0$. Why is that?
+
+
+\subsection{Comparing linear advection with the spectral and finite difference methods}
+Remember how, for a simple finite difference method, e.g. SOA centred in space finite differences, our prognostic equation looked instead like this:
+
+\begin{equation}
+	\frac{d \widehat{q_k}}{d t}  + ikc \left[   \frac {\sin k \Delta x}{k\Delta x}  \right]  \widehat{q_k} = 0 
+	\label{FD_linear_advection}
+\end{equation}
+
+which means that waves will travel with a lower phase speed than what the analytical solution implies, particularly so for the high wave numbers. Again, remember that, in practice, the spectral method uses a finite number of wave numbers, so accuracy will also be limited with that method.
+
+All of the above transformations, for the linear model, are rather simple and intuitive. However, the minute we attempt to go non-linear (e.g. just go to Burger's equation from the above), things instantly become more complicated.
+
+\section{Nonlinear advection model with the spectral method}
+Let us go back to one of our favourite problems in 1D, \emph{Burger's equation}:
+
+\begin{equation}
+	\frac{\partial u}{\partial t} + u	\frac{\partial u}{\partial x} = 0
+\end{equation}
+
+As before, over a periodic domain, we can use the spectral method to do this:
+
+\begin{equation}
+	\sum_{k=-n}^{n} 	\frac{d \widehat{u_k}}{d t}  e^{ikx_j} +  \left( \sum_{l=-n}^{n}  \widehat{u_l} e^{ilx_j} \right)  \left(  \sum_{m=-n}^{n} 	im \widehat{u_m} e^{imx_j} \right)  = 0
+\end{equation}
+
+Can you see the problem arising now? We are trying to solve for $\widehat{u_k}(t)$ in the range of wave numbers $-n \le k \le n$, but looking at the rhs of the equation above, we can see how we can expect to have terms like these: $e^{ilx_j}e^{imx_j}$, which will not necessarily lie in that range. Therefore, we shall have to re-visit our definition of the equivalence between spectral truncation and number of grid points.
+
+This is why: for a given Fourier mode, we shall end up with this expression:
+
+\begin{equation}
+		\frac{d \widehat{u_k}}{d t}  +  \left\{ \sum_{l=-n}^{n} \sum_{m=-n}^{n}	im \left[    \widehat{u_l}  \widehat{u_m}  e^{i(l+m)x_j} \right]  \right\} e^{-ikx_j} = 0      \qquad  \forall -n \le k \le n
+\end{equation}
+
+In practice, the quantity between the curly brackets involves computing sums of wavenumbers, which is by definition carried out at grid points. Those sums happen over an interval $\pm \alpha$. We must pick $\alpha$ so that it can cover all possible values of $l+m$ that lie in the range $-n \le k \le n$. We are already familiar with this problem: it is \emph{aliasing}. We can see what those values are from figure \ref{fig:nlm}:
+
+\begin{figure}
+	\begin{center}
+	\includegraphics[width=0.65\textwidth]{Spectral-Pictures/nml.png}
+	\end{center}
+	\label{fig:nlm}
+	\caption{How the wave numbers $l$, $m$ may contribute to forming new wave numbers in the range  $-n \le k \le n$. What is inside the two triangular regions marked by $X$ may not contribute.}
+	\end{figure}
+
+We can figure out that two regions must be excluded, which are outside the range, so that we can subtract the total number of points to be considered. The number of points in each of those two triangular regions is:
+
+\begin{equation}
+	1+2+3 ... + (n-1) =   \frac{n(n-1)}{2} 
+\end{equation}
+
+We shall therefore retain these many points:
+
+\begin{equation}
+(2n+1)^2 - 2 \left[  \frac{n(n-1)}{2}  \right] =   (4n^2 + 4n +1) -  (n^2 - n)  = 3n^2 + 5n +1
+\end{equation}
+
+This is not good news, as the number of grid points required to correctly represent the non-linear terms depends on the square of $n$. And this is just in 1D. What can we do instead? As Dave Randall recalls, both Orszag and Eliassen et al. came up with a solution in 1970: compute the two terms involved in the advection of $u$, that is $u$ and $\frac{\partial u}{\partial x}$ using the spectral method, then computing their product on the grid, then re-projecting into wave space, thus avoiding the problem, and enjoying the best of two worlds. 
+
+This is what is done in practice:
+
+\begin{equation}
+	\left( \widehat{u   \frac{\partial u}{\partial x}} \right) _k  =  \frac{1}{M}  \sum_{j=1}^{M}  \left\{  \left[ u (x_j) \frac{\partial u}{\partial x} (x_j) \right]   e^{-ikx_j}       \right\}  \qquad  \forall -n \le k \le n
+	\label{spectral_on_grid1}
+\end{equation}
+
+which is saying that we intend to compute the spectral coefficients of the product of the two terms involved in the advection of $u$ by $u$, starting from their grid point representation. Using the expressions derived before (   and   ), we can compute those terms by using Fourier series, like this:
+
+\begin{equation}
+	\left( \widehat{u   \frac{\partial u}{\partial x}} \right) _k  =  \frac{1}{M}  \sum_{j=1}^{M}  
+	\left[  \left( \sum_{l=-n}^{n}  \widehat{u_l} e^{ilx_j} \right)    \left(  \sum_{m=-n}^{n} 	im \widehat{u_m} e^{imx_j} \right) e^{-ikx_j}       
+	\right]  \qquad  \forall -n \le k \le n
+	\label{spectral_on_grid2}
+\end{equation}
+
+What are we doing here? We are using the spectral method to compute the gradient (the partial derivative $\frac{\partial u}{\partial x}$), but we are doing it on the grid, avoiding the problem of aliasing, and increasing our efficiency. In fact, this requires far fewer grid points, because we have three Fourier modes, but they are now allowed to interact as before, so we end up with just $3n+1$ coefficients, and we have a new equivalence:
+
+\begin{definition}[Equivalence of truncation and number of grid points for non-linear advection]
+	\begin{equation}
+		M \ge 3n+1
+	\end{equation}
+	which is 50\% more points than the $2n+1$ number of grid points required to represent $u$ itself, albeit far fewer than those required by computing the product in wave space.
+	\end{definition}
+
+\section{A simple spectral model workflow for non-linear advection}
+Now that we have our set of equations, and some ideas on the ideal relationship between truncation and number of grid points, as well as a strategy to deal with aliasing, we can design a toy model.
+
+\fcolorbox{ocre}{lightgray}{\parbox{\dimexpr \linewidth-2\fboxsep-2\fboxrule}{
+		\textbf{A very simple spectral model}
+
+\begin{enumerate}
+	\item initialise the spectral coefficients $\widehat{u_k}$,  for $-n \le k \le n$, by making use of the $u$ field on a grid (usually from observations, or analysis)
+	\item evaluate both $u$ and $\frac{\partial u}{\partial x}$ on the grid, making sure that the grid size obeys $M\ge3n+1$. Remember that the gradient $\frac{\partial u}{\partial x}$  is computed using the spectral method, so that it is nearly exact
+	\item form the product $u\frac{\partial u}{\partial x}$ on the grid
+	\item transform $u\frac{\partial u}{\partial x}$ back into wave space, for $-n \le k \le n$, which gives us the coefficients $\left( \widehat{u   \frac{\partial u}{\partial x}} \right) _k$
+	\item now predict the new values of $\widehat{u_k}$, with increments due to advection
+	\item go back to the second step and continue to iterate until all time steps have been completed
+\end{enumerate}
+}}
+
+Note that the grid-point representation contains more information than we actually need ($3n+1$ real numbers versus the $2n+1$ real numbers needed for our spectral coefficients): at every time step we throw away about 1/3 of the information that we produce on the grid: this is the price we pay in order to avoid aliasing.
+
+\section{The spectral method on a sphere}
+We saw in the chapter on SWEs that working on a sphere involves metric terms. Fourier series are good basis functions on a Cartesian grid, albeit not suitable for a sphere. Instead, we use basis functions that are aware of the topology:
+
+\begin{definition}[Spherical harmonics]
+	These were defined by Silberman (1954), as:
+	\begin{eqnarray}
+		F(\lambda, \phi)= \sum_{m=-\infty}^{\infty} \sum_{n=|m|}^{\infty} F_n^m Y_n^m (\lambda, \phi)\\
+		Y_n^m (\lambda, \phi) = e^{im \lambda} P_n^m (\sin \phi)
+	\end{eqnarray}
+	where $Y_n^m$ are the spherical harmonics, and  $P_n^m$ are the associated Legendre transforms of the first kind, which satisfy:
+	\begin{equation}
+		P_n^m (\sin \phi) = T.B.A.
+		\end{equation}
+	here $m$ is the zonal wave number and $n-m$ is the meridional nodal number, and it is necessary that $n \ge m$.
+\end{definition}
+
+The spherical harmonics are the eigenfunctions of the Laplacian on the sphere:
+	\begin{equation}
+	\nabla^2 Y_n^m (\sin \phi) = \frac{-n(n+1)}{a^2} Y_n^m
+\end{equation}
+where $a$ is the radius of the sphere.

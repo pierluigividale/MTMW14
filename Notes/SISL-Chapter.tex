@@ -103,14 +103,12 @@ centred (leapfrog) scheme. We can also choose the time-level of the RHS terms. F
 
 are forward explicit and implicit schemes respectively.
 
-~
 
 Rule of thumb: implicit schemes are more stable than explicit
 (e.g., implicit schemes for exponential decay are stable for any
 time-step). However, fully implicit schemes for coupled equations are
 difficult to solve and involve expensive iterations. 
 
-~
 
 Numerical weather prediction models use semi-implicit methods where
 only the ``gravity wave terms'' are treated implicity and the rest are
@@ -118,7 +116,6 @@ explicit. The mass conservation equation can be {\em inverted} to
 solve for future $\eta^{n+1}$. No iteration is required and schemes
 are devised so that the matrix inversion is only done once. 
 
-~
 
 {\bf Benefit:} Lifts CFL restriction on time-step associated with
 the fast GWs.
@@ -130,35 +127,41 @@ the fast GWs.
 
 In atmospheric models, the fastest gravity waves, i.e., the external-gravity or “Lamb” waves, have speeds on the order of 300 $m s^{-1}$ , which is also the speed of sound. The typical time step for a model with a 10km mesh will thus have to be \underline{\hspace{1cm}}? This is unfortunate, because the external gravity modes are believed to play only a minor role in weather and climate dynamics. 
 
+\begin{eqnarray}
+	 \frac{h_{j}^{n+1} - h_{j}^{n}}{\Delta t}  + H \left(  \frac{u_{j+1}^{n+1} - u_{j}^{n+1}}{\Delta x}  \right)  & = & 0 \\
+	 	\frac{u_{j+1}^{n+1} - u_{j+1}^{n}}{\Delta t}  + g \left( \frac{h_{j+1}^{n+1} - h_{j}^{n+1}}{\Delta x}   \right)  & = & 0 
+\end{eqnarray}
+
 %\begin{minipage}{0.4\textwidth}
-\begin{figure}
-	\includegraphics[trim={2cm 4.5cm 0cm 3cm},clip,width=12.cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/Figures/SWE_GWs_Implicit}
-	\label{fig:Spherical}
+%\begin{figure}
+%	\includegraphics[trim={2cm 4.5cm 0cm 3cm},clip,width=12.cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/Figures/SWE_GWs_Implicit}
+%	\label{fig:Spherical}
 	%\setbeamerfont{caption name}{size=\tiny}
-	\caption{\label{fig:blue_rectangle} 1D SWEs in implicit form}
-\end{figure}
+%	\caption{\label{fig:blue_rectangle} 1D SWEs in implicit form}
+%\end{figure}
 %\end{minipage} 
 
-\hfill
+Gravity waves are, therefore, commonly treated with implicit schemes, in order to mitigate this problem. However, this means solving a matrix problem (see following slides).	
 
-\begin{minipage}{0.55\textwidth}
-	Gravity waves are, therefore, commonly treated with implicit schemes, in order to mitigate this problem. However, this means solving a matrix problem (see following slides).	
-\end{minipage}
 
 %\begin{minipage}{0.4\textwidth}
-\begin{figure}
-	\includegraphics[trim={1cm 2cm 0cm 2cm},clip,width=12cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/Figures/SWE_GWs_FWBW_h_equation}\\
-	\includegraphics[trim={0cm 2cm 0cm 2cm},clip,width=12cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/Figures/SWE_GWs_FWBW_u_equation}
-	\label{fig:Spherical}
+%\begin{figure}
+%	\includegraphics[trim={1cm 2cm 0cm 2cm},clip,width=12cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/Figures/SWE_GWs_FWBW_h_equation}\\
+%	\includegraphics[trim={0cm 2cm 0cm 2cm},clip,width=12cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/Figures/SWE_GWs_FWBW_u_equation}
+%	\label{fig:Spherical}
 	%\setbeamerfont{caption name}{size=\tiny}
-	\caption{\label{fig:blue_rectangle} 1D SWEs in FW-BW form}
-\end{figure}
+%	\caption{\label{fig:blue_rectangle} 1D SWEs in FW-BW form}
+%\end{figure}
 %\end{minipage} \hfill
 
 %\begin{minipage}{0.55\textwidth}
 Another approach is to go for the so called \emph{forward-backward} scheme, which eliminated the need for solving a matrix problem.
 %\end{minipage}
 
+\begin{eqnarray}
+	\frac{h_{j}^{n+1} - h_{j}^{n}}{\Delta t}  + H \left(  \frac{u_{j+1}^{n} - u_{j}^{n}}{\Delta x}  \right)  & = & 0 \\
+	\frac{u_{j+1}^{n+1} - u_{j+1}^{n}}{\Delta t}  + g \left( \frac{h_{j+1}^{n+1} - h_{j}^{n+1}}{\Delta x}   \right)  & = & 0 
+\end{eqnarray}
 
 \subsection{A semi-implicit scheme for SWEs}
 
@@ -240,6 +243,8 @@ scheme barely costs more that an explicit scheme per time-step but
 enables a much longer time-step because it lifts the CFL restriction
 associated with gravity wave speed $\sqrt{gH}$.
 
+\clearpage
+
 \section{Frames of reference}
 \subsection{A reminder: Eulerian and Lagrangian frames of reference}
 	
@@ -248,34 +253,51 @@ associated with gravity wave speed $\sqrt{gH}$.
 %\begin{tabular}{lc}
 %\begin{minipage}[l]{0.5\textwidth}	
 
-\begin{itemize}
-	\item Eulerian: $\frac {\partial \Psi}{\partial t} + u \frac {\partial \Psi}{\partial x}= S$
-	\item Lagrangian: $\frac {d \Psi}{d t} = S$ ~ (1)		
-\end{itemize}
+\begin{definition}[Eulerian]
+\begin{equation}
+\frac {\partial \Psi}{\partial t} + u \frac {\partial \Psi}{\partial x}= S
+\label{eqn:eulerian}
+\end{equation}
+\end{definition}
 
-%\end{minipage}
-%\end{tabular}
+\begin{definition}[Lagrangian]
+\begin{equation}
+\frac {d \Psi}{d t} = S
+\label{eqn:lagrangian}
+\end{equation}
+\end{definition}
 
-%\begin{minipage}[c]{0.5\textwidth}	
 	\begin{center}
 		\begin{tabular}{cc}
 			\rotatebox{0}{\includegraphics[width=0.3\textwidth]{Figures/UP-Eulerian.png}} \\
 			\rotatebox{0}{\includegraphics[width=0.15\textwidth]{Figures/UP-Lagrangian.png}}
 		\end{tabular}
 	\end{center}
-%\end{minipage}
 
 
-The two are tied by the definition of the total derivative: $\frac {d}{d t} = \frac {\partial }{\partial t} + \frac {d x}{d t} \frac {\partial }{\partial x}$\\
-and the definition of velocity: $\frac {d x}{d t} = u$ ~ (2)\\
+The two are tied by:
 
-~
+\begin{definition}[The total derivative]
+	\begin{equation}
+\frac {d}{d t} = \frac {\partial }{\partial t} + \frac {d x}{d t} \frac {\partial }{\partial x}
+\label{eqn:totalderivative}
+\end{equation}
+\end{definition}
 
-We could solve (1) as an initial value problem, by choosing a number of regularly spaced fluid particles at $t=0$, assigning a $\Psi$ value to each and then following them around the flow by integrating the two ODEs (1) and (2) in time.\\
+and
 
-~
+\begin{definition}[velocity]
+		\begin{equation}
+\frac {d x}{d t} = u
+\label{eqn:velocity}
+\end{equation}
+\end{definition}
 
-\underline{Problem:} the parcels would very likely spread out in a non-homogeneous fashion, so that any numerical approximation of $\Psi(x,t)$ will become highly inaccurate wherever they are sparse (see the extra slides at the end for more). What can we do?
+We could solve \ref{eqn:lagrangian} as an initial value problem, by choosing a number of regularly spaced fluid particles at $t=0$, assigning a $\Psi$ value to each and then following them around the flow by integrating the two simple ODEs (\ref{eqn:lagrangian} and \ref{eqn:velocity}) in time.\\
+
+\begin{exercise}[Inhomogeneous distribution and sampling]
+The parcels would very likely spread out in a non-homogeneous fashion, so that any numerical approximation of $\Psi(x,t)$ will become highly inaccurate wherever they are sparse (see the extra slides at the end for more). What can we do?
+\end{exercise}
 
 \section{The Lagrangian method}
 \subsection{Trajectory calculations}
@@ -293,15 +315,13 @@ We could solve (1) as an initial value problem, by choosing a number of regularl
 	following fluid parcels by modelling $S$ and integrating
 	(\ref{velocity}).
 	
-	~
-	
+
 	{\bf Advantages:} No underlying grid, so can represent air masses
 	accurately as they thin to arbitrarily fine-scales. Also, no CFL
 	criterion to limit time-step (i.e., parcels can travel far in one
 	time-step).
 	
-	~
-	
+
 	{\bf Disadvantages:} Velocity stirs air parcels so they are
 	irregularly spaced and often far apart, making estimation of gradients
 	difficult. In {\em kinematic models}, velocity is given but mixing
@@ -377,7 +397,6 @@ Since velocity $U$ is constant, it is quite easy to show that:
 
 \subsection{Semi-Lagrangian Methods in 2D: how to find $\tilde{x}^n_{i,j}$}
 
-	
 	Calculate short trajectories backward-in-time from a fixed grid and
 	use them to evaluate the Lagrangian rates of change at every
 	grid-point. Trajectory calculation can be cheap, because quite short. 
@@ -482,8 +501,8 @@ stability at a given spatial resolution, summarised by the CFL criterion:
 where $c$ is the fastest speed of information propagation. Generally,
 flows are {\em unbalanced} meaning that there are fast waves involving
 fluid movement that is not related to PV. Such fast waves can limit
-the time-step. Then, \underline{the semi-Lagrangian method} does not
-help, because it \underline{only ensures stability with respect to advection}.
+the time-step. Then, \emph{the semi-Lagrangian method} does not
+help, because it only ensures stability  \underline{with respect to advection}.
 
 \begin{itemize}
 \item
@@ -503,54 +522,6 @@ explicit.
 All global NWP models currently use semi-implicit, semi-Lagrangian
 methods attempting to achieve stability for long time-steps ($1 < \alpha <
 10$).
-
-
-\subsection{From Lecture 5: gravity waves and Semi Implicit}
-
-	In atmospheric models, the fastest gravity waves, i.e., the external-gravity or “Lamb” waves, have speeds on the order of 300 $m s^{-1}$ , which is also the speed of sound, requiring a very short time step. This is unfortunate, because the external gravity modes are believed to play only a minor role in weather and climate dynamics. 
-	
-The SWEs are discretised below
-using a leapfrog scheme for Coriolis terms but a
-trapezoidal scheme (mixed implicit-explicit) for the gravity wave
-terms:
-\begin{eqnarray*}
-	\frac{u^{n+1}-u^{n-1}}{2\Delta t}-fv^n+\frac{g}{2}
-	\left( \partd{h}{x}^{n+1} +\partd{h}{x}^{n-1} \right) & = & 0 \\
-	\frac{v^{n+1}-v^{n-1}}{2\Delta t}+fu^n+\frac{g}{2}
-	\left( \partd{h}{y}^{n+1} +\partd{h}{y}^{n-1} \right) & = & 0 \\
-	\frac{h^{n+1}-h^{n-1}}{2\Delta t}+\frac{H}{2}
-	\left( \partd{u}{x}^{n+1} +\partd{u}{x}^{n-1}
-	+\partd{v}{y}^{n+1} +\partd{v}{y}^{n-1} 
-	\right) & = & 0. 
-\end{eqnarray*}
-
-Re-arranging with future values on the left:
-\begin{eqnarray*}
-	u^{n+1}+\Delta t g \partd{h}{x}^{n+1} & = & A \\
-	v^{n+1}+\Delta t g \partd{h}{y}^{n+1} & = & B \\
-	h^{n+1}+\Delta t H \left( \partd{u}{x}^{n+1}+\partd{v}{y}^{n+1} \right) & = & C
-\end{eqnarray*}
-	
-
-
-\section{Some real world applications: explicit GCMs and SISL GCMs}
-\subsection{Hurricane and Typhoon simulation in climate GCMs: precipitation composite}
-
-	\begin{center}	
-		\includegraphics[width=0.8\textwidth]{Figures/TC-precipitation}
-	\end{center}
-	
-
-\subsection{Hurricane and Typhoon simulation in climate GCMs: vertical structure composite}
-	\begin{center}	
-		\includegraphics[width=0.8\textwidth]{Figures/TC-structures}
-	\end{center}
-	
-
-\subsection{Why the differences}
-
-	These GCMs are very different in terms of dynamical core, parameterizations etc., but they are also quite different in terms of the use of the time step. I have been experimenting with our UK model (HadGEM3), and Colin Zarzycki has been experimenting with the NCAR model, managing to double the number of hurricanes with a time step of 1/4, but I have also tested the same ideas in the ECMWF model, since it is the one that uses very long time steps.
-	
 
 \section{Extras}
 
@@ -588,7 +559,7 @@ Re-arranging with future values on the left:
 				
 %			\end{minipage}
 %			\begin{minipage}[c]{0.4\textwidth}
-				\rotatebox{0}{\includegraphics[width=0.8\textwidth]{Figures/q_contour.eps}}
+				\rotatebox{0}{\includegraphics[width=0.6\textwidth]{Figures/q_contour.eps}}
 %			\end{minipage}
 %		\end{tabular}
 		
@@ -646,7 +617,6 @@ Re-arranging with future values on the left:
 
 
 \subsection{Models for balanced dynamics} 
-
 	
 	A family of models is obtained by treating the {\em material
 		conservation} and {\em PV inversion} operations in an Eulerian or
@@ -689,14 +659,12 @@ Re-arranging with future values on the left:
 %		\begin{minipage}[l]{0.6\textwidth}
 			Potential vorticity is treated in a Lagrangian way (by
 			calculating trajectories of nodes on tracer contours).
-			
-			~
-			
+						
 			Example here shows a single contour advected by an unsteady polar
 			vortex. Note the finescale filamentary structure.
 %		\end{minipage}
 %		\begin{minipage}[c]{0.4\textwidth}
-			\rotatebox{90}{\includegraphics[width=0.9\textwidth]{Figures/T170F6_t170.eps}}
+			\rotatebox{90}{\includegraphics[width=0.5\textwidth]{Figures/T170F6_t170.eps}}
 %		\end{minipage}
 	\end{tabular}
 	
@@ -713,3 +681,5 @@ Re-arranging with future values on the left:
 	{\bf Disadvantages:} Allowing for non-conservation (e.g.,
 	sources/sinks) is difficult because such processes violate
 	monotonicity preservation and must introduce new $q$-contours.
+	
+	
