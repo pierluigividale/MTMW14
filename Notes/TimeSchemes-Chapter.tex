@@ -473,7 +473,7 @@ so the scheme is \emph{unconditionally unstable}. }}
 		$$\lambda = \frac{1 + \frac{i \Omega}{2}}{1 - \frac{i \Omega}{2}} = \frac{\sqrt{1-\frac{\Omega^2}{4}+i\Omega}}{1+\frac{\Omega^2}{4}}$$
 		which upon taking the norm gives us  
 		$$|\lambda|=1$$
- so the scheme is \emph{A-stable} with no amplitude error at all. An excellent choice. }}
+ so the scheme is \emph{A-stable} with no amplitude error at all. An excellent choice in terms of amplitude, but it does not mean that the solution is an exact replica of the analytical solution.}}
 
 \begin{exercise}
 	Go back to the derivation of eqn. \ref{oscillation-family}; recognise that, for the particular family of schemes we are considering, $\alpha=1-\beta$, because of the consistency condition. Substitute, and form an expression for the amplification factor $|z|$ that only depends on $\beta$, $\omega$ and the time step $\Delta t$:
@@ -540,7 +540,7 @@ For {\bf backward}:
 \end{equation}
 In this case, $\lambda = \frac{1}{1+K}<1$ and the scheme is unconditionally stable; also, in the limit $K \rightarrow \infty$, the scheme behaves exactly like the true solution.
 
-Other schemes, applied to the decay equation, produce the behaviour shown in Fig. \ref{allschemes-decay}.
+%Other schemes, applied to the decay equation, produce the behaviour shown in Fig. \ref{allschemes-decay}.
 
 \subsubsection{When wonderful schemes go wrong: Leapfrog and the decay equation}
 Once again, the Leapfrog is s.o.a. for this equation, but there are critical issues:
@@ -548,7 +548,13 @@ Once again, the Leapfrog is s.o.a. for this equation, but there are critical iss
 	\item it is unconditionally unstable for all $|\Omega|$
 	\item it is still creating a computational mode, and it oscillates between time steps, changing sign. This is the result of a constructive feedback effect, called "overstability"
 	\end{enumerate}
-See Dave Randall's notes for an in-depth analysis of these issues.
+This is shown in figure \ref{fig:Leapfrog-decay}. See Dave Randall's notes for an in-depth analysis of these issues.
+
+\begin{figure}[h!]
+	\includegraphics[trim={0cm 0.cm 0cm .7cm},clip,width=1.0\textwidth]{TimeSchemes-Pictures/Leapfrog-decay}
+	\caption{David Randall's illustration (his Fig 4.12) of the behaviour of the Leapfrog scheme for the decay equation}
+	\label{fig:Leapfrog-decay}
+\end{figure}
 
 In summary, there is a very big danger in using the {\bf Leapfrog} scheme in solving the decay equation, in that we will end up with an unconditionally unstable scheme, and computational modes. It is in fact a very bad choice for any equation that contains damping (so, think turbulence scheme, or the decay of radiation through a cloud, or through a vegetation canopy).
  

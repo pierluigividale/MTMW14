@@ -6,6 +6,208 @@
 
 \vspace{1em}
 
+
+\section{The governing equations}
+
+In his lecture on Chaos, Tim Palmer explains how the Navier Stokes equations, describing the motion of a Newtonian fluid (loosely, a viscous fluid); the Euler equations describe the motion of a fluid with no viscosity. To this day have no analytical solutions (see the \href{https://en.wikipedia.org/wiki/Millennium_Prize_Problems}{Millenium Prize}). 
+
+Predicting the behavior of geophysical fluids only requires a handful of equations, fundamentally Newton's second law, the ideal gas law, the first law of thermodynamics, and the continuity equation. Additionally, if we are imposing forcings, we will end up using Planck's law, as well as a number of empirical formulations describing phenomena such as turbulence, or the behavior of live organisms, such as bacteria, or cells in live tissues.
+
+Leaving aside the empirical aspects of "Earth System" processes, that is, the parametrisations that we shall be discussing in later chapters, the main equations we are concerned with in prediction are:
+
+\subsection{Equation of Motion}
+
+Newton's second law for a fixed or inertial frame of reference:
+
+\begin{equation}
+	\frac{d_a \bm{V}_a}{dt}=\bm{M}
+\end{equation}
+
+where $\bm{M}$ represents the vector sum of all forces per unit mass. We are normally interested on fluid motion on our planet, which is rotating, thus not an inertial frame of reference. Assuming that the rotation is expressed by the angular velocity $\bm{\Omega}$, we can express the equation of motion in terms of a relative term and a rotation term:
+
+\begin{equation}
+	\bm{V}_a=\bm{V} + \bm{\Omega} \times \bm{r}
+\end{equation}
+
+where $\bm{r}$ is the position vector of a particle of fluid as measured from the origin of the Earth's centre.
+
+After some substitutions, we can rewrite our equation of motion to relate the inertial system ($\frac{d_a}{dt}$) and the rotating system ($\frac{d}{dt}$):
+
+\begin{equation}
+	\frac{d_a \bm{V}_a}{dt}=   \frac{d \bm{V}_a}{dt}    + \bm{\Omega} \times \bm{V}_a
+\end{equation}
+
+In terms of $\bm{M}$. the main forces we are concerned with are the pressure force, gravitation  ($\bm{g}_a$) and friction ($\bm{F}$), so that, after further simplification (and incorporating the centrifugal force into $\bm{g}$)
+
+\begin{equation}
+	\frac{d \bm{V}}{dt} = \alpha \grad{p} -2 \bm{\Omega} \times \bm{V} + \bm{g} + \bm{F}
+\end{equation}
+
+and the second term on the rhs of the equation above is referred to as the \emph{Coriolis force}.
+
+\subsubsection{The hydrostatic approximation}
+
+For large-scale motion of air (see the scale analysis later in the chapter), the atmosphere may be assumed to be in hydrostatic equilibrium: vertical acceleration and the vertical component of the Coriolis force may be omitted.
+\begin{eqnarray}
+	\frac{d \bm{V}_H}{dt} = \alpha \grad{p} - \bm{f} \times \bm{V}_H + \bm{g} + \bm{F}_H\\
+	0 = -\alpha \frac{\partial p}{\partial z} - g
+\end{eqnarray}
+where the subscript $H$ indicates horizontal quantities and $f=2\bm{\Omega}\sin{\phi}$ is the Coriolis parameter, that is the vertical component of the Earth's velocity at latitude $\phi$.
+
+\subsection{Continuity}
+
+Conservation of mass implies that the mass inflow (the difference in the flux across all faces of the volume of fluid) needs to be balanced by the change of mass inside the fluid:
+
+\begin{equation}
+	\frac{d \rho}{dt} =  -\bm{\nabla} \cdot (\rho \bm{V}) = - \rho \bm{\nabla} \cdot {\bm{V} }  -\bm{V} \cdot \grad{\rho}
+\end{equation}
+
+where $\rho$ is density. Another form of this is:
+
+\begin{equation}
+	-\frac{1}{\rho} \frac{d \rho}{dt} =   \frac{1}{\alpha} \frac{d \alpha}{dt}     = \bm{\nabla} \cdot  \bm{V} 
+\end{equation}
+
+
+where the specific volume $\alpha = 1/\rho$.
+
+\subsection{Equation of state}
+
+The most typical expression used in atmospheric physics is Boyle's and Charles' law:
+
+\begin{equation}
+	p\alpha=RT
+	\label{ideal_gas}
+\end{equation}
+
+
+\subsection{Thermodynamics}
+
+If we omit chemical, electrical and magnetic effects, the first law of thermodynamics for the atmosphere can be written as:
+
+\begin{equation}
+	Q=\frac{dl}{dt} + W
+\end{equation}
+
+where $Q$ is the rate at which heat is added, $W$ is the rate at which work accomplished by the gas on its environment by expansion and $dl/dt$ is the rate of change of internal energy of the gas. For a perfect gas, $dl/dt=c_vdT/dt$, where $c_v$ is the specific heat at constant volume and $W=p d\alpha/dt$. If we substitute:
+
+ \begin{equation}
+ 	Q= c_v \frac{dT}{dt} + p\frac{d\alpha}{dt} 
+ \end{equation}
+If we now use the ideal gas law (\ref{ideal_gas}), we end up with a (dry) form that is quite familiar to atmospheric scientists:
+
+ \begin{equation}
+ 	Q= c_p T \frac{d(\ln \theta)}{dt}
+ \end{equation}
+
+where $\theta = T{(p_0/p)}^k$ is the potential temperature, $k=R/c_p$ and $p_0=1000mb$ is the reference pressure.
+
+
+\subsection{Primitive Equations}
+The collection of momentum, continuity, state and thermodynamics come together, usually under the hydrostatic approximation, to form the \emph{Primitive Equations}, first written out in a form we use to this day by Bjerkness.
+
+\begin{eqnarray}
+		\frac{d \bm{V}_H}{dt} = \alpha \grad{p} - \bm{f} \times \bm{V}_H + \bm{g} + \bm{F}_H\\
+	0 = -\alpha \frac{\partial p}{\partial z} - g \nonumber \\
+	-\frac{1}{\rho} \frac{d \rho}{dt} =   \frac{1}{\alpha} \frac{d \alpha}{dt}     = \bm{\nabla} \cdot  \bm{V} \nonumber \\
+	p\alpha=RT \nonumber \\
+	c_p T \frac{d(\ln \theta)}{dt} = Q \nonumber
+\end{eqnarray}
+
+which is the minimal set we solve in a typical weather or climate model.
+
+
+\section{Approximating the governing equations in the study of waves}
+
+Geophysical fluids support a number of waves, with different amplitudes, phase speeds, directions of propagation. We shall initially look into some of the most common ones, and later on focus on just two of them: gravity inertia waves and Rossby waves. For now, let us look at how different approximations lead us to discovering the properties of a variety of waves supported by geophysical fluids.
+
+We start with a simplified set in two dimensions, $x$ and $z$:
+
+\begin{eqnarray}
+	\frac{d u}{dt} + \alpha \frac{\partial p}{\partial x} = 0\\
+		\frac{d w}{dt} + \alpha \frac{\partial p}{\partial z} + g =0 \nonumber \\
+	\alpha \frac{d p}{d t} +p \gamma \frac{d \alpha}{dt}  = 0 \nonumber \\
+  \alpha \bm{\nabla} \cdot  \bm{V}  -  \frac{d \alpha}{dt}     = 0 \nonumber
+\end{eqnarray}
+
+where $\gamma = c_p/c_v$ and $\alpha = 1/\rho$.
+
+This system can be linearised using the perturbation method, that is, velocity comprises the sum of a constant current $U$ and of a perturbation $u'$; also the average thermodynamic variables are in hydrostatic balance.
+
+\begin{eqnarray}
+	\frac{d u'}{dt} + U \frac{\partial u'}{\partial x} + \bar{\alpha} \frac{\partial p'}{\partial x} = 0\\
+	\delta_1 (\frac{\partial w'}{\partial t} + U \frac{\partial w'}{\partial x} ) + \bar{\alpha} \frac{\partial p'}{\partial z}  - \frac{g \alpha'}{\bar{\alpha}} =0 \nonumber\\
+	\bar{\alpha}  (\frac{\partial p'}{\partial t} + U \frac{\partial p'}{\partial x} ) -g w'  +\bar{p}\gamma  ( \frac{\partial \alpha'}{\partial t} + U  \frac{\partial \alpha'}{\partial x} + w'  \frac{\partial \bar{\alpha}}{\partial z}) = 0 \nonumber \\
+    (\frac{\partial u'}{\partial x} + \frac{\partial w'}{\partial z} ) \bar{\alpha} - \delta_2  ( \frac{\partial \alpha'}{\partial t} + U  \frac{\partial \alpha'}{\partial x}) - w'  \frac{\partial \bar{\alpha}}{\partial z}  = 0  \nonumber
+\label{primitive_linear}
+\end{eqnarray}
+
+where $\delta_1$ and $\delta_2$ are handy coefficients that will enable us to suppress certain vertical acceleration and compressibility terms, by taking on the values of zero or one.
+
+\subsection{Sound waves}
+
+These are compression waves that can be isolated by setting $g=0$; ~~ $\delta_1=\delta_2=1$ and by letting $\bar{p}$ and $\bar{\alpha}$ be constants. 
+We can then stipulate that all perturbation quantities are harmonic in $x,z,t$, with constant coefficients, in this form:
+
+\begin{eqnarray}
+u'=Se^{i (\mu x+kz-\nu t)}  ~~~~~~ w'=We^{i (\mu x+kz-\nu t ) }  \\
+p'=Pe^{i (\mu x+kz-\nu t)}  ~~~~~~ \alpha'=Ae^{i (\mu x+kz-\nu t ) } \nonumber  
+\end{eqnarray}
+
+\begin{definition}
+	The phase speed is the velocity of the phase lines $(\mu x+kz = \mathtt{constant})$ in the normal direction, and is related to frequency in this way:
+	\begin{equation}
+		c = \nu \mathcal{L} / 2 \pi
+	\end{equation}
+	where $\mathcal{L} $ is the wavelength normal to the phase lines. 
+\end{definition}
+
+Substitution into \ref{primitive_linear}, solving for the determinant of the resulting matrix leads eventually to an expression for the phase speed of sound waves:
+
+\begin{equation}
+	c = \pm \sqrt{\gamma R \bar{T}}
+\end{equation}
+
+\begin{exercise}
+Try substituting typical values to see what the magnitude of this phase speed is.
+\end{exercise}
+
+
+\subsection{Sound waves and internal gravity waves}
+If, instead of considering the average pressure and density to be constant, we impose the variation with height that is implied by the presence of gravity, the hydrostatic equation and state equations will have solutions of this type:
+
+\begin{eqnarray}
+	\bar{p}= \bar{p}(0) e^{-z/H}  ~~~~~~ \bar{\alpha}= \bar{\alpha}(0) e^{z/H}  
+\end{eqnarray}
+
+where $H = R\bar{T}/g$ is called the scale height. Substitution leads to a new set of harmonic functions:
+
+\begin{eqnarray}
+	u'=S\bar{\alpha}^{1/2} e^{i (\mu x+kz-\nu t)}  ~~~~~~ w'=W\bar{\alpha}^{1/2} e^{i (\mu x+kz-\nu t ) }  \\
+~~	p'=P\bar{\alpha}^{1/2} e^{i (\mu x+kz-\nu t)}  ~~~~~~ \alpha'=A\bar{\alpha}^{3/2} e^{i (\mu x+kz-\nu t ) } \nonumber  
+\end{eqnarray}
+
+which, when substituted into \ref{primitive_linear}, leads in turn to a new matrix equation, which, after some algebra and dropping some terms of negligible magnitude, has this general solution:
+
+ \begin{equation}
+	\delta_1 \delta_2 \nu^4 -\gamma RT(k^2 + \mu^2\delta_1)\nu^2 + \mu^2 \frac{\gamma R \bar{T} g}{\bar{\theta}}\frac{\partial \bar{\theta}}{\partial z} = 0
+	\label{GIS_sol.ution}
+\end{equation}
+
+This equation has four roots, of which two are sound waves and two are a pair of internal gravity waves. It is possible to isolate waves by specific settings of $g$, which eliminates the gravity waves, or by different settings of $\delta_1$ and $\delta_2$, to prevent sound waves, which will give pure gravity waves.
+
+The phase speed will be:
+
+\begin{equation}
+	c = \pm \frac{\mu}{\mu^2+k^2} (\frac{g}{\bar{\theta}} \frac{\partial \bar{\theta}}{\partial z} )^{1/2}
+\end{equation}
+
+These oscillations are stable if the lapse rate is subadiabatic ($\frac{\partial \bar{\theta}}{\partial z}>0$), but unstable if the lapse rate is superadiabatic.
+
+Depending on the relative size of the disturbance in the horizontal versus vertical direction, that is the relative size of the wave numbers, these waves will propagate preferentially in one direction. For instance, if the vertical scale is much smaller than the horizontal scale, we go back to the hydrostatic approximation, $|delta_1$ can be set to zero and the phase speed is simplified accordingly and we can impose solutions that propagate horizontally with a vertical variation.
+
+The set \ref{primitive_linear} supports one more set of wave solutions for an isothermal fluid: these are horizontally propagating waves with the speed of sound ($c=\pm \sqrt{\gamma R \bar{T}}$) and they are called \emph{Lamb waves}, very similar to external gravity waves, which will be discussed later for the shallow water equations.
+
 \section{Shallow atmosphere approximation} 
 
 Also known as the {\em traditional approximation} since it also
@@ -46,7 +248,52 @@ atmosphere approximation.
 \end{itemize}
 
 
-\subsection{Filtering the equations to remove unwanted scales of motion} 
+\subsection{Further approximations} 
+
+Further approximations are usually based on {\em scaling} where
+the typical spatial and length scales associated with motions of
+interest are assumed. For example:
+
+\begin{definition}[Planar approximation]
+
+{\bf $L/a \ll 1$} Can use local Cartesian coordinates where $(dx,dy)=(a \cos\phi_0
+\,d\lambda, a\,d\phi)$. 
+
+Can drop spherical metric terms from PEs.
+\end{definition}
+
+
+\begin{definition}[Anelastic approximation]
+{\bf $\Delta \rho /\rho_0 \ll 1$} Mass conservation equation becomes $\nabla.(\rho_r {\mathbf u})=0$
+where $\rho_r(z)$ is a reference density.
+Filters sound waves.
+\end{definition}
+
+\begin{definition}[Boussinesq approximation ]
+{\bf $\Delta \rho /\rho_0 \ll 1$ and $H\ll H_{\rho}$} Huge density height scale, $H_{\rho}$, implies $w \partd{\rho_r}{z}\ll
+\rho_r \partd{w}{z}$. In practice, the density variation is only important in the buoyancy term of the (vertical) momentum equation, $\rho g$. The \emph{continuity equation}:
+\begin{equation}
+	\frac{1}{\rho} \lagd{\rho}{t} + \nabla \cdot \mathbf{u} = 0
+	\label{continuity-equation}
+\end{equation}
+
+ends up simplified to its incompressible ($\rho_r \approx$ constant) form: $\nabla \cdot \mathbf{u} = 0$. 
+
+\end{definition}
+
+\begin{definition}[Hydrostatic balance]
+{\bf $H/L \ll 1$} Vertical momentum equation reduces to:
+\begin{equation}
+	\frac{1}{\rho}\partd{p}{z}=-g
+	\label{hydrostatic}
+\end{equation}
+Filters vertically-propagating sound waves, but can support Lamb waves, and can distort gravity waves if $L_x \approx L_y$.
+
+If we also want to filter out gravity waves, we must additionally set the local time rate of change of the divergence field to zero.
+\end{definition}
+
+
+\subsection{Practical example: filtering the equations to remove unwanted scales of motion} 
 
 The problem with our Euler equations is that they support all types of motion, some of which may be unwanted, depending on what scientific questions we are trying to answer. 
 
@@ -74,49 +321,6 @@ The governing equations of compressible fluid dynamics contain acoustic waves. I
 	\hline
 \end{tabular}
 
-
-\subsection{Further approximations} 
-
-Further approximations are usually based on {\em scaling} where
-the typical spatial and length scales associated with motions of
-interest are assumed. For example:
-
-~
-
-{\bf Planar approximation ($L/a \ll 1$)} Can use local Cartesian coordinates where $(dx,dy)=(a \cos\phi_0
-\,d\lambda, a\,d\phi)$. 
-
-Can drop spherical metric terms from PEs.
-
-~
-
-{\bf Anelastic approximation ($\Delta \rho /\rho_0 \ll 1$)} Mass conservation equation becomes $\nabla.(\rho_r {\mathbf u})=0$
-where $\rho_r(z)$ is a reference density.
-Filters sound waves.
-
-~
-
-{\bf Boussinesq approximation ($\Delta \rho /\rho_0 \ll 1$ and $H\ll H_{\rho}$)} Huge density height scale, $H_{\rho}$, implies $w \partd{\rho_r}{z}\ll
-\rho_r \partd{w}{z}$. In practice, the density variation is only important in the buoyancy term of the (vertical) momentum equation, $\rho g$. The \emph{continuity equation}:
-\begin{equation}
-	\frac{1}{\rho} \lagd{\rho}{t} + \nabla \cdot \mathbf{u} = 0
-	\label{continuity-equation}
-\end{equation}
-
-ends up simplified to its incompressible ($\rho_r \approx$ constant) form: $\nabla \cdot \mathbf{u} = 0$. 
-
-~
-
-{\bf Hydrostatic balance ($H/L \ll 1$)} Vertical momentum equation reduces to:
-\begin{equation}
-	\frac{1}{\rho}\partd{p}{z}=-g
-	\label{hydrostatic}
-\end{equation}
-Filters vertically-propagating sound waves, but can support Lamb waves, and can distort gravity waves if $L_x \approx L_y$.
-
-If we also want to filter out gravity waves, we must additionally set the local time rate of change of the divergence field to zero.
-
-
 \section{Simplifying the PEs}
 \subsection{PEs on the sphere}
 In an Eulerian framework, our momentum equations end up looking like this:
@@ -132,9 +336,8 @@ We must now consider the fact that we are studying fluids (atmosphere, ocean) on
 	\begin{center}
 		\includegraphics[trim={0cm 2cm 0cm 2cm},clip,width=7.cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/RotatingEarthDiagram.pdf}
 		\label{fig:Spherical}
-		%%\setbeamerfont{caption name}{size=\tiny}
 	\end{center}
-	\caption{\label{fig:blue_rectangle} Schematic of spherical coordinate system}
+	\caption{Schematic of spherical coordinate system}
 \end{figure}
 
 	In the spherical coordinate system we use $\lambda$ (longitude), $\theta$ (latitude) and r, to replace $x,y,z$, where $x=r \cos{\theta} \lambda$; $y=r\theta$; $z=r-a$, so that:
@@ -162,17 +365,6 @@ The full form of the momentum equations in a rotating spherical coordinate syste
 
 where the terms involving $\Omega$ are the Coriolis terms. The symbol $f$ is often used to represent the Coriolis term that appears in both horizontal momentum equations ($2 \Omega \sin \theta$ ). The equation of state and the continuity, thermodynamic and constituent equations are not modified by the effects of rotation.
 
-%\includegraphics[trim={2cm 10.5cm 0cm 2.cm},clip,width=10.cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/PEs_Sphere_1.pdf}
-%\%label{fig:Spherical-PEs1}
-%	%\setbeamerfont{caption name}{size=\tiny}
-%\caption{\label{fig:blue_rectangle} \tiny PEs on the Sphere}
-
-%\includegraphics[trim={2cm 5cm 0cm 4cm},clip,width=10.cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/PEs_Sphere_2.pdf}
-%\label{fig:Spherical-PEs2}
-%	%\setbeamerfont{caption name}{size=\tiny}
-%\caption{\label{fig:blue_rectangle} \tiny PEs on the Sphere}
-
-
 \subsection{Small quantities, big quantities: Scale Analysis}
 
 Some of the terms in the equation set are very small: do take a look at Table \ref{fig:Scale-Analysis-Tables} and you will see that there are differences amounting to several orders of magnitude. We are tempted to neglect the smaller terms, so that we may end up with a simpler equation set. This is in fact what  was commonly done  in the 1960s, when digital computers were far less powerful than today's computers
@@ -182,8 +374,7 @@ Cancelling out the smallest terms, we end up with simpler equations and some imp
 		\begin{center}
 	\includegraphics[trim={4cm 1.5cm 0cm 1cm},clip,width=18.cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/ScaleAnalysisTables.pdf}
 		\end{center}
-	%	%\setbeamerfont{caption name}{size=\tiny}
-	\caption{\label{fig:blue_rectangle} Scale Analysis Tables for PE terms in the atmosphere (A) and ocean (O)}
+	\caption{Scale Analysis Tables for PE terms in the atmosphere (A) and ocean (O)}
 		\label{fig:Scale-Analysis-Tables}
 \end{figure}
 
@@ -196,11 +387,6 @@ If we make careful use of scale analysis, we can strongly simplify the PEs we wa
 	\frac {\partial v}{\partial t} + \left(\mathbf{v}\cdot\nabla\right)v + \frac{2 \Omega \sin \theta +u \tan \theta}{a} u  = -\frac{1}{\rho} \frac{\partial p}{\partial y}+F_y \\
 	0 =-\frac{1}{\rho} \frac{\partial p}{\partial z}-g+F_z
 \end{eqnarray}
-
-%\includegraphics[trim={2cm 2.5cm 0cm 2.cm},clip,width=17.cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/PEs_Sphere_3.pdf}
-%\label{fig:Spherical-PEs1}
-%	%\setbeamerfont{caption name}{size=\tiny}
-%\caption{\label{fig:blue_rectangle} \tiny PEs on the Sphere}
 
 \subsection{Simplified PEs after scale analysis, now back on a PLANE}
 
@@ -218,10 +404,6 @@ and the continuity equation also becomes much simpler, as metric terms drop out.
 the component of the Earth's rotation normal to the Earth's surface at
 reference latitude $\phi_0$. 	
 
-%\includegraphics[trim={2cm 0.5cm 0.cm 10.cm},clip,width=12.cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/PEs_Sphere_4.pdf}
-%\label{fig:Spherical-PEs1}
-%%\setbeamerfont{caption name}{size=\tiny}
-%\caption{\label{fig:blue_rectangle} \tiny PEs on the Sphere}
 
 \section{Shallow water equations}
 
@@ -236,8 +418,6 @@ the PEs reduce to:
 
 plus thermodynamic eqn and eqn of state. Remember that $f_0=2\Omega \sin\phi_0$ is the Coriolis parameter normal to the Earth's surface at
 reference latitude $\phi_0$.
-
-~
 
 Pressure and fluid depth are next divided into
 a reference state and perturbation:
@@ -269,35 +449,123 @@ where $(u,v)$ is now the depth-average velocity and $w_{bot}=0$ was assumed.
 \subsection{SWEs linearised around a basic state} 
 
 {\bf Shallow-water equations} on the
-plane tangent to the Earth's surface, {\em linearised} about a resting basic state ($u=u_r(z)+u'(x,y,z,t); v=v_r(z)+v'(x,y,z,t);h=H+\eta(x,y,z,t)$):
+plane tangent to the Earth's surface, {\em linearised} about a resting basic state ($u=u_r(z)+u'(x,y,z,t); ~ v=v_r(z)+v'(x,y,z,t); ~ h=H+\eta(x,y,z,t)$):
+
 \begin{eqnarray}
-	&&\frac{\partial \eta}{\partial t} + H \left(
-	\frac{\partial u}{\partial x}+\frac{\partial v}{\partial y}\right) = 0,
-	\\
-	&&\frac{\partial u}{\partial t} - f_0 v = - g\frac{\partial \eta}{\partial x}, \\
-	&&\frac{\partial v}{\partial t} + f_0 u = - g\frac{\partial \eta}{\partial y}, 
+	\frac{\partial \eta}{\partial t} + H \left(
+	\frac{\partial u}{\partial x}+\frac{\partial v}{\partial y}\right) & = & 0 \\
+	\frac{\partial u}{\partial t} - f_0 v  + g\frac{\partial \eta}{\partial x} & = & 0 \\
+	\frac{\partial v}{\partial t} + f_0 u  + g\frac{\partial \eta}{\partial y} & = & 0 
 \end{eqnarray}
 where $\eta$ is the surface elevation, $H$ is fluid depth, $(u,v)$ is
 the depth-averaged horizontal velocity, $f$ is the Coriolis parameter
 and $g$ is the gravitational acceleration. 
-
-~~
 
 Now discretise the problem using regular grids to describe $u$, $v$ and $\eta$ 
 
 e.g., $\eta_{ij}=$ free surface elevation at the $i$th longitude and $j$th
 latitude point.
 
+\section{Excursus: SWEs in 1D}
+
+Before carrying out analysis of the different numerical approaches to integrating the 2D SWEs, can we predict what their behaviour will be, based on experience we have gained before? Let us start with advection in 1D, and build from here.
+
+The simplest advection problem imposes a constant velocity to the transport of a species $q$:
+
+\begin{equation}
+	\frac{\partial q}{\partial t} = - c \frac{\partial q}{\partial x} 
+\end{equation}
+
+The most intuitive numerical approximation is:
+\begin{equation}
+	q_j^{n+1} = q_j^n - c \frac {\Delta t}{\Delta x} (q_{j+1}^n - q_j^n)
+\end{equation}
+
+But we can make this a bit more interesting, by relaxing the condition for constant velocity:
+\begin{equation}
+	\frac{\partial q}{\partial t} = - U \frac{\partial q}{\partial x}  \rightarrow  q_j^{n+1} = q_j^n - U_j^n \frac {\Delta t}{\Delta x} (q_{j+1}^n - q_j^n)
+\end{equation}
+
+which means that we require one more equation, to describe the time evolution of $U$, that is, $\frac{\partial U}{\partial t} = ?$
+
+How can 1D SWEs help us understand grid stagger? If we want to move from the linear problem to the non-linear problem, we must add an equation for the time change of velocity. The 1D SWEs provide a good example:
+
+\begin{eqnarray}
+	\frac{\partial h}{\partial t} + H \frac{\partial u}{\partial x} = 0 \\
+	\frac {\partial u}{\partial t} + g \frac{\partial h}{\partial x} = 0 \nonumber
+\end{eqnarray}
+
+Let $c^2 \equiv gH$ and substitute: we end up with two second order equations that have the very same form as the oscillation equation (see Chapter 2), that is: $\frac{\partial^2 u}{\partial t^2} = c^2 \frac{\partial^2 u}{\partial x^2}$ and $\frac{\partial^2 h}{\partial t^2} = c^2 \frac{\partial^2 h}{\partial x^2}$.
+
+If we impose the usual wave solution (see the exercise) we end up with the dispersion relation: $\omega^2 = c^2k^2$, which has two solution, thus one wave moving eastward and one wave moving westward.
+
+\begin{exercise}[Analytical versus numerical solutions]
+	Start from the two shallow water equations on the previous page. Impose the wave solution proposed on the slide, for $u_j$ and $h_j$: 
+	
+	\begin{equation}
+		(u_j,h_j) \sim e^{i(k x_j -\omega t)} = e^{i(k j \Delta x -\omega t)}
+	\end{equation}
+	
+	\begin{enumerate}
+		\item Substitute into the centred numerical expressions (in time and space) and show that you end up with an expression that contains a $\sin$ function.
+		\item How does the numerical solution compare to the analytical solution in terms of a) amplitude and b) phase?
+		\item Plot a wavenumber versus frequency plot for the analytical and numerical solution
+		\item Expand your thinking to Numerical Weather Prediction models that might be using such schemes: discuss what operational problems we may encounter in the presence of a $\sin$ in such numerical predictions.
+	\end{enumerate}
+\end{exercise}
+
+Let us now discretise the rhs, that is, the spatial gradient terms. Once again, we are tempted to go for the most intuitive way to do this, that is:
+
+\begin{eqnarray}
+	\frac{\partial h}{\partial t} + \frac {H}{2 \Delta x} (u_{j+1}^n - u_{j-1}^n)= 0 \\
+	\frac {\partial u}{\partial t} + \frac {g}{2 \Delta x} (h_{j+1}^n - h_{j-1}^n) = 0 \nonumber
+\end{eqnarray}
+
+If we now discretise in time (using FT, just as an example, not as a recommended approach):
+
+\begin{eqnarray}
+	h_j^{n+1}  = h_j^n  -  \frac {H}{2 \Delta x} (u_{j+1}^n - u_{j-1}^n)  \\
+	u_j^{n+1}  =  u_j^n -  \frac {g}{2 \Delta x} (h_{j+1}^n - h_{j-1}^n)  \nonumber
+\end{eqnarray}
+
+Analysis of the scheme above, and comparison with figure \ref{fig:1D-grid-stagger}, quickly reveals how we can anticipate a problematic computational mode, because two independent solutions can co-exist on the grid.
+
+\begin{figure}[h!]
+	\includegraphics[trim={0cm 0.cm 0cm 0.cm},clip,width=15.cm]{/Users/vidale/Projects/Teaching/MTMW14/Figures/1D-grid-stagger}
+	\caption{Dave Randall's figure 10.1, a representation of centered variable stagger in solving the SWEs.}
+	\label{fig:1D-grid-stagger}
+\end{figure}
+
+There is an additional shortcoming of the numerical approximation: if we impose a wave solution of the type $(u_j,h_j) \approx e^{i(kj\Delta x - \omega t)}$ (see a simplified example in the exercise in this section), we end up with a dispersion relation that is not identical to the analytical one. This is the numerical expression for the dispersion relation:
+
+\begin{equation}
+	\omega^2 = gH \left(  \frac{\sin k \Delta x}{\Delta x}^2   \right)
+	\label{numerical-dispersion-relation}
+	\end{equation}
+
+\begin{exercise}[Shedding of waves, as dependent on wave number]
+What does the numerical dispersion relation, eqn. \ref{numerical-dispersion-relation} mean for the propagation of a signal like a square wave (a delta function)? 
+\end{exercise}
+
+\subsection{Resolving waves on a grid: the problem of aliasing} 
+
+We must always be aware of the dangers of under-representing our waves: we saw aliasing in the time domain, and the same principle applies here, for space. This is shown, using a figure borrowed from the time domain, with sampling points indicative of decreasing model resolution (decreasing sampling frequency), in figure \ref{fig:Waves-Aliasing}.
+
+\begin{figure}[h!]
+	\includegraphics[trim={0cm 0.cm 0cm 0.cm},clip,width=15.cm]{/Users/vidale/Projects/Teaching/MTMW14/"2019 module/Waves resolved on a Grid".png}
+	\caption{Aliasing in 1D (example carried from the time domain, Dave Randall's Fig 1-17).}
+	    \label{fig:Waves-Aliasing}
+\end{figure}
+
+\clearpage
+
+\section{Arakawa's 2D grids}
 \subsection { Horizontal gradients in SWEs: how to discretize in space?} 
 
-SWEs seem nice and simple, but now we have spatial gradients: $\frac{\partial u}{\partial x}$, $\frac{\partial v}{\partial y}$, $\frac{\partial \eta}{\partial x}$, $\frac{\partial \eta}{\partial y}$.\\
-
-~
+SWEs seem nice and simple, but now we have spatial gradients: $\frac{\partial u}{\partial x}$, $\frac{\partial v}{\partial y}$, $\frac{\partial \eta}{\partial x}$, $\frac{\partial \eta}{\partial y}$.
 
 How are we going to discretise the problem, using regular grids, to obtain a good simulation of $u$, $v$ and $\eta$? Something like this?
 
-\begin{tabular}{lc}
-	\begin{minipage}[c]{0.7\textwidth}
 		\begin{eqnarray*}
 			\frac{\partial u}{\partial x}\Big|_{ij} &\approx& \left(\frac{u_{i+1,j}+u_{i+1,j-1}}{2} - \frac{u_{i-1,j}+u_{i-1,j-1}}{2} \right)\frac{1}{2 \Delta x} \\
 			\frac{\partial v}{\partial y}\Big|_{ij} &\approx& \left(\frac{v_{i,j+1}+v_{i-1,j+1}}{2} - \frac{v_{i,j-1}+v_{i-1,j-1}}{2} \right)\frac{1}{2 \Delta y} \\
@@ -308,14 +576,9 @@ How are we going to discretise the problem, using regular grids, to obtain a goo
 			\frac{\partial \eta}{\partial y}\Big|_{ij} &\approx& \left(\frac{\eta_{i,j+1}+\eta_{i+1,j+1}}{2} - \frac{\eta_{i,j-1}+\eta_{i+1,j-1}}{2} \right)\frac{1}{2 \Delta y} \\
 			f u\big|_{ij} &\approx& f_j \frac{u_{i,j}+u_{i+1,j}+u_{i,j-1}+u_{i+1,j-1}}{4}
 		\end{eqnarray*}
-	\end{minipage}
-\end{tabular}
-
 ~
 
 {\bf But why? It all seems so arbitrary.} There are a few criteria: we want to avoid computational modes and we want waves to propagate/evolve in a realistic way in space and time.
-
-\section{Arakawa's 2D grids}
 \subsection{Horizontally staggered grids} 
 
 Need to choose finite difference
@@ -422,6 +685,8 @@ Stagger the variables, eliminate computational mode, but we pay the cost of lots
 	\end{minipage}
 \end{tabular}
 
+\clearpage
+
 \subsection{Arakawa's C grid}
 Stagger the variables, eliminate computational mode, interpolation only required for Coriolis terms!\\
 
@@ -497,6 +762,7 @@ Idea similar to B grid, but we push out $u,v$ instead of $\eta$: stagger the var
 	\end{minipage}
 \end{tabular}
 
+\clearpage
 
 \subsection{Arakawa's Sm\"org{\aa}sbord}
 
@@ -547,70 +813,7 @@ In 1-D, on the interval $\Omega=[0,1]$ we could for instance have:
 	au(1)+Bu'(1)=g(1)
 \end{eqnarray}
 
-This contrasts with \textbf{mixed boundary conditions}, which are boundary conditions of different types specified on different subsets of the boundary.\\
-
-\clearpage
-
-\section{Excursus: SWEs in 1D}
-
-Before carrying out analysis of the different numerical approaches to integrating the 2D SWEs, can we predict what their behaviour will be, based on experience we have gained before? Let us start with advection in 1D, and build from here.
-
-\begin{figure}[h!]
-\includegraphics[trim={0cm 0.5cm 0cm 2.cm},clip,width=16.cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/Adv_2_SWEs_1.pdf}
-\label{fig:Spherical-PEs1}
-%	%\setbeamerfont{caption name}{size=\tiny}
-\caption{\label{fig:blue_rectangle} From linear non non-linear advection in 1D}
-\end{figure}
-
-\subsection{How 1D SWEs help to understand grid stagger} 
-If we want to move from the linear problem to the non-linear problem, we must add an equation for the time change of velocity.
-
-\begin{figure}[h!]
-\includegraphics[trim={0cm 0.5cm 0cm 2.cm},clip,width=15.cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/Adv_2_SWEs_2.pdf}
-\label{fig:Spherical-PEs2}
-%	%\setbeamerfont{caption name}{size=\tiny}
-\caption{\label{fig:blue_rectangle} 1D Shallow Water Equations}
-\end{figure}
-
-\subsection{Resolving waves on a grid} 
-
-We must always be aware of the dangers of under-representing our waves: we saw aliasing in the time domain, and the same principle applies here, for space.
-
-\begin{figure}[h!]
-	\includegraphics[trim={0cm 0.cm 0cm 0.cm},clip,width=15.cm]{/Users/vidale/Projects/Teaching/MTMW14/"2019 module/Waves resolved on a Grid".png}
-	\label{fig:Spherical-PEs2}
-	%	%\setbeamerfont{caption name}{size=\tiny}
-	\caption{\label{fig:blue_rectangle} Aliasing in 1D (example carried from the time domain).}
-\end{figure}
-
-\begin{figure}[h!]
-\includegraphics[trim={0cm 2cm 0cm 2.cm},clip,width=15.cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/Adv_2_SWEs_3.pdf}
-\label{fig:Spherical-PEs2}
-%	%\setbeamerfont{caption name}{size=\tiny}
-\caption{\label{fig:blue_rectangle} SWEs with staggering in 1D}
-\end{figure}
-
-\begin{figure}[h!]
-\includegraphics[trim={0cm 0.5cm 0cm 1.cm},clip,width=15.cm]{/Users/vidale/Projects/Teaching/MTMW14/"2016 module"/Adv_2_SWEs_4.pdf}
-\label{fig:Spherical-PEs2}
-%	%\setbeamerfont{caption name}{size=\tiny}
-\caption{\label{fig:blue_rectangle} SWEs with staggering in 1D: the dispersion problem}
-\end{figure}
-
-\subsection{Exercise: analytical versus numerical solutions} 
-
-Start from the two shallow water equations on the previous page. Impose the wave solution proposed on the slide, for $u_j$ and $h_j$: 
-
-\begin{equation}
-	(u_j,h_j) \sim e^{i(k x_j -\omega t)} = e^{i(k j \Delta x -\omega t)}
-\end{equation}
-
-\begin{enumerate}
-	\item Substitute into the centred numerical expressions (in time and space) and show that you end up with an expression that contains a $\sin$ function.
-	\item How does the numerical solution compare to the analytical solution in terms of a) amplitude and b) phase?
-	\item Plot a wavenumber versus frequency plot for the analytical and numerical solution
-	\item Expand your thinking to Numerical Weather Prediction models that might be using such schemes: discuss what operational problems we may encounter in the presence of a $\sin$ in such numerical predictions.
-\end{enumerate}
+This contrasts with \textbf{mixed boundary conditions}, which are boundary conditions of different types specified on different subsets of the boundary.
 
 \clearpage
 
@@ -663,7 +866,7 @@ E^n = \int_{\Omega} \frac{1}{2} \rho \left( g (\eta^n)^2 + h \|\bu^n\|^2 \right)
 Note that this quantity only gives information about the changes in the amplitude of the solution. It does not indicate how the numerical method is affecting the phase of the solution.
 
 
-\subsection{``Mostly implicit'' schemes are unconditionally stable}
+\subsubsection{``Mostly implicit'' schemes are unconditionally stable}
 
 \begin{center}
 	\begin{tabular}{cc}
@@ -676,7 +879,7 @@ Note that this quantity only gives information about the changes in the amplitud
 However, they can be quite dissipative if they are ``a bit too implicit''. The semi-implicit scheme ($\alpha = \beta = \gamma = 1/2$) is exactly conserving energy while a fully-implicit scheme ($\alpha = \beta = \gamma = 1$) is very dissipative and thus not always accurate.
 
 
-\subsection{Both the gravity and Coriolis terms must be at least semi-implicit}
+\subsubsection{Both the gravity and Coriolis terms must be at least semi-implicit}
 
 \begin{center}
 	\begin{tabular}{cc}
@@ -687,14 +890,12 @@ However, they can be quite dissipative if they are ``a bit too implicit''. The s
 	\end{tabular}
 \end{center}
 
-\BTi
-When there is no dissipation, the equations are purely hyperbolic ($\mathcal{R}e(\kappa) = 0$) and the time integration scheme can only be stable if the implicity coefficients are all larger or equal to 1/2. In that case, the solution of the system requires to invert a non-diagonal matrix, which can be computationally expensive. The effect of using a ``mostly implicit'' time integration scheme with a large time step is to slow down fast propagating gravity waves. These schemes are thus useful for long simulation for which gravity waves are physically insignificant.
-\ETi
 
+When there is no dissipation, the equations are purely hyperbolic ($\mathcal{R}e(\kappa) = 0$) and the time integration scheme can only be stable if the implicity coefficients are all larger or equal to 1/2. In that case, the solution of the system requires to invert a non-diagonal matrix, which can be computationally expensive. The effect of using a ``mostly implicit'' time integration scheme with a large time step is to slow down fast propagating gravity waves. These schemes are thus useful for long simulation for which gravity waves are physically insignificant.
 
 
 \subsection{Explicit schemes}
-\subsection{Example of a stable explicit scheme: Adams-Bashforth 3}
+\subsubsection{Example of a stable explicit scheme: Adams-Bashforth 3}
 
 \begin{eqnarray*}
 	&&\hspace{-0.6cm} \eta^{n+1} = \eta^n - h \Delta t \bnabla \cdot \left(\frac{23}{12} \bu^n - \frac{16}{12} \bu^{n-1} + \frac{5}{12} \bu^{n-2}\right),
@@ -706,23 +907,19 @@ When there is no dissipation, the equations are purely hyperbolic ($\mathcal{R}e
 %	\begin{minipage}{0.6\textwidth}
 	
 	\begin{figure}
-		\includegraphics[trim={0.25cm 0.cm 0.25cm 0.25cm},clip,width=0.6\textwidth]{Figures/energy_AB3.eps}
+		\includegraphics[trim={0.25cm 0.cm 0.25cm 0.25cm},clip,width=0.8\textwidth]{Figures/energy_AB3.eps}
 	\end{figure}
 	%	\end{minipage}
 \hfill
 %	\begin{minipage}{0.35\textwidth}
 	
-	This scheme is conditionally stable with a stability condition prescribed by gravity waves. A leap-frog scheme would have about the same properties but it would become unstable if some dissipation was added to the scheme. \\
+This scheme \footnote{More details: Durran D.R. (1991) ``The Third-order Adams-Bashforth method: An attractive alternative to Leap-frog time differencing''. \emph{Monthly Weather Review}, 119, 702-720.} is conditionally stable with a stability condition prescribed by gravity waves. A leap-frog scheme would have about the same properties but it would become unstable if some dissipation was added to the scheme. \\
 	
 	%	\end{minipage}
 %\end{tabular}
 
-\medskip
 
-\footnote{More details: Durran D.R. (1991) ``The Third-order Adams-Bashforth method: An attractive alternative to Leap-frog time differencing''. \emph{Monthly Weather Review}, 119, 702-720.}
-
-
-\subsection{Another example: Forward-Backward in Time scheme}
+\subsubsection{Another example: Forward-Backward in Time scheme}
 
 The Forward-Backward in Time (FBT) scheme has been introduced by Sielecki (1968) and later analysed and improved by Beckers and Deleersnijder (1993)\footnote{Sielecki A. (1968) ``An energy conserving difference scheme for the storm surge equations'', \emph{Monthly Weather Review}, 96, 150-156. Beckers J. and Deleersnijder E. (1993) ``Stability of a FBTCS scheme applied to the propagation of shallow-water inertia-gravity waves on various grids'', \emph{Journal of Computational Physics}, 108, 95-104.}. It tries to mimic a semi-implicit scheme by alternatively changing the order in which the two momentum equations are solved for. The future height anomaly term is used in the two momentum equations as soon as it is available; the Coriolis term is discretized by using the most recently computed velocity component, which requires alternation:
 
@@ -749,18 +946,16 @@ and
 It can be seen that for each set of equations, the Coriolis term is first discretized explicitly and then implicitly. The order of the two momentum equations is switched in the second set of equations. As a result, the time discretization of the Coriolis term appears to be semi-implicit ``on average''. The divergence is always explicit and the gradient is always implicit. It can be shown that the scheme is conditionally stable with about the same stability condition as AB3.
 
 \begin{center}
-	\includegraphics[width=0.4\textwidth]{Figures/energy_FBT.eps}
+	\includegraphics[width=0.8\textwidth]{Figures/energy_FBT.eps}
 \end{center}
-
-\section{Some real world applications}
-{Hurricane and Typhoon simulation in climate GCMs: precipitation composite}
-
-\begin{center}	
-	\includegraphics[width=0.8\textwidth]{Figures/TC-precipitation}
-\end{center}
-
 
 \section{Real world applications: variable staggering in W \& C models}
+
+\begin{figure}[h!]	
+	\includegraphics[width=0.8\textwidth]{Figures/TC-precipitation}
+	\caption{Hurricane and Typhoon simulation in climate GCMs: precipitation composite}
+\end{figure}
+
 \subsection{Unified Model: New Dynamics vs EndGame grids} 
 
 The choice of grid stagger makes a difference even in very complex GCMs. Here is an example of simply switching the variables defined at the poles.
@@ -788,5 +983,5 @@ The evolution from New Dynamics (2002) to EndGame (2014) meant greater scalabili
 		\caption{}
 		\label{fig:UM-scalablity}
 	\end{subfigure}
-	\caption{(a) Numerical solutions for the Unified model around the South Pole, using the New Dynamics and EndGame dynamical cores; (b) the parallel scalability of the two DCs.}
+	\caption{(a) Numerical solutions for the Unified model around the South Pole, using the New Dynamics and EndGame dynamical cores; (b) the parallel scalability of the two DynCores.}
 \end{figure}

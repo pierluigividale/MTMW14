@@ -655,22 +655,18 @@ methods attempting to achieve stability for long time-steps ($1 < \alpha <
 \section{Hybrid models}
 \subsection{Contour-advective semi-Lagrangian (CASL)}
 	
-	\begin{tabular}{lc}
-%		\begin{minipage}[l]{0.6\textwidth}
-			Potential vorticity is treated in a Lagrangian way (by
-			calculating trajectories of nodes on tracer contours).
-						
-			Example here shows a single contour advected by an unsteady polar
-			vortex. Note the finescale filamentary structure.
-%		\end{minipage}
-%		\begin{minipage}[c]{0.4\textwidth}
-			\rotatebox{90}{\includegraphics[width=0.5\textwidth]{Figures/T170F6_t170.eps}}
-%		\end{minipage}
-	\end{tabular}
-	
+			Potential vorticity is treated in a Lagrangian way (by calculating trajectories of nodes on tracer contours).		The example in Fig. \ref{fig:CASL} shows a single contour advected by an unsteady polar vortex. Note the finescale filamentary structure.
+
+\begin{center}
+\begin{figure}[h!]
+\includegraphics[angle=90,width=0.35\textwidth]{Figures/T170F6_t170.eps}
+\label{fig:CASL}
+\caption{CASL as illustrated in Dritschel et al. (1997)}
+\end{figure}
+\end{center}
+
 	But velocity and other {\em wave-like} variables are stored on a fixed
-	grid\footnote{\BTi Dritschel, D.G. and Ambaum, M.H.P. (1997) \emph{ Quart. J. Roy. Meteor. Soc.}, {\bf 123},
-		1097-1130.\ETi}.
+	grid\footnote{\BTi Dritschel, D.G. and Ambaum, M.H.P. (1997) \emph{ Quart. J. Roy. Meteor. Soc.}, {\bf 123},	1097-1130.\ETi}.
 	
 	{\bf Advantages:} Avoids numerical dissipation of conserved variables
 	and the CFL criterion. Potential vorticity inversion to obtain {\em

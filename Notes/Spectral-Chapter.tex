@@ -42,12 +42,23 @@ In practice, for a numerical model, and given limited computational resources, t
 \end{equation}
 
 \begin{equation}
-	\widehat{q_k}(t) \cong  \frac{1}{M}  \sum_{j=1}^{M} q(x_j,t) e^{-ikx_j}, \qquad  \forall \quad -n \le k \le n,
+	\widehat{q_k}(t) \cong  \frac{1}{M}  \sum_{j=1}^{M} q(x_j,t) e^{-ikx_j} \qquad  \forall \quad -n \le k \le n,
 		\label{speccoeff_discrete}
 \end{equation}
 
  where $n$ is the \emph{truncation}, with $-n \le k \le n$  and $M$ is the number of grid points, which determines the spatial resolution. The discretised transform pair (\ref{specfunc_discrete} and \ref{speccoeff_discrete}) tells us that we are computing $n$ wave numbers at each grid point $j$ and that we are using information from M grid points to compute each spectral coefficient. 
  
+ Figure \ref{fig:Delta-Wave} illustrates what happens in practice when we try to approximate a delta function with truncated Fourier series.
+ 
+ \begin{figure}[h!]
+ 	\begin{center}
+ 		\includegraphics[width=1.\textwidth]{Spectral-Pictures/Delta-Wave.png}
+ 	\end{center}
+ 	\label{fig:Delta-Wave}
+ 	\caption{A Delta function represented by a finite number of wave superpositions. Credit: AWI.}
+ \end{figure}
+ 
+
  \subsection{Truncation, accuracy and computational costs}
  The truncation is exactly reversible if $M$ is large. This is equivalent to model resolution in finite difference models. What are the computational costs involved? We can find out by substituting \ref{specfunc_discrete} into \ref{speccoeff_discrete}:
  
@@ -58,12 +69,13 @@ In practice, for a numerical model, and given limited computational resources, t
 
 note that both wave numbers are bound by $n$, and that we have a maximum wave number $\pm 2n$, corresponding to our truncation $n$, thus a total of $2n+1$ complex conjugates $\widehat{q_t}(t)$ (why the $+1$?) are needed. If we count those, we are dealing with $4n+2$ real numbers, but the assumption that $q$ is real means that $\widehat{q_{-k}}=\widehat{q_k^*}$, where $q^*$ is the complex conjugate, so in reality we only need carry half the real numbers (see Dave Randall's notes for a demonstration). This means that computing the Fourier representation is equivalent to discretising the function $q(x,t)$ onto $2n+1$ grid points.
 
-\begin{definition}[The relationship between spectral truncation and number of grid points\\]
-The above means that, in order to compute the transforms and then faithfully represent the function (amplitude, phase etc.) on a grid, we must make sure that the grid definition, which comprises $M$ points, obeys this relationship:
+\begin{definition}[Relationship between truncation ($n$) and grid points ($M$)]
+The above means that, in order to compute the transforms and then faithfully represent our function $q$ (amplitude, phase etc.) on a grid, we must make sure that the grid definition, which comprises $M$ points, obeys this relationship:
 \begin{equation}
 	M \ge 2n+1
 \end{equation}
 \end{definition}
+
 As a simple example, a Fourier representation of $q$, including just wave numbers 0 and 1, is equivalent to a grid-point representation of $q$ that uses only 3 grid points. Note that this is a minimal requirement, because computing terms like advection, involving more than one variable, or even non-linear term, for instance in the case of parametrisations (which are normally carried out on the grid) is likely to require an even higher number of grid points for accuracy.
 
 In summary, computing the transform, and then its inverse at each time step seems like a lot of work, and it must be carried out at every time step. Why bother doing all that?
@@ -82,21 +94,21 @@ which reminds us that we are \underline{never} going to be able to afford infini
 Let us make use of the expression for the $x$-gradient to understand things a little more. If we substitute \ref{speccoeff_discrete} into \ref{gradient_truncated}, after re-arranging some terms we shall have: 
 
 \begin{equation}
-	\frac{\partial	q(x_l,t)} {\partial x} \cong   \sum_{k=-n}^{n} \left[  \frac{ik}{M}  q(x_j,t) e^{-ikx_j} \right] e^{ikx_l}
+	\frac{\partial	q(x_j,t)} {\partial x} \cong   \sum_{k=-n}^{n} \left[  \frac{ik}{M}  \sum_{l=1}^{M} q(x_l,t) e^{-ikx_l} \right] e^{ikx_j}
 	\label{spectral_costs_gradient}
 \end{equation}
 
 we can now reverse the two sums, to produce a very interesting relationship:
 
 \begin{equation}
-	\frac{\partial	q(x_l,t)} {\partial x} \cong   \frac{i}{M}  \sum_{j=1}^{M}  \alpha_j^l  q(x_j,t)
+	\frac{\partial	q(x_j,t)} {\partial x} \cong   \sum_{l=1}^{M}  \alpha_j^l  q(x_l,t)
 	\label{spectral_costs_gradient_reversed}
 \end{equation}
 
 where:
 
 \begin{equation} 
-	\alpha_j^l \equiv \sum_{k=-n}^{n}  k  e^{ik (x_l-x_j)} 
+	\alpha_j^l \equiv \sum_{k=-n}^{n}  \frac{ik}{M}  e^{ik (x_j-x_l)} 
 	\label{gradient_coefficients}
 \end{equation}
 
@@ -112,7 +124,7 @@ Let us go back to one of our favourite problems in 1D:
 when transformed into wave space:
 
 \begin{equation}
-  \sum_{k=-n}^{n} 	\frac{d \widehat{q_k}}{d t}  e^{ikx_j}+ c  \sum_{k=-n}^{n} 	ik \widehat{q_k} e^{ikx_j}= 0
+  \sum_{k=-n}^{n} 	\frac{d \widehat{q_k}}{d t}  e^{ikx}+ c  \sum_{k=-n}^{n} 	ik \widehat{q_k} e^{ikx}= 0
 \end{equation}
 
 Because we have used basis functions that are orthogonal by design, we can invoke linear independence to write this:
@@ -147,22 +159,23 @@ Let us go back to one of our favourite problems in 1D, \emph{Burger's equation}:
 As before, over a periodic domain, we can use the spectral method to do this:
 
 \begin{equation}
-	\sum_{k=-n}^{n} 	\frac{d \widehat{u_k}}{d t}  e^{ikx_j} +  \left( \sum_{l=-n}^{n}  \widehat{u_l} e^{ilx_j} \right)  \left(  \sum_{m=-n}^{n} 	im \widehat{u_m} e^{imx_j} \right)  = 0
+	\sum_{k=-n}^{n} 	\frac{d \widehat{u_k}}{d t}  e^{ikx} +  \left( \sum_{l=-n}^{n}  \widehat{u_l} e^{ilx} \right)  \left(  \sum_{m=-n}^{n} 	im \widehat{u_m} e^{imx} \right)  = 0
+	\label{Burger-spectral}
 \end{equation}
 
 Can you see the problem arising now? We are trying to solve for $\widehat{u_k}(t)$ in the range of wave numbers $-n \le k \le n$, but looking at the rhs of the equation above, we can see how we can expect to have terms like these: $e^{ilx_j}e^{imx_j}$, which will not necessarily lie in that range. Therefore, we shall have to re-visit our definition of the equivalence between spectral truncation and number of grid points.
 
-This is why: for a given Fourier mode, we shall end up with this expression:
+This is why: for any given Fourier mode, \ref{Burger-spectral} implies that:
 
 \begin{equation}
-		\frac{d \widehat{u_k}}{d t}  +  \left\{ \sum_{l=-n}^{n} \sum_{m=-n}^{n}	im \left[    \widehat{u_l}  \widehat{u_m}  e^{i(l+m)x_j} \right]  \right\} e^{-ikx_j} = 0      \qquad  \forall -n \le k \le n
+		\frac{d \widehat{u_k}}{d t}  +  \left\{ \sum_{l=-\alpha}^{\alpha} \sum_{m=-\alpha}^{\alpha}	im \left[    \widehat{u_l}  \widehat{u_m}  e^{i(l+m)x} \right]  \right\} e^{-ikx} = 0      \qquad  \forall -n \le k \le n
 \end{equation}
 
 In practice, the quantity between the curly brackets involves computing sums of wavenumbers, which is by definition carried out at grid points. Those sums happen over an interval $\pm \alpha$. We must pick $\alpha$ so that it can cover all possible values of $l+m$ that lie in the range $-n \le k \le n$. We are already familiar with this problem: it is \emph{aliasing}. We can see what those values are from figure \ref{fig:nlm}:
 
-\begin{figure}
+\begin{figure}[h!]
 	\begin{center}
-	\includegraphics[width=0.65\textwidth]{Spectral-Pictures/nml.png}
+	\includegraphics[width=0.6\textwidth]{Spectral-Pictures/nml.png}
 	\end{center}
 	\label{fig:nlm}
 	\caption{How the wave numbers $l$, $m$ may contribute to forming new wave numbers in the range  $-n \le k \le n$. What is inside the two triangular regions marked by $X$ may not contribute.}
@@ -200,12 +213,13 @@ which is saying that we intend to compute the spectral coefficients of the produ
 
 What are we doing here? We are using the spectral method to compute the gradient (the partial derivative $\frac{\partial u}{\partial x}$), but we are doing it on the grid, avoiding the problem of aliasing, and increasing our efficiency. In fact, this requires far fewer grid points, because we have three Fourier modes, but they are now allowed to interact as before, so we end up with just $3n+1$ coefficients, and we have a new equivalence:
 
-\begin{definition}[Equivalence of truncation and number of grid points for non-linear advection]
+\begin{definition}[Truncation ($n$) and grid points ($M$) for non-linear advection]
 	\begin{equation}
 		M \ge 3n+1
 	\end{equation}
-	which is 50\% more points than the $2n+1$ number of grid points required to represent $u$ itself, albeit far fewer than those required by computing the product in wave space.
 	\end{definition}
+
+	which is 50\% more points than the $2n+1$ number of grid points required to represent $u$ itself, albeit far fewer than those required by computing the product in wave space.
 
 \section{A simple spectral model workflow for non-linear advection}
 Now that we have our set of equations, and some ideas on the ideal relationship between truncation and number of grid points, as well as a strategy to deal with aliasing, we can design a toy model.
@@ -238,7 +252,7 @@ We saw in the chapter on SWEs that working on a sphere involves metric terms. Fo
 	\begin{equation}
 		P_n^m (\sin \phi) = T.B.A.
 		\end{equation}
-	here $m$ is the zonal wave number and $n-m$ is the meridional nodal number, and it is necessary that $n \ge m$.
+	here $m$ is the \emph{zonal wave number} and $n-m$ is the  \emph{meridional nodal number}, and it is necessary that $n \ge m$.
 \end{definition}
 
 The spherical harmonics are the eigenfunctions of the Laplacian on the sphere:
@@ -246,3 +260,93 @@ The spherical harmonics are the eigenfunctions of the Laplacian on the sphere:
 	\nabla^2 Y_n^m (\sin \phi) = \frac{-n(n+1)}{a^2} Y_n^m
 \end{equation}
 where $a$ is the radius of the sphere.
+
+As in the case of the Fourier transforms, we are unable to retain infinite wave numbers, so we truncate:
+
+\begin{equation}
+	\bar{F}(\lambda, \phi)= \sum_{m=-M}^{M} \sum_{n=|m|}^{N(m)} F_n^m Y_n^m (\lambda, \phi)
+\end{equation}
+
+where $\bar{F}$ is an approximation to $F$, and summing between $-M$ and $M$ guarantees that $\bar{F}$ is real. 
+
+Figure \ref{fig:SphericalHarmonics} shows what these base functions look like. 
+
+\begin{figure}[h!]
+	\begin{center}
+		\includegraphics[width=.8\textwidth]{Spectral-Pictures/SphericalHarmonics.png}
+	\end{center}
+	\label{fig:SphericalHarmonics}
+	\caption{Sherical harmonics. Credit: .}
+\end{figure}
+
+In practice, these spherical harmonic transforms are a combination of a Fourier and a Legendre transform. The Legendre transform comes from "Gaussian quadrature", which can be summarised by integrating a function $f(x)$ in the interval $-1 \le x \le 1$, as in:
+
+\begin{equation}
+	I = \int_{-1}^{1}  f(x) dx
+\end{equation}
+and again, if we do this at discrete points:
+\begin{equation}
+	I \approx \sum_{i}^{N}  f(x_i) w_i
+\end{equation}
+where $w_i$ are the weights. In the special case in which $ f(x)$ is itself a sum of Legendre polynomials, as in a Legendre transform, we would like for this approximation to cause the least possible error. Legendre showed that we can in fact retrieve the exact value of $I$, as long as we assess $f(x_i)$ at latitudes where the highest Legendre polynomial passes through zero (the roots of the highest Legendre polynomials). We can determine what this latitudes are by using a number of iterative methods, but at least this needs only be done once. The Legendre transform is computed using a method called "Gaussian quadrature".
+
+The overall procedure of using spherical harmonic transforms (and their inverse) is not dissimilar from what we saw previously with the Fourier transform.
+
+\subsection{Spectral truncations}
+There are many ways to choose the truncation, $N(m)$, and the most common are \emph{rhomboidal} and \emph{triangular}. In both cases, we first choose the highest zonal wave number, $M$ and then the value of $N$ follows. Figure \ref{fig:Truncations} illustrates some of the traditional ones.
+
+\begin{figure}[h!]
+	\begin{center}
+		\includegraphics[width=0.75\textwidth]{Spectral-Pictures/Truncations.png}
+	\end{center}
+	\label{fig:Truncations}
+	\caption{A cartoon of what the different spectral truncations mean in terms of the values of $N$, $M$. Credit: .}
+\end{figure}
+
+\begin{definition}[Rhomboidal truncation]
+\begin{equation}
+N = M + |m|
+\end{equation}
+ $N$ (the maximum value of $n$ to be included in the sum) increases with the value of $m$, in such a way that the highest meridional nodal number is the same for all values of $m$.
+ 
+ The number of spectral coefficients needed is:
+ \begin{equation}
+ 	(M+1)^2+M^2 + M
+ \end{equation}
+ 
+\end{definition}
+
+\begin{definition}[Triangular truncation]
+	\begin{equation}
+		N = M
+	\end{equation}
+	the “two-dimensional wave number” $N$ is a the same for all of the spherical harmonics that are included in the model, so the highest meridional nodal number is smaller for the larger values of $m$.
+	The number of spectral coefficients needed is:
+	\begin{equation}
+		(M+1)^2
+	\end{equation}
+\end{definition}
+
+We normally designate spectral models by names such as "T106", which tells us that we are dealing with triangular truncation and the highest zonal wave numbers, $M=106$.
+
+\section{The good, the bad and the ugly}
+We saw in the introduction, and during the HPC lecture, that spectral models are still very competitive with finite difference models; in fact, for the NH version of the IFS, Niels Wedi could run the DYAMOND simulations at a speed circa 3x that of the Unified Model (HadGEM3). Also, spectral models tend to converge to a fairly accurate solution for quite low truncations, in part due to the fact that they simulate gradients with very high accuracy, and propagate waves without spectral discrimination.
+
+However, not all is wonderful with spectral methods.
+
+\begin{figure}[h!]
+	\begin{center}
+		\includegraphics[width=0.85\textwidth]{Spectral-Pictures/Gibbs-Orography.png}
+	\end{center}
+	\label{fig:GIbbs}
+	\caption{Gibbs phenomenon illustrated by the difference of real versus transformed orography, with uncershoots and overshoots, including over the ocean. Credit: AWI.}
+\end{figure}
+
+\subsection{Gibbs phenomenon}
+Figure \ref{fig:GIbbs} shows what happens when we treat orography by using the spectral method: because of the truncation, we end up with a number of overshoots and undershoots (as seen at the start of the chapter), even over the oceans, which are supposed to be flat on average. This causes divergence and convergence in the flow, which manifests itself as spurious vertical motion, and the Gibbs phenomenon can often be recognised by inspecting the cloud and/or precipitation fields. Even nowadays, despite many advances in the field, this is one of the telltales revealing that we are dealing with a spectral model.
+
+\subsection{Computational costs}
+Until ECMWF found a way to compute fast Legendre transforms, the cost was O($N^3$), while of course for finite difference schemes it is O($N^2$). In principle, the number of grid points around a latitude circle must be $\ge 3M+1$. The number of latitude circles for a triangular truncation must be  $\ge \frac{(3M+1)}{2}$, so in total $\frac{(3M+1)^2}{2}$, thus O($N^2$), but in lack of a fast Legendre transform the cost is higher, O($N^3$).
+
+\subsection{Conservation (lack thereof)}
+By design, because of the truncation, spectral models do not conserve anything, not even mass. This is acceptable for NWP, as anyway Data Assimilation will reset the fields with every initialisation, or even continuously with 4D-Var, but it is not a desirable quality for climate simulation.
