@@ -1,7 +1,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
 \chapterimage{2613-1477-max.jpg} % Chapter heading image
-\chapter{The Shallow Water Equations}
+\chapter{The Shallow Water Equations}\label{chapter-SWEs}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \vspace{1em}
@@ -9,7 +9,7 @@
 
 \section{The governing equations}
 
-In his lecture on Chaos, Tim Palmer explains how the Navier Stokes equations, describing the motion of a Newtonian fluid (loosely, a viscous fluid); the Euler equations describe the motion of a fluid with no viscosity. To this day have no analytical solutions (see the \href{https://en.wikipedia.org/wiki/Millennium_Prize_Problems}{Millenium Prize}). 
+In his lecture on Chaos, Tim Palmer explains how the Navier Stokes equations, describing the motion of a Newtonian fluid (loosely, a viscous fluid); the Euler equations describe the motion of a fluid with no viscosity. To this day no analytical solutions have been found (see the \href{https://en.wikipedia.org/wiki/Millennium_Prize_Problems}{Millenium Prize}). 
 
 Predicting the behavior of geophysical fluids only requires a handful of equations, fundamentally Newton's second law, the ideal gas law, the first law of thermodynamics, and the continuity equation. Additionally, if we are imposing forcings, we will end up using Planck's law, as well as a number of empirical formulations describing phenomena such as turbulence, or the behavior of live organisms, such as bacteria, or cells in live tissues.
 
@@ -49,7 +49,7 @@ and the second term on the rhs of the equation above is referred to as the \emph
 
 For large-scale motion of air (see the scale analysis later in the chapter), the atmosphere may be assumed to be in hydrostatic equilibrium: vertical acceleration and the vertical component of the Coriolis force may be omitted.
 \begin{eqnarray}
-	\frac{d \bm{V}_H}{dt} = \alpha \grad{p} - \bm{f} \times \bm{V}_H + \bm{g} + \bm{F}_H\\
+	\frac{d \bm{V}_H}{dt} = \alpha \grad{p} - \bm{f} \times \bm{V}_H + \bm{g} + \bm{F}_H \nonumber \\
 	0 = -\alpha \frac{\partial p}{\partial z} - g
 \end{eqnarray}
 where the subscript $H$ indicates horizontal quantities and $f=2\bm{\Omega}\sin{\phi}$ is the Coriolis parameter, that is the vertical component of the Earth's velocity at latitude $\phi$.
@@ -107,11 +107,12 @@ where $\theta = T{(p_0/p)}^k$ is the potential temperature, $k=R/c_p$ and $p_0=1
 The collection of momentum, continuity, state and thermodynamics come together, usually under the hydrostatic approximation, to form the \emph{Primitive Equations}, first written out in a form we use to this day by Bjerkness.
 
 \begin{eqnarray}
-		\frac{d \bm{V}_H}{dt} = \alpha \grad{p} - \bm{f} \times \bm{V}_H + \bm{g} + \bm{F}_H\\
+		\frac{d \bm{V}_H}{dt} = \alpha \grad{p} - \bm{f} \times \bm{V}_H + \bm{g} + \bm{F}_H  \\
 	0 = -\alpha \frac{\partial p}{\partial z} - g \nonumber \\
 	-\frac{1}{\rho} \frac{d \rho}{dt} =   \frac{1}{\alpha} \frac{d \alpha}{dt}     = \bm{\nabla} \cdot  \bm{V} \nonumber \\
 	p\alpha=RT \nonumber \\
 	c_p T \frac{d(\ln \theta)}{dt} = Q \nonumber
+	\label{primitive}
 \end{eqnarray}
 
 which is the minimal set we solve in a typical weather or climate model.
@@ -128,6 +129,7 @@ We start with a simplified set in two dimensions, $x$ and $z$:
 		\frac{d w}{dt} + \alpha \frac{\partial p}{\partial z} + g =0 \nonumber \\
 	\alpha \frac{d p}{d t} +p \gamma \frac{d \alpha}{dt}  = 0 \nonumber \\
   \alpha \bm{\nabla} \cdot  \bm{V}  -  \frac{d \alpha}{dt}     = 0 \nonumber
+  \label{primitive_1d}
 \end{eqnarray}
 
 where $\gamma = c_p/c_v$ and $\alpha = 1/\rho$.
@@ -135,7 +137,7 @@ where $\gamma = c_p/c_v$ and $\alpha = 1/\rho$.
 This system can be linearised using the perturbation method, that is, velocity comprises the sum of a constant current $U$ and of a perturbation $u'$; also the average thermodynamic variables are in hydrostatic balance.
 
 \begin{eqnarray}
-	\frac{d u'}{dt} + U \frac{\partial u'}{\partial x} + \bar{\alpha} \frac{\partial p'}{\partial x} = 0\\
+	\frac{d u'}{dt} + U \frac{\partial u'}{\partial x} + \bar{\alpha} \frac{\partial p'}{\partial x} = 0 \\
 	\delta_1 (\frac{\partial w'}{\partial t} + U \frac{\partial w'}{\partial x} ) + \bar{\alpha} \frac{\partial p'}{\partial z}  - \frac{g \alpha'}{\bar{\alpha}} =0 \nonumber\\
 	\bar{\alpha}  (\frac{\partial p'}{\partial t} + U \frac{\partial p'}{\partial x} ) -g w'  +\bar{p}\gamma  ( \frac{\partial \alpha'}{\partial t} + U  \frac{\partial \alpha'}{\partial x} + w'  \frac{\partial \bar{\alpha}}{\partial z}) = 0 \nonumber \\
     (\frac{\partial u'}{\partial x} + \frac{\partial w'}{\partial z} ) \bar{\alpha} - \delta_2  ( \frac{\partial \alpha'}{\partial t} + U  \frac{\partial \alpha'}{\partial x}) - w'  \frac{\partial \bar{\alpha}}{\partial z}  = 0  \nonumber
@@ -204,45 +206,72 @@ The phase speed will be:
 
 These oscillations are stable if the lapse rate is subadiabatic ($\frac{\partial \bar{\theta}}{\partial z}>0$), but unstable if the lapse rate is superadiabatic.
 
-Depending on the relative size of the disturbance in the horizontal versus vertical direction, that is the relative size of the wave numbers, these waves will propagate preferentially in one direction. For instance, if the vertical scale is much smaller than the horizontal scale, we go back to the hydrostatic approximation, $|delta_1$ can be set to zero and the phase speed is simplified accordingly and we can impose solutions that propagate horizontally with a vertical variation.
+Depending on the relative size of the disturbance in the horizontal versus vertical direction, that is the relative size of the wave numbers, these waves will propagate preferentially in one direction. For instance, if the vertical scale is much smaller than the horizontal scale, we go back to the hydrostatic approximation, $\delta_1$ can be set to zero and the phase speed is simplified accordingly and we can impose solutions that propagate horizontally with a vertical variation.
 
 The set \ref{primitive_linear} supports one more set of wave solutions for an isothermal fluid: these are horizontally propagating waves with the speed of sound ($c=\pm \sqrt{\gamma R \bar{T}}$) and they are called \emph{Lamb waves}, very similar to external gravity waves, which will be discussed later for the shallow water equations.
 
 \section{Shallow atmosphere approximation} 
 
-Also known as the {\em traditional approximation} since it also
-applies to the oceans. The deepest motions in the atmosphere have
-depth scales, $H\approx\,$20km. The oceans are even shallower. Therefore
-$H/a< 1/300$. The shallow limit $H/a\ll 1$ gives:
+The system \ref{primitive} supports a complex variety of phenomena across a huge range of scales. The flow almost adiabatic with ``weak'' forcing $\Rightarrow$ stable
+stratification established.
+
+~
+
+Earth's rotation has profound influence on motions $\Rightarrow$
+layerwise-2D motions.
+
+~
+
+The system may be simplified by noting the following:
 
 \begin{itemize}
 	\item
-	radial coordinate $r\rightarrow a$ (i.e., constant)
+	Earth rotates about its polar axis at rate $\Omega=7.292 \times 10^{-5}$s$^{-1}$,
 	
 	\item
-	$\partd{}{r}\rightarrow \partd{}{z}$ where $z$ is height relative to Earth's surface
+	Earth is approximately an oblate spheroid,
+	
+	\item 
+	Radius to poles $a_{pole}\approx 6357$km, radius to equator $a_{eq}\approx
+	6378$km. Average, $a\approx 6371$km.
 	
 	\item
-	In order to retain same form for kinetic energy and zonal angular
-	momentum equations, must drop terms containing $w$ in horizontal
+	Atmosphere and oceans are shallow relative to the Earth's radius.
+\end{itemize}
+
+~
+
+The Shallow Water approximation is also known as the {\em traditional approximation} since it also applies to the oceans. The deepest motions in the atmosphere have
+depth scales, $H\approx\,$20km, far smaller that the radius of the Earth, $a$, approximately in this ratio: $H/a< 1/300$, and the oceans are even shallower than the atmosphere. 
+
+\begin{definition}[Shallow Water approximation] The shallow limit $H/a\ll 1$ implies:
+
+\medskip
+
+\begin{itemize}
+\item radial coordinate $r\rightarrow a$ (i.e., constant)
+\item $\partd{}{r}\rightarrow \partd{}{z}$ where $z$ is height relative to Earth's surface
+\item In order to retain same form for kinetic energy and zonal angular
+	momentum equations, we must drop terms containing $w$ in horizontal
 	momentum equations and the horizontal component of Coriolis
 	acceleration.
 \end{itemize}
+\end{definition}
 
 The resulting {\em primitive equations} (PEs) are the basis of almost
 all atmosphere and ocean {\em general circulation models} (GCMs)
 except the Met Office Unified Model which does not make a shallow
-atmosphere approximation.
+atmosphere approximation. Note how: \\
 
 \begin{itemize}
 	\item
-	Biggest errors are in Tropics associated with neglect of horizontal
+	The largest errors are in Tropics, associated with neglect of horizontal
 	component of Coriolis acceleration.\footnote{\BTi White, Hoskins, Roulstone and Staniforth (2005) Consistent approximate models of the global atmosphere: shallow, deep, hydrostatic, quasi-hydrostatic and non-hydrostatic. \emph{Quart. J. Roy. Met. Soc.}, \textbf{131},
 		2081-2107.
 		\ETi }
 	
 	\item
-	Effects of spherical geopotential approximation are unknown.\footnote{\BTi White, Staniforth and Wood (2008) Spheroidal coordinate systems for modelling global atmospheres. \emph{Quart. J. Roy. Met. Soc.}, \textbf{134},
+	The effects of spherical geopotential approximation are unknown.\footnote{\BTi White, Staniforth and Wood (2008) Spheroidal coordinate systems for modelling global atmospheres. \emph{Quart. J. Roy. Met. Soc.}, \textbf{134},
 		261-270.
 		\ETi }
 \end{itemize}
@@ -326,8 +355,8 @@ The governing equations of compressible fluid dynamics contain acoustic waves. I
 In an Eulerian framework, our momentum equations end up looking like this:
 \begin{eqnarray}
 	\frac {\partial u}{\partial t} + \left(\mathbf{v}\cdot\nabla\right)u=-\frac{1}{\rho} \frac{\partial p}{\partial x}+F_x \\
-	\frac {\partial v}{\partial t} + \left(\mathbf{v}\cdot\nabla\right)v=-\frac{1}{\rho} \frac{\partial p}{\partial y}+F_y \\
-	\frac {\partial w}{\partial t} + \left(\mathbf{v}\cdot\nabla\right)w=-\frac{1}{\rho} \frac{\partial p}{\partial z}-g+F_z
+	\frac {\partial v}{\partial t} + \left(\mathbf{v}\cdot\nabla\right)v=-\frac{1}{\rho} \frac{\partial p}{\partial y}+F_y \nonumber \\
+	\frac {\partial w}{\partial t} + \left(\mathbf{v}\cdot\nabla\right)w=-\frac{1}{\rho} \frac{\partial p}{\partial z}-g+F_z \nonumber
 \end{eqnarray}
 
 We must now consider the fact that we are studying fluids (atmosphere, ocean) on our planet, which is approximately a sphere of radius $a$, rotating with angular velocity $\Omega$,
@@ -348,8 +377,8 @@ We must now consider the fact that we are studying fluids (atmosphere, ocean) on
 
 \begin{eqnarray}
 	\frac {\partial u}{\partial t} + \left(\mathbf{v}\cdot\nabla\right)u - \frac{u \tan \theta}{a} v  + \frac{w}{a}u =-\frac{1}{\rho} \frac{\partial p}{\partial x}+F_x \\
-	\frac {\partial v}{\partial t} + \left(\mathbf{v}\cdot\nabla\right)v + \frac{u \tan \theta}{a} u  + \frac{w}{a}v =-\frac{1}{\rho} \frac{\partial p}{\partial y}+F_y \\
-	\frac {\partial w}{\partial t} + \left(\mathbf{v}\cdot\nabla\right)w - \frac{u^2 + v^2}{a} =-\frac{1}{\rho} \frac{\partial p}{\partial z}-g+F_z
+	\frac {\partial v}{\partial t} + \left(\mathbf{v}\cdot\nabla\right)v + \frac{u \tan \theta}{a} u  + \frac{w}{a}v =-\frac{1}{\rho} \frac{\partial p}{\partial y}+F_y \nonumber \\
+	\frac {\partial w}{\partial t} + \left(\mathbf{v}\cdot\nabla\right)w - \frac{u^2 + v^2}{a} =-\frac{1}{\rho} \frac{\partial p}{\partial z}-g+F_z \nonumber
 \end{eqnarray}
 
 
@@ -359,8 +388,8 @@ The full form of the momentum equations in a rotating spherical coordinate syste
 
 \begin{eqnarray}
 	\frac {\partial u}{\partial t} + \left(\mathbf{v}\cdot\nabla\right)u - \frac{2 \Omega \sin \theta + u \tan \theta}{a} v  + \frac{w}{a}u + w \cdot 2 \Omega \cos \theta =-\frac{1}{\rho} \frac{\partial p}{\partial x}+F_x \\
-	\frac {\partial v}{\partial t} + \left(\mathbf{v}\cdot\nabla\right)v + \frac{2 \Omega \sin \theta +u \tan \theta}{a} u  + \frac{w}{a}v =-\frac{1}{\rho} \frac{\partial p}{\partial y}+F_y \\
-	\frac {\partial w}{\partial t} + \left(\mathbf{v}\cdot\nabla\right)w - \frac{u^2 + v^2}{a} - u \cdot 2 \Omega \cos \theta =-\frac{1}{\rho} \frac{\partial p}{\partial z}-g+F_z
+	\frac {\partial v}{\partial t} + \left(\mathbf{v}\cdot\nabla\right)v + \frac{2 \Omega \sin \theta +u \tan \theta}{a} u  + \frac{w}{a}v =-\frac{1}{\rho} \frac{\partial p}{\partial y}+F_y \nonumber \\
+	\frac {\partial w}{\partial t} + \left(\mathbf{v}\cdot\nabla\right)w - \frac{u^2 + v^2}{a} - u \cdot 2 \Omega \cos \theta =-\frac{1}{\rho} \frac{\partial p}{\partial z}-g+F_z \nonumber
 \end{eqnarray}
 
 where the terms involving $\Omega$ are the Coriolis terms. The symbol $f$ is often used to represent the Coriolis term that appears in both horizontal momentum equations ($2 \Omega \sin \theta$ ). The equation of state and the continuity, thermodynamic and constituent equations are not modified by the effects of rotation.
@@ -384,8 +413,8 @@ If we make careful use of scale analysis, we can strongly simplify the PEs we wa
 
 \begin{eqnarray}
 	\frac {\partial u}{\partial t} + \left(\mathbf{v}\cdot\nabla\right)u - \frac{2 \Omega \sin \theta + u \tan \theta}{a} v  = -\frac{1}{\rho} \frac{\partial p}{\partial x}+F_x \\
-	\frac {\partial v}{\partial t} + \left(\mathbf{v}\cdot\nabla\right)v + \frac{2 \Omega \sin \theta +u \tan \theta}{a} u  = -\frac{1}{\rho} \frac{\partial p}{\partial y}+F_y \\
-	0 =-\frac{1}{\rho} \frac{\partial p}{\partial z}-g+F_z
+	\frac {\partial v}{\partial t} + \left(\mathbf{v}\cdot\nabla\right)v + \frac{2 \Omega \sin \theta +u \tan \theta}{a} u  = -\frac{1}{\rho} \frac{\partial p}{\partial y}+F_y \nonumber \\
+	0 =-\frac{1}{\rho} \frac{\partial p}{\partial z}-g+F_z \nonumber
 \end{eqnarray}
 
 \subsection{Simplified PEs after scale analysis, now back on a PLANE}
@@ -395,8 +424,8 @@ $\beta$-plane: Coriolis term changes linearly in the meridional direction\\
 
 \begin{eqnarray}
 	\partd{u}{t} + \left( \mathbf{v} \cdot \nabla\right) u - f_0 v & = & -\frac{1}{\rho_o}\partd{p}{x} +F_x \\
-	\partd{v}{t} + \left( \mathbf{v} \cdot \nabla\right) v + f_0 u & = & -\frac{1}{\rho_o}\partd{p}{y} +F_y \\
-	0 & = & - \frac{1}{\rho} \partd{p}{z} - g + F_z
+	\partd{v}{t} + \left( \mathbf{v} \cdot \nabla\right) v + f_0 u & = & -\frac{1}{\rho_o}\partd{p}{y} +F_y \nonumber \\
+	0 & = & - \frac{1}{\rho} \partd{p}{z} - g + F_z \nonumber
 	%\partd{u}{x}+\partd{v}{y}+\partd{w}{z} & = & 0
 \end{eqnarray}
 
@@ -411,9 +440,9 @@ Making the planar, Boussinesq and hydrostatic approximations, and neglecting tho
 the PEs reduce to:
 \begin{eqnarray}
 	\lagd{u}{t}-f_0 v & = & -\frac{1}{\rho_o}\partd{p}{x} \\
-	\lagd{v}{t}+f_0 u & = & -\frac{1}{\rho_o}\partd{p}{y} \\
-	0 & = & - \frac{1}{\rho} \partd{p}{z} - g \\
-	\partd{u}{x}+\partd{v}{y}+\partd{w}{z} & = & 0
+	\lagd{v}{t}+f_0 u & = & -\frac{1}{\rho_o}\partd{p}{y} \nonumber \\
+	0 & = & - \frac{1}{\rho} \partd{p}{z} - g \nonumber  \\
+	\partd{u}{x}+\partd{v}{y}+\partd{w}{z} & = & 0 \nonumber
 \end{eqnarray}
 
 plus thermodynamic eqn and eqn of state. Remember that $f_0=2\Omega \sin\phi_0$ is the Coriolis parameter normal to the Earth's surface at
@@ -430,7 +459,7 @@ over a fluid layer of depth $h$. Integrating hydrostatic balance
 downwards from the top to any level $z$:
 \begin{eqnarray*}
 	\frac{1}{\rho}\partd{p}{z}=-g \Rightarrow p_{top}-p(x,y,z,t) & = & -\rho_o g (h-z) \\
-	\Rightarrow -\frac{1}{\rho_o} \partd{p}{x} & = & -g \partd{h}{x}
+	\Rightarrow -\frac{1}{\rho_o} \partd{p}{x} & = & -g \partd{h}{x} \nonumber
 \end{eqnarray*}
 
 assuming that there are no pressure perturbations on the top.
@@ -440,8 +469,8 @@ $-g\partd{\eta}{y}$, since the reference depth $H$ must be constant.
 The mass conservation equation integrated vertically is:
 \begin{eqnarray*}
 	\partd{u}{x}+\partd{v}{y}+\partd{w}{z} = 0 \Rightarrow \left\{ \partd{u}{x}+\partd{v}{y} \right\} h+[w]^{top}_{bot} & = & 0 \\
-	\left\{ \partd{u}{x}+\partd{v}{y} \right\} h+\lagd{h}{t} & = & 0 \\
-	\partd{h}{t}+\partd{(hu)}{x}+\partd{(hv)}{y} & = & 0
+	\left\{ \partd{u}{x}+\partd{v}{y} \right\} h+\lagd{h}{t} & = & 0 \nonumber \\
+	\partd{h}{t}+\partd{(hu)}{x}+\partd{(hv)}{y} & = & 0 \nonumber
 \end{eqnarray*}
 where $(u,v)$ is now the depth-average velocity and $w_{bot}=0$ was assumed. 
 
@@ -453,10 +482,12 @@ plane tangent to the Earth's surface, {\em linearised} about a resting basic sta
 
 \begin{eqnarray}
 	\frac{\partial \eta}{\partial t} + H \left(
-	\frac{\partial u}{\partial x}+\frac{\partial v}{\partial y}\right) & = & 0 \\
+	\frac{\partial u}{\partial x}+\frac{\partial v}{\partial y}\right) & = & 0 \nonumber \\
 	\frac{\partial u}{\partial t} - f_0 v  + g\frac{\partial \eta}{\partial x} & = & 0 \\
-	\frac{\partial v}{\partial t} + f_0 u  + g\frac{\partial \eta}{\partial y} & = & 0 
+	\frac{\partial v}{\partial t} + f_0 u  + g\frac{\partial \eta}{\partial y} & = & 0 \nonumber
+\label{eqn:SWEs-2d}
 \end{eqnarray}
+
 where $\eta$ is the surface elevation, $H$ is fluid depth, $(u,v)$ is
 the depth-averaged horizontal velocity, $f$ is the Coriolis parameter
 and $g$ is the gravitational acceleration. 
@@ -493,26 +524,12 @@ How can 1D SWEs help us understand grid stagger? If we want to move from the lin
 \begin{eqnarray}
 	\frac{\partial h}{\partial t} + H \frac{\partial u}{\partial x} = 0 \\
 	\frac {\partial u}{\partial t} + g \frac{\partial h}{\partial x} = 0 \nonumber
+\label{eqn:SWEs-1d}
 \end{eqnarray}
 
-Let $c^2 \equiv gH$ and substitute: we end up with two second order equations that have the very same form as the oscillation equation (see Chapter 2), that is: $\frac{\partial^2 u}{\partial t^2} = c^2 \frac{\partial^2 u}{\partial x^2}$ and $\frac{\partial^2 h}{\partial t^2} = c^2 \frac{\partial^2 h}{\partial x^2}$.
+Let $c^2 \equiv gH$ and substitute: we end up with two second order equations that have the very same form as the oscillation equation (see Chapter \ref{chapter:Time-Schemes}), that is: $\frac{\partial^2 u}{\partial t^2} = c^2 \frac{\partial^2 u}{\partial x^2}$ and $\frac{\partial^2 h}{\partial t^2} = c^2 \frac{\partial^2 h}{\partial x^2}$.
 
-If we impose the usual wave solution (see the exercise) we end up with the dispersion relation: $\omega^2 = c^2k^2$, which has two solution, thus one wave moving eastward and one wave moving westward.
-
-\begin{exercise}[Analytical versus numerical solutions]
-	Start from the two shallow water equations on the previous page. Impose the wave solution proposed on the slide, for $u_j$ and $h_j$: 
-	
-	\begin{equation}
-		(u_j,h_j) \sim e^{i(k x_j -\omega t)} = e^{i(k j \Delta x -\omega t)}
-	\end{equation}
-	
-	\begin{enumerate}
-		\item Substitute into the centred numerical expressions (in time and space) and show that you end up with an expression that contains a $\sin$ function.
-		\item How does the numerical solution compare to the analytical solution in terms of a) amplitude and b) phase?
-		\item Plot a wavenumber versus frequency plot for the analytical and numerical solution
-		\item Expand your thinking to Numerical Weather Prediction models that might be using such schemes: discuss what operational problems we may encounter in the presence of a $\sin$ in such numerical predictions.
-	\end{enumerate}
-\end{exercise}
+If we impose the usual wave solution (see the exercise at the end of this section) we end up with the dispersion relation: $\omega^2 = c^2k^2$, which has two solution, thus one wave moving eastward and one wave moving westward.
 
 Let us now discretise the rhs, that is, the spatial gradient terms. Once again, we are tempted to go for the most intuitive way to do this, that is:
 
@@ -536,15 +553,28 @@ Analysis of the scheme above, and comparison with figure \ref{fig:1D-grid-stagge
 	\label{fig:1D-grid-stagger}
 \end{figure}
 
-There is an additional shortcoming of the numerical approximation: if we impose a wave solution of the type $(u_j,h_j) \approx e^{i(kj\Delta x - \omega t)}$ (see a simplified example in the exercise in this section), we end up with a dispersion relation that is not identical to the analytical one. This is the numerical expression for the dispersion relation:
+There is an additional shortcoming of the numerical approximation: if we impose a wave solution of the type $(u_j,h_j) \approx e^{i(kj\Delta x - \omega t)}$ (see a simplified example in the exercise in this section), we end up with a dispersion relation that is not identical to the analytical one. This is the numerical expression for the \emph{dispersion relation}:
 
 \begin{equation}
 	\omega^2 = gH \left(  \frac{\sin k \Delta x}{\Delta x}^2   \right)
 	\label{numerical-dispersion-relation}
 	\end{equation}
 
-\begin{exercise}[Shedding of waves, as dependent on wave number]
-What does the numerical dispersion relation, eqn. \ref{numerical-dispersion-relation} mean for the propagation of a signal like a square wave (a delta function)? 
+\medskip
+
+\begin{exercise}[Analytical versus numerical solutions]
+	Start from the two shallow water equations in \ref{eqn:SWEs-1d}. Impose the wave solution proposed on the slide, for $u_j$ and $h_j$: 
+	
+	\begin{equation}
+		(u_j,h_j) \sim e^{i(k x_j -\omega t)} = e^{i(k j \Delta x -\omega t)} \nonumber
+	\end{equation}
+	
+	\begin{enumerate}
+		\item Substitute into the centred numerical expressions (in time and space) and show that you end up with an expression that contains a $\sin$ function.
+		\item How does the numerical solution compare to the analytical solution in terms of a) amplitude and b) phase?
+		\item Plot a wavenumber versus frequency plot for the analytical and numerical solution
+		\item Expand your thinking to Numerical Weather Prediction models that might be using such schemes: discuss what operational problems we may encounter in the presence of a $\sin$ in such numerical predictions.
+	\end{enumerate}
 \end{exercise}
 
 \subsection{Resolving waves on a grid: the problem of aliasing} 
@@ -556,6 +586,11 @@ We must always be aware of the dangers of under-representing our waves: we saw a
 	\caption{Aliasing in 1D (example carried from the time domain, Dave Randall's Fig 1-17).}
 	    \label{fig:Waves-Aliasing}
 \end{figure}
+
+
+\begin{exercise}[Shedding of waves, as dependent on wave number]
+	What does the numerical dispersion relation, eqn. \ref{numerical-dispersion-relation} mean for the propagation of a signal like a square wave (a delta function)? 
+\end{exercise}
 
 \clearpage
 
@@ -572,9 +607,9 @@ How are we going to discretise the problem, using regular grids, to obtain a goo
 			&& \\
 			\frac{\partial \eta}{\partial x}\Big|_{ij} &\approx& \left(\frac{\eta_{i+1,j}+\eta_{i+1,j+1}}{2} - \frac{\eta_{i-1,j}+\eta_{i-1,j+1}}{2} \right)\frac{1}{2 \Delta x} \\
 			f v\big|_{ij} &\approx& f_j \frac{v_{i,j}+v_{i,j+1}+v_{i-1,j}+v_{i-1,j+1}}{4} \\
-			&& \\
+			&& \nonumber \\
 			\frac{\partial \eta}{\partial y}\Big|_{ij} &\approx& \left(\frac{\eta_{i,j+1}+\eta_{i+1,j+1}}{2} - \frac{\eta_{i,j-1}+\eta_{i+1,j-1}}{2} \right)\frac{1}{2 \Delta y} \\
-			f u\big|_{ij} &\approx& f_j \frac{u_{i,j}+u_{i+1,j}+u_{i,j-1}+u_{i+1,j-1}}{4}
+			f u\big|_{ij} &\approx& f_j \frac{u_{i,j}+u_{i+1,j}+u_{i,j-1}+u_{i+1,j-1}}{4} \nonumber
 		\end{eqnarray*}
 ~
 
@@ -586,10 +621,9 @@ methods to solve the {\bf shallow-water equations} on the
 plane tangent to the Earth's surface, {\em linearised} about a resting basic state:
 \begin{eqnarray}
 	&&\frac{\partial \eta}{\partial t} + H \left(
-	\frac{\partial u}{\partial x}+\frac{\partial v}{\partial y}\right) = 0,
-	\\
-	&&\frac{\partial u}{\partial t} - f_0 v = - g\frac{\partial \eta}{\partial x}, \\
-	&&\frac{\partial v}{\partial t} + f_0 u = - g\frac{\partial \eta}{\partial y}, 
+	\frac{\partial u}{\partial x}+\frac{\partial v}{\partial y}\right) = 0, \\
+	&&\frac{\partial u}{\partial t} - f_0 v = - g\frac{\partial \eta}{\partial x}, \nonumber\\
+	&&\frac{\partial v}{\partial t} + f_0 u = - g\frac{\partial \eta}{\partial y}, \nonumber
 \end{eqnarray}
 where $\eta$ is the surface elevation, $H$ is fluid depth, $(u,v)$ is
 the depth-averaged horizontal velocity, $f$ is the Coriolis parameter
@@ -617,7 +651,7 @@ Simplest and intuitive, but there is the danger of computational modes.\\
 		\begin{eqnarray*}
 			\eta-grid \;\;\; \;\;\; \;\;\;
 			\frac{\partial u}{\partial x}\Big|_{ij} &\approx& \frac{u_{i+1,j}-u_{i-1,j}}{2 \Delta x} \\
-			\frac{\partial v}{\partial y}\Big|_{ij} &\approx& \frac{v_{i,j+1}-v_{i,j-1}}{2 \Delta y} \\
+			\frac{\partial v}{\partial y}\Big|_{ij} &\approx& \frac{v_{i,j+1}-v_{i,j-1}}{2 \Delta y}  \\
 			&& \\
 			u-grid \;\;\; \;\;\; \;\;\;
 			\frac{\partial \eta}{\partial x}\Big|_{ij} &\approx& \frac{\eta_{i+1,j}-\eta_{i-1,j}}{2 \Delta x} \\
@@ -810,7 +844,7 @@ In 1-D, on the interval $\Omega=[0,1]$ we could for instance have:
 
 \begin{eqnarray}
 	au(0)-Bu'(0)=g(0) \\
-	au(1)+Bu'(1)=g(1)
+	au(1)+Bu'(1)=g(1) \nonumber
 \end{eqnarray}
 
 This contrasts with \textbf{mixed boundary conditions}, which are boundary conditions of different types specified on different subsets of the boundary.

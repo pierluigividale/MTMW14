@@ -1,0 +1,971 @@
+\documentclass[xcolor=dvipsnames]{beamer} % dvipsnames gives more built-in colors
+\usetheme{Singapore}
+\useoutertheme{miniframes} % Alternatively: miniframes, infolines, split
+\useinnertheme{circles}
+\usecolortheme{dove}
+\usepackage{wrapfig}
+
+\def\verytiny{\fontsize{5pt}{5pt}\selectfont}
+\newcommand{\BE}{ \begin{enumerate}}
+\newcommand{\EE}{ \end{enumerate}}
+\newcommand{\BI}{ \begin{itemize}}
+\newcommand{\EI}{ \end{itemize}}
+\newcommand{\BEQ}{ \begin{equation}}
+\newcommand{\EEQ}{ \end{equation}}
+\newcommand{\BDM}{ \begin{displaymath}}
+\newcommand{\EDM}{ \end{displaymath}}
+\newcommand{\BFNS}{ \begin{footnotesize}}
+\newcommand{\EFNS}{ \end{footnotesize}}
+\newcommand{\BS}{ \begin{small}}
+\newcommand{\ES}{ \end{small}}
+\newcommand{\BSS}{ \begin{scriptsize}}
+\newcommand{\ESS}{ \end{scriptsize}}
+\newcommand{\BTi}{ \begin{tiny}}
+\newcommand{\ETi}{ \end{tiny}}
+\newcommand{\BVTi}{ \begin{verytiny}}
+\newcommand{\EVTi}{ \end{verytiny}}
+\newcommand{\balpha}{\mbox{\boldmath $\alpha$}}
+\newcommand{\bOmega}{\mbox{\boldmath $\Omega$}}
+\newcommand{\btau}{\mbox{\boldmath $\tau$}}
+\newcommand{\bchi}{\mbox{\boldmath $\chi$}}
+\newcommand{\bnabla}{\mbox{\boldmath $\nabla$}}
+\newcommand{\grad}{\mbox{\boldmath $\nabla$}}
+\newcommand{\boldeta}{\mbox{\boldmath $\eta$}}
+\newcommand{\bphi}{\mbox{\boldmath $\varphi$}}
+\newcommand{\ds}{\displaystyle}
+\newcommand{\nl}{\ \\ }
+\newcommand{\ud}{\textrm{ d}}
+\newcommand{\bs}{\bigskip}
+\newcommand{\BTc}{ \begin{tabular}{c}}
+\newcommand{\BTl}{ \begin{tabular}{l}}
+\newcommand{\BTr}{ \begin{tabular}{r}}
+\newcommand{\ET}{ \end{tabular}}
+\newcommand{\bu}{\mathbf{u}}
+\newcommand{\bv}{\mathbf{v}}
+\newcommand{\bx}{\mathbf{x}}
+\newcommand{\be}{\mathbf{e}}
+\newcommand{\bb}{\mathbf{b}}
+\newcommand{\bk}{\mathbf{k}}
+\newcommand{\bd}{\mathbf{d}}
+\newcommand{\bn}{\mathbf{n}}
+\newcommand{\bq}{\mathbf{q}}
+\newcommand{\ba}{\mathbf{a}}
+\newcommand{\bF}{\mathbf{F}}
+\newcommand{\bI}{\mathbf{I}}
+\newcommand{\bT}{\mathbf{T}}
+\newcommand{\ust}{u_{*}}
+\newcommand{\ddz}{\frac{\partial}{\partial z}}
+\newcommand{\ddt}{\frac{\partial}{\partial t}}
+\newcommand{\dudx}{\frac{\partial u}{\partial x}}
+\newcommand{\dudz}{\frac{\partial u}{\partial z}}
+\newcommand{\dvdz}{\frac{\partial v}{\partial z}}
+\newcommand{\dudt}{\frac{\partial u}{\partial t}}
+\newcommand{\dvdt}{\frac{\partial v}{\partial t}}
+\newcommand{\ddudxx}{\frac{\partial^2 u}{\partial x^2}}
+\newcommand{\dbudz}{\frac{\partial \bu}{\partial z}}
+\newcommand{\dbudt}{\frac{\partial \bu}{\partial t}}
+\newcommand{\partd}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\lagd}[2]{\frac{D #1}{D #2}}
+\newcommand{\lagdh}[2]{\frac{D_h #1}{D #2}}
+
+\newcommand{\arrow}[5]{ \put(#1,#2){\vector(#3,#4){#5}} }
+\newcommand{\grid}{ 
+\put(0,0){\vector(1,0){8}}
+\put(0,1){\line(1,0){7}}  \put(0,2){\line(1,0){7}}
+\put(0,3){\line(1,0){7}}  \put(0,4){\line(1,0){7}}
+\put(0,5){\line(1,0){7}}
+\put(0,0){\vector(0,1){6}}  
+\put(1,0){\line(0,1){5}}  \put(2,0){\line(0,1){5}}  
+\put(3,0){\line(0,1){5}}  \put(4,0){\line(0,1){5}}  
+\put(5,0){\line(0,1){5}}  \put(6,0){\line(0,1){5}}  
+\put(7,0){\line(0,1){5}}
+\put(2.8,-0.7){$j$}
+\put(7.3,-0.7){$x$}
+\put(-0.7,2.8){$n$}
+\put(-2.0,3.8){$n+1$}
+\put(-0.7,5.3){$t$}}
+\newcommand{\arakawa}{
+\put(1,0){\line(0,1){4}}
+\put(3,0){\line(0,1){4}}
+\put(0,1){\line(1,0){4}}
+\put(0,3){\line(1,0){4}}
+}
+
+
+\title{Numerical modelling of atmosphere and oceans \\ Lecture 6}
+\author{P.L. Vidale}
+\institute{
+  NCAS Climate, Department of Meteorology\\
+  University of Reading, UK\\
+  p.l.vidale@reading.ac.uk}
+\date{23 February 2023}
+
+\begin{document}
+
+\frame{\titlepage}
+
+%\section[Outline]{}
+\frame{\tableofcontents}
+
+\section{Re-visiting advection and time step limitations}
+\frame
+{
+	\frametitle{A graphical description}
+	\BSS
+	Let us start with something familiar, e.g. simple advection solved with CTCS.
+	We have our beloved CFL criterion from studying the problem of advection:
+	$\alpha = U \frac{\Delta t}{\Delta h} \le \alpha_{max}$
+	, where $\Delta h$ is our grid spacing.\\
+	
+	~
+
+\begin{wrapfigure}{r}{0.5\textwidth}
+	\begin{center}
+\includegraphics[width=0.55\textwidth]{Figures/image_grid_cfl.jpg}
+	\end{center}
+\caption{CFL in the x direction}
+\end{wrapfigure}
+	
+What is the practical meaning of CFL for Eulearian finite differences?
+
+~
+
+If we think of it as a method for propagating information in space, the CFL criterion is telling us that we are not allowed to transmit information from grid point $i$ to grid point $i+2$ without first making a stop at grid point $i+1$.
+If our information "leapfrogs", very bad things will happen.
+
+	\begin{center}
+\includegraphics[width=0.2\textwidth]{Figures/GameOver.jpg}
+	\end{center}
+	
+\ESS
+}
+
+\subsection{A short reminder of the CFL condition in 1 dimension}
+\frame
+{
+	\frametitle{The example of advection in 1D}
+	\BSS
+	Let us start with something familiar, e.g. simple advection solved with CTCS:
+	
+	\begin{equation}
+		\frac {A_j^{n+1}-A_j^{n-1}}{ 2 \Delta t} +c \left(  \frac {A_{j+1}^{n}-A_{j-1}^{n}}{ 2 \Delta x}  \right) = 0
+		\label{adv-CTCS-1D}
+	\end{equation}
+	
+	We can substitute a (Von Neumann) solution of this type: ${A_j^{n}=B^{n \Delta t} e^{i \mu m \Delta x}}$, where $\mu$ is the horizontal wavenumber and $m \Delta x$ is the distance along the $x$ axis. $B$ can be any complex number. If we substitute into our finite difference (CTCS) scheme above we obtain:
+	
+	\begin{equation}
+		\left ( B^{(n+1)\Delta t}-B^{(n-1) \Delta t} \right ) e^{i \mu m \Delta x} = - \frac {c \Delta t}{\Delta x} B^{n \Delta t} \left( e^{i \mu (m+1) \Delta x}  - e^{i \mu (m-1) \Delta x}  \right)
+		\label{adv-CTCS-1D-solution}
+	\end{equation}
+	
+	If we remember Euler's formula: $e^{i \theta}=\cos \theta +i \sin \theta$ and we multiply the expression above by $B^{\Delta t}$ we obtain a simple equation, after we cancel out the common term $A_j^{n}$:
+	
+	\begin{equation}
+		B^{2 \Delta t}    + 2 i \sigma B^{\Delta t}  -1 = 0  
+		\label{adv-CTCS-1D-stability}
+	\end{equation}
+	
+	where $\mathbf{\sigma = \frac {c \Delta t}{\Delta x} \sin \mu \Delta x}$, so that (\ref{adv-CTCS-1D-stability}) has the solution:
+	
+	\begin{equation}
+		B^{\Delta t} = -i \sigma \pm \left( 1 - \sigma^2 \right)^{1/2} 
+		\label{adv-CTCS-1D-eigenvalues}
+	\end{equation}
+	
+	\ESS
+}
+
+\frame{
+	\BSS	
+	Two cases may be considered: \textbf{stable}, with $|\sigma| \leq 1$ and \textbf{unstable}, with $|\sigma| > 1$.
+	\medskip
+	
+	The \underline{stable case} is very interesting from the point of view of phase, group velocity etc., but does not seem to pose major threats to the stability of the simulation (see Haltiner and Williams, pages 112-119).
+	
+	\medskip
+	The \underline{unstable case} concerns us from the point of view of the amplitude of the signal. In fact, if $|\sigma| > 1$, then $\left( 1 - \sigma^2 \right)^{1/2}$ is imaginary and both roots will be pure imaginary:
+	
+	
+	
+	\begin{align}
+		B_{+}^{\Delta t}  &= -i \left ( \sigma -S \right)  \mathrm{,where } | \sigma| > S \equiv \left(  \sigma^2 - 1 \right)^{1/2} \nonumber \\
+		B_{-}^{\Delta t}  &= -i \left ( \sigma +S \right)  \nonumber
+		\label{adv-CTCS-1D-unstable-solution}
+	\end{align}
+	
+	If $\sigma$ is positive, the magnitude $R=|B_{-}^{\Delta t}| > 1$ and the solution $ B_{-}^{\Delta t} = R e^{-i \pi /2 }$ will thus grow exponentially when raised to the power of $n$ across the time steps. If $\sigma$ is positive, the other root has a magnitude exceeding $1$. \\
+	In either case, the solution: $A_j^{n} = \left( M B_{+}^{n \Delta t}+ E B_{-}^{n \Delta t} \right)e^{i \mu m \Delta x}$  (with two arbitrary constants, $M,E$, to be determined later), will amplify with increasing time, which is not a desired property, since it does not correspond to the true solution of the differential equation. This phenomenon of \emph{exponential amplification of the solution} is known as \emph{computational instability} and must be avoided at all costs. 
+	
+	\ESS
+}
+
+
+\frame{
+	\frametitle{The Courant-Friedrichs-Levy (CFL) condition in 1D}
+	\BSS
+	So, we are left with having to impose a \emph{condition for a stable solution} $|\sigma| \leq 1$, that is:
+	
+	\begin{equation}
+		\left | \frac {c \Delta t}{\Delta x} \sin \mu \Delta x \right | \leq 1
+	\end{equation}	
+	
+	If this condition is to hold for all admissible values of the wavelength $\mu$, then the maximum value of $\sin \mu \Delta x$ will happen for the highest resolved wavenumber (that is a wavelenght $L=4 \Delta x$), which requires that:
+	
+	\begin{equation}
+		\left | \frac {c \Delta t}{\Delta x}  \right | \leq 1
+	\end{equation}	
+	which is commonly referred to as the \emph{\textbf{Courant-Friedrichs-Levy (CFL)} condition for computational stability}.
+	\ESS
+}
+
+\frame{
+	\frametitle{The CFL condition in 1D: plugging in some numbers}
+	\BSS
+
+What happens in practice? What typical time step are we contending with, in the horizontal and vertical directions?
+
+\medskip
+
+\begin{minipage}{0.45\textwidth}
+	{\bf Horizontal example:} $\Delta x = 10km$, $c = O(100) ms^{-1}$ what $\Delta t$ can we afford?
+	
+	\medskip
+	
+	But what happens for a contemporary grid, like this one?	
+	\begin{figure}[H]
+		\includegraphics[trim={0cm 0.cm 0cm 0cm},clip,width=0.65\textwidth]{Figures/horizontal-irregular-grid}
+	\end{figure}
+\end{minipage}
+\hfill
+\begin{minipage}{0.45\textwidth}
+
+{\bf Vertical example:} $\Delta z = 500m$, $c = O(1) ms^{-1}$ what $\Delta t$ can we afford?
+
+	\medskip
+
+But what happens for a typical vertical atmospheric grid, telescoped, like this one?
+	\begin{figure}[H]
+	\includegraphics[trim={0cm 0.cm 0cm 0cm},clip,width=0.6\textwidth]{Figures/vertical-telescoped-grid}
+\end{figure}
+
+\end{minipage}
+
+\ESS
+}
+
+
+\section{The CFL condition in 2 dimensions}
+
+\frame{
+	\frametitle{The Courant-Friedrichs-Levy (CFL) condition in 2D}
+	\BSS
+	Same problem as before, albeit advection in 2D:
+	
+	\begin{equation}
+		\frac{\partial A}{\partial t} + \mathbf{V}_s \cdot \grad{A} = 0 \textrm{, where } \mathbf{V}_s=U\mathbf{i}+V\mathbf{j} = \textrm{const.}
+	\end{equation}
+	
+	Let $\Delta x = \Delta y =d$; $x=jd$; $y=kd$; $t=n \Delta t$ and apply CTCS as before:
+	
+	\begin{equation}
+		{A_{j,k}^{n+1}-A_{j,k}^{n-1}} = - \frac{ U \Delta t}{d} \left( A_{j+1,k}^{n} - A_{j-1,k}^{n}  \right) - \frac{ V \Delta t}{d} \left( A_{j,k+1}^{n} - A_{j,k-1}^{n}  \right) 
+		\label{adv-CTCS-2D}
+	\end{equation}
+	
+	Just as before, we apply a solution following the Von Neumann method: ${A_{j,k}^{n}=B^{n \Delta t} e^{i pjd + qkd }}$ and we simplify by cancelling common terms, just as we did in the 1D case, leading to:
+	
+	\begin{equation}
+		B^{n+1}  =  B^{n-1}  - \frac{2 i \Delta t}{d}  \left ( U \sin pd + V \sin qd \right) B_n
+		\label{adv-CTCS-2D-solution}
+	\end{equation}
+	
+	We can solve by defining $D=B^{n-1}$, re-writing (\ref{adv-CTCS-2D-solution}) in matrix form and finding its eigenvalues. This is quite similar to what is done on page 127 of Haltiner and Williams to solve the 1D case we treated before, which results in a quadratic equation ((5-55), page 127) with coefficients identical to what we found previously (equation (\ref{adv-CTCS-1D-eigenvalues}), else see (5-16) in H\&W, page 112).
+	
+	
+	\ESS
+}
+
+\frame{
+	\frametitle{The 2D eigenvalues for stability and the 2D CFL}
+	\BSS
+	The eigenvalues are:
+	
+	\begin{equation}
+		\lambda = -i \frac{ \Delta t}{d}  \left ( U \sin pd + V \sin qd \right) \pm \sqrt { 1-  (\frac{ \Delta t}{d})^2  \left ( U \sin pd + V \sin qd \right) ^2 }
+	\end{equation}
+	
+	which will have (the desired) magnitude of $1$ provided that: 
+	\begin{equation}
+		\frac{ \Delta t}{d}  \left | U \sin pd + V \sin qd \right | \leq 1
+	\end{equation}
+	
+	At this time we consider $U$ and $V$ as projections of the vector $\mathbf{V}_s$ onto the $x$ and $y$ directions, making use of the "angle of the wind", or \emph{direction of the wave front} $\theta$: $U=V_s \cos \theta$ and $V=V_s \sin \theta$, which gives us:
+	
+	
+	\begin{equation}
+		\frac{ V_s\Delta t}{d}  \left | \cos \theta \sin pd + \sin \theta \sin qd \right | \leq 1
+	\end{equation}
+	
+	Which is the wind direction $\theta$ that is most likely to violate CFL? Since the wave numbers $p,q$ are independent, we can choose the maximum value, $1$, for each of the two terms: $\sin pd$ and $\sin qd$, and we are left with the task of maximising the remaining sum: $\cos \theta + \sin \theta$, which is $\sqrt{2}=0.707$, corresponding to $\theta=\pi/4=45^o$.
+	
+	So, \textbf{for 2D CTCS, the CFL condition} that will allow us to avoid computational instability under all circumstances (even with wind blowing at an angle of $45^o$) is: 
+	\begin{equation}
+		V_s \Delta t \sqrt{2} / d \leq 1 \textrm{ or } V_s \Delta t \leq 0.707 d 
+	\end{equation}
+	
+	
+	\ESS
+}
+
+\frame{
+	\frametitle{2D CFL: graphical interpretation}
+	\BSS
+	In summary, we have seen that in 2D the maximum value of $\Delta t$ required for computational stability is almost 30\% smaller than for the 1D case, other things being equal. In order to understand this, consider the two figures below: on the left is the grid as seen normally, while on the right is the grid as seen when aligned with the progressing wavefront, at an angle of $45^o$.
+	A wave propagating at that angle (e.g from the SW to the NE) encounters an effective distance of $d/\sqrt{2}$ between gridpoints. So, the CFL stability criterion says that the wave cannot move more than the effective distance between gridpoints ($d/\sqrt{2}$ at its shortest) during time $\Delta t$, without incurring computatational instability.
+	
+	\medskip
+	
+	\begin{minipage}{0.45\textwidth}
+		\begin{figure}[H]
+			\includegraphics[trim={5.25cm 0.cm 6.25cm 1.25cm},clip,width=0.75\textwidth]{Figures/2D_CFL_drawing}
+		\end{figure}
+	\end{minipage}%
+	\begin{minipage}{0.45\textwidth}
+		\begin{figure}[H]
+			\includegraphics[trim={4.25cm 0.cm 7.25cm 4.5cm},clip,width=0.75\textwidth]{Figures/2D_CFL_drawing_rotated}
+		\end{figure}
+	\end{minipage}
+	
+	
+	\ESS
+}
+
+\frame
+{
+	\frametitle{CFL in the real world}
+	\BSS
+	In lectures 4,5 we started to learn about Arakawa-sensei's staggered grids, and I showed you my current C-grid configuration, for the UM's EndGame dynamical core. \\
+	
+	\medskip
+	
+	In the last row near the poles, my $\Delta x \approx 5$km GCM has a grid spacing of 3.1m. Given a "worst case scenario" for wave propagation, what should my time step be, according to the 1D ("optimistic!") CFL criterion? Please compute that now, and raise your hand as soon you have the answer.\\
+	
+	\medskip
+	
+	Here is my real time step: 
+	
+	\begin{figure}
+		\includegraphics[width=0.75\textwidth]{Figures/Stevens_Table5}
+		\tiny{\caption{DYAMOND GCMs, with typical $\Delta x \approx 5$km, from Stevens et al., 2019}}
+	\end{figure}
+	
+	
+	How can such magic be possible?
+	
+	\ESS
+}
+
+
+\frame
+{
+	\frametitle{CFL and coupled equations: where does $\Delta t$ matter?}
+	\BSS
+	Let us not confuse the advection process with the other processes, described in parametrizations, or with the coupling between the equations. 
+	
+	Also, remember that the time step may be set by the 2D CFL, but the vertical grid spacing is very likely far smaller, meaning that we must use a different numerical scheme in the vertical.
+	
+	As an example, take a look at our SWEs:
+	\begin{eqnarray*}
+		\frac{u^{n+1}-u^{n-1}}{2\Delta t}-fv^n+\frac{g}{2}
+		\left( \partd{h}{x}^{n+1} +\partd{h}{x}^{n-1} \right) & = & 0 \\
+		\frac{v^{n+1}-v^{n-1}}{2\Delta t}+fu^n+\frac{g}{2}
+		\left( \partd{h}{y}^{n+1} +\partd{h}{y}^{n-1} \right) & = & 0 \\
+		\frac{h^{n+1}-h^{n-1}}{2\Delta t}+\frac{H}{2}
+		\left( \partd{u}{x}^{n+1} +\partd{u}{x}^{n-1}
+		+\partd{v}{y}^{n+1} +\partd{v}{y}^{n-1} 
+		\right) & = & 0. 
+	\end{eqnarray*}
+	
+	\ESS
+}
+
+\section{Time integration for 2D SWE}
+\frame
+{
+	\frametitle{Staggered time integration schemes for the SWE}
+	\BSS
+	The advection-diffusion equation in one dimension is a useful prototype with which to explore issues of stability, convergence and approximation error. However, the equations ocean modellers use are frequently multi-dimensional. This leads to special problems and results in some cases. With regards to temporal stability, however, schemes which are unstable in one dimension are also unstable in multi-dimensional problems. Schemes which are conditionally stable in one dimension are also conditionally stable in two dimensions or higher, but with more restrictive conditions on $\Delta t$.
+	
+	\vspace{0.2cm}For equations that support more than one type of process, {\bf the stability criterion will depend on the fastest propagating processes}. However, the fastest propagating phenomena might be of little physical importance and therefore the stability condition might be too constraining. For instance, the linear shallow water equations allow the existence of inertia-gravity and Rossby waves. The propagation speed of the former is about $\sqrt{gH} \approx 100 $ ms$^{-1}$, which is quite large. For Rossby waves, the propagation is of the order of $\beta R_D^2$, which is much smaller. The time integration scheme will therefore greatly depend on the physical processes of interest. 
+	
+	\hspace{2cm}
+	\ESS
+}
+
+\frame
+{
+	\frametitle{Reminder from Lecture 5: a semi-implicit scheme for SWEs}
+	\BSS
+	
+	The shallow water equations linearised about a state of rest are below
+	discretised using a leapfrog scheme for Coriolis terms but a
+	trapezoidal scheme (mixed implicit-explicit) for the gravity wave
+	terms:
+	\begin{eqnarray*}
+		\frac{u^{n+1}-u^{n-1}}{2\Delta t}-fv^n+\frac{g}{2}
+		\left( \partd{h}{x}^{n+1} +\partd{h}{x}^{n-1} \right) & = & 0 \\
+		\frac{v^{n+1}-v^{n-1}}{2\Delta t}+fu^n+\frac{g}{2}
+		\left( \partd{h}{y}^{n+1} +\partd{h}{y}^{n-1} \right) & = & 0 \\
+		\frac{h^{n+1}-h^{n-1}}{2\Delta t}+\frac{H}{2}
+		\left( \partd{u}{x}^{n+1} +\partd{u}{x}^{n-1}
+		+\partd{v}{y}^{n+1} +\partd{v}{y}^{n-1} 
+		\right) & = & 0. 
+	\end{eqnarray*}
+	
+	Re-arranging with future values on the left:
+	\begin{eqnarray*}
+		u^{n+1}+\Delta t g \partd{h}{x}^{n+1} & = & A \\
+		v^{n+1}+\Delta t g \partd{h}{y}^{n+1} & = & B \\
+		h^{n+1}+\Delta t H \left( \partd{u}{x}^{n+1}+\partd{v}{y}^{n+1} \right) & = & C
+	\end{eqnarray*}
+	
+	Can we mix and match at will? Let us start again with the basic ideas of explicit and implicit.
+	
+	\ESS
+}
+
+\subsection{Implicit schemes}
+\frame
+{
+	\frametitle{Implicit schemes}
+	\BSS
+	In the shallow water equations, fast gravity waves are due to the divergence and gradient terms, and slow Rossby waves are due to the Coriolis term. By treating them differently, one could try to circumvent the stability condition due to gravity waves. The following time integration schemes allow one to change the degree of implicity of the divergence, Coriolis and gradient terms:;
+	\begin{eqnarray*}
+		\eta^{n+1} + \alpha h \Delta t \bnabla \cdot \bu^{n+1} &=& \eta^n - (1-\alpha) h \Delta t \bnabla \cdot \bu^n,
+		\\
+		\bu^{n+1} + \beta f \Delta t \bk \times \bu^{n+1} + \gamma g \Delta t \bnabla \eta^{n+1} &=& \bu^n - (1-\beta) f \Delta t \bk \times \bu^n - (1-\gamma) g \Delta t \bnabla \eta^n.
+	\end{eqnarray*}
+	The implicity coefficients $\alpha$, $\beta$ and $\gamma \in [0,1]$. One way to have ``some information'' about the accuracy and stability of a time integration scheme is to compute the evolution of the energy:
+	\[
+	E^n = \int_{\Omega} \frac{1}{2} \rho \left( g (\eta^n)^2 + h \|\bu^n\|^2 \right) \ud \Omega.
+	\]
+	Note that this quantity only gives information about the changes in the amplitude of the solution. It does not indicate how the numerical method is affecting the phase of the solution.
+	\ESS
+}
+
+
+\frame
+{
+	\frametitle{``Mostly implicit'' schemes are unconditionally stable}
+	\BSS
+	\begin{center}
+		\begin{tabular}{cc}
+			$\alpha = \beta = \gamma = 1/2$  & $\alpha = \beta = \gamma = 1$ \\
+			\includegraphics[width=0.4\textwidth]{Figures/energy_si.eps}
+			&
+			\includegraphics[width=0.4\textwidth]{Figures/energy_impl.eps}
+		\end{tabular}
+	\end{center}
+	However, they can be quite dissipative if they are ``a bit too implicit''. The semi-implicit scheme ($\alpha = \beta = \gamma = 1/2$) is exactly conserving energy while a fully-implicit scheme ($\alpha = \beta = \gamma = 1$) is very dissipative and thus not always accurate.
+	\ESS
+} 
+
+
+\frame
+{
+	\frametitle{Both the gravity and Coriolis terms must be at least semi-implicit}
+	\BSS
+	\begin{center}
+		\begin{tabular}{cc}
+			$\alpha = \gamma = 1/2$, $\beta=0$  & $\beta = 1/2$, $\alpha = \gamma = 0$ \\
+			\includegraphics[width=0.4\textwidth]{Figures/energy_sifexpl.eps}
+			&
+			\includegraphics[width=0.4\textwidth]{Figures/energy_expl.eps}
+		\end{tabular}
+	\end{center}
+	\ESS
+	\BTi
+	When there is no dissipation, the equations are purely hyperbolic ($\mathcal{R}e(\kappa) = 0$) and the time integration scheme can only be stable if the implicity coefficients are all larger or equal to 1/2. In that case, the solution of the system requires to invert a non-diagonal matrix, which can be computationally expensive. The effect of using a ``mostly implicit'' time integration scheme with a large time step is to slow down fast propagating gravity waves. These schemes are thus useful for long simulation for which gravity waves are physically insignificant.
+	\ETi
+}
+
+
+\subsection{Explicit schemes}
+\frame
+{
+	\frametitle{Example of a stable explicit scheme: Adams-Bashforth 3}
+	\BSS
+	\begin{eqnarray*}
+		&&\hspace{-0.6cm} \eta^{n+1} = \eta^n - h \Delta t \bnabla \cdot \left(\frac{23}{12} \bu^n - \frac{16}{12} \bu^{n-1} + \frac{5}{12} \bu^{n-2}\right),
+		\\
+		&&\hspace{-0.6cm} \bu^{n+1} = \bu^n - f \Delta t \bk \times \left(\frac{23}{12} \bu^n - \frac{16}{12} \bu^{n-1} + \frac{5}{12} \bu^{n-2}\right) - g \Delta t \bnabla \left( \frac{23}{12} \eta^n - \frac{16}{12} \eta^{n-1} + \frac{5}{12} \eta^{n-2} \right)
+	\end{eqnarray*}
+	
+	%\begin{tabular}{lc}
+	\begin{minipage}{0.6\textwidth}
+		\begin{figure}[H]
+			\includegraphics[trim={0.25cm 0.cm 0.25cm 0.25cm},clip,width=0.6\textwidth]{Figures/energy_AB3.eps}
+		\end{figure}
+	\end{minipage}
+	\hfill
+	\begin{minipage}{0.35\textwidth}
+		This scheme is conditionally stable with a stability condition prescribed by gravity waves. A leap-frog scheme would have about the same properties but it would become unstable if some dissipation was added to the scheme. \\
+	\end{minipage}
+	%\end{tabular}
+	
+	\medskip
+	
+	\footnote{More details: Durran D.R. (1991) ``The Third-order Adams-Bashforth method: An attractive alternative to Leap-frog time differencing''. \emph{Monthly Weather Review}, 119, 702-720.}
+	
+	\ESS
+}
+
+
+\frame
+{
+	\frametitle{Another example: Forward-Backward in Time scheme}
+	\BSS
+	The Forward-Backward in Time (FBT) scheme has been introduced by Sielecki (1968) and later analysed and improved by Beckers and Deleersnijder (1993)\footnote{\BVTi Sielecki A. (1968) ``An energy conserving difference scheme for the storm surge equations'', \emph{Monthly Weather Review}, 96, 150-156. Beckers J. and Deleersnijder E. (1993) ``Stability of a FBTCS scheme applied to the propagation of shallow-water inertia-gravity waves on various grids'', \emph{Journal of Computational Physics}, 108, 95-104.\EVTi}. It tries to mimic a semi-implicit scheme by alternatively changing the order in which the two momentum equations are solved for. The future height anomaly term is used in the two momentum equations as soon as it is available; the Coriolis term is discretized by using the most recently computed velocity component, which requires alternation:
+	\ESS
+	\BSS
+	\[
+	\left\{ \begin{array}{l}
+		\eta^{n+1} = \eta^n - h \Delta t \bnabla \cdot \bu^n,
+		\\
+		u^{n+1} = u^n + f \Delta t v^n - g \Delta t \ds \frac{\partial \eta}{\partial x}^{n+1},
+		\\
+		v^{n+1} = v^n - f \Delta t u^{n+1} - g \Delta t \ds \frac{\partial \eta}{\partial y}^{n+1},
+	\end{array} \right.
+	\]
+	and
+	\[
+	\left\{ \begin{array}{l}
+		\eta^{n+2} = \eta^{n+1} - h \Delta t \bnabla \cdot \bu^{n+1},
+		\\
+		v^{n+2} = v^{n+1} - f \Delta t u^{n+1} - g \Delta t \ds \frac{\partial \eta}{\partial y}^{n+2},
+		\\
+		u^{n+2} = u^{n+1} + f \Delta t v^{n+2} - g \Delta t \ds \frac{\partial \eta}{\partial x}^{n+2}.
+	\end{array} \right.
+	\]
+	\ESS
+}
+
+
+\frame
+{
+	\frametitle{Forward-Backward in Time scheme (cont'd)}
+	\BFNS
+	It can be seen that for each set of equations, the Coriolis term is first discretized explicitly and then implicitly. The order of the two momentum equations is switched in the second set of equations. As a result, the time discretization of the Coriolis term appears to be semi-implicit ``on average''. The divergence is always explicit and the gradient is always implicit. It can be shown that the scheme is conditionally stable with about the same stability condition as AB3.
+	\EFNS
+	\begin{center}
+		\includegraphics[width=0.4\textwidth]{Figures/energy_FBT.eps}
+	\end{center}
+}
+
+
+\section{Stability analysis in 1D and 2D}
+\frame
+{
+	\frametitle{Comments about the second project}
+	\BSS
+	The goal of the second project is to solve the Stommel model on the finite difference C-grid with a FBT time integration scheme. The Stommel model is the simplest geophysical flow model able to represent a wind-driven circulation in a closed basin with a western boundary layer. The model equations read:
+	\begin{eqnarray}
+		&&\frac{\partial \mathbf{u}}{\partial t} + (f_0+\beta y) \mathbf{e}_z \times
+		\mathbf{u} = -g \bnabla \eta - \gamma \mathbf{u} + \frac{\btau^{\eta}}{\rho h},\\
+		&&\frac{\partial \eta}{\partial t} + h \bnabla \cdot \mathbf{u} = 0,
+	\end{eqnarray}
+	where $f_0$ is the reference value of the Coriolis parameter, $\beta$ is the reference value of the Coriolis parameter first derivative in the $y$-direction, $\gamma$ is a linear friction coefficient, $\rho$ is the homogeneous density of the fluid and $\btau^{\eta}$ is the wind stress acting on the surface of the fluid. The model solutions look like these:
+	\begin{center}
+		\includegraphics[width=0.9\textwidth]{Figures/sol_project2.eps}
+	\end{center}
+	\ESS
+}
+
+
+\frame
+{
+	\frametitle{How do we decide on grid, grid spacing, time step?}
+	
+	Remember that we started with the CFL criterion in 1D:
+	
+	\begin{equation}
+		\mu = U \frac {\Delta t}{\Delta x} \le 1
+	\end{equation}
+	
+	\BSS
+	There are now several ways in which we can meet the stability criteria for our particular 2D SWE problem. Thinking a bit harder about these decisions seems to lead to some circular reasoning: where do we start? \textbf{Are there tradeoffs?} 
+	\medskip
+	
+	Questions that we must consider when we choose the numerical method to solve our problem:
+	\begin{enumerate}
+		\item What is the "worst case scenario" distance relevant to CFL for SWEs in 2D?
+		\item How many grid points are the minimum required to resolve anything?
+		\item What is the size of our domain?
+		\item What is the size of the phenomenon we are trying to simulate?
+		\item What do all these decisions end up causing in terms of the physical realism of the solutions? For instance, compromising the accuracy of solution for one wave type.
+		
+	\end{enumerate}
+	\ESS
+}
+
+\subsection{Numerical analysis of the 1D "upstream" advection equation}
+\frame
+{
+	\frametitle{There is more to choosing $\Delta t$ and $\Delta x $}
+	\BSS
+	It is not a given that going for a small $\mu$ is always the best possible decision.
+	For instance, let us start with the advection equation and let us choose the \textbf{upstream scheme}, which we know is \textbf{dissipative}. That means, each time step we lose a bit of the signal.
+	
+	
+	If we increase the resolution of our model, making the time step smaller, we may think that we will obtain a better solution. However, this is not necessairly true for every $\mu$.
+	
+	\medskip
+	Consider a domain of size $D$, resolved by a number $J$ of $\Delta x$ points, in which we are solving the advection equation:
+	
+	\begin{equation}
+		\frac {A_j^{n+1}-A_j^{n}}{\Delta t} +c \left(  \frac {A_j^{n}-A_{j-1}^{n}}{\Delta x}  \right) = 0
+		\label{adv-upstream}
+	\end{equation}
+	
+	$D=J \Delta x$ and {\bf every time that we decrease $\Delta x$ we increase $J$, so that the domain size D does not change}. For a signal that has wavenumber $k$ in the $x$ direction:
+	
+	\begin{equation}
+		k \Delta x = \frac {k D}{J}
+	\end{equation}
+	
+	\ESS
+}
+
+\frame
+{
+	\frametitle{Stability analysis of the upstream advection equation}
+	
+	\BSS
+	If you remember your Von Neuman analysis, \textbf{the amplification factor, $\lambda$} for upstream advection (equation \ref{adv-upstream})	has this form:
+	
+	\begin{equation}
+		|\lambda|^2 = 1+2\mu(\mu-1)(1-\cos k \Delta x) = 1+2\mu(\mu-1)[1-\cos ( \frac {k D} {J})]
+	\end{equation}
+	
+	which tells us that $\lambda$ depends on both wavenumber ($k$) and our Courant number ($\mu$). 
+	In order to maintain computational stability, \emph{we keep $\mu$ fixed as $\Delta x$ decreases}, and that decision limits our time step:
+	
+	\begin{equation}
+		\Delta t = \frac {\mu \Delta x}{c} = \frac {\mu D}{cJ}
+	\end{equation}
+	
+	Since we know the velocity of the fluid, $c$, we also know how long it takes for it to cross the entire domain: $T=\frac {D}{c}$. If we choose to carry out the time integration in $N$ steps:
+	
+	\begin{equation}
+		N= \frac {T}{\Delta t} = \frac {D}{c \Delta t} = \frac {D}{\mu \Delta x} = \frac {J}{\mu}
+	\end{equation}
+	
+	\ESS
+}	
+
+
+\frame
+{
+	\BSS
+	\frametitle{How damped is the signal after N time steps?}
+	The total amount of damping that "accumulates" throughout the time integration ($N$ time steps) is given by:
+	
+	\begin{equation}
+		|\lambda|^N=(|\lambda^2|)^{N/2} = \left \{ 1 -2 \mu (1-\mu) \left[ 1 - \cos ( \frac {k D} {J}) \right] \right \} ^{\frac {J}{2 \mu}}
+	\end{equation}
+	
+	This relationship says that $\lambda$ depends on $J$ (the resolution) in two different ways, so that making $\Delta x$ smaller (increasing the resolution) can be good or bad. 
+	
+	\medskip
+	Which is it?
+	Let us pick a wavelength half the domain size, so that $kD=4 \pi$. This causes the $\cos$ factor in the equation to approach 1, which \textbf{weakens the damping}; on the other hand it also causes the exponent to increase, which \textbf{strenghtens the damping}. This is shown in the figure, for two values of $\mu$.
+	
+	\begin{minipage}{0.4\textwidth}
+		\begin{figure}[H]
+			\includegraphics[trim={0cm 0cm 0cm 0cm},clip,width=5.cm]{/Users/vidale/Projects/Teaching/MTMW14/Figures/Resolution_damping.png}
+		\end{figure}
+	\end{minipage}
+	\hfill
+	\begin{minipage}{0.5\textwidth}
+		Overall, \textbf{increasing the resolution, $J$, is good}: $\lambda$ tends to 1 on the right hand side, even though we take more time steps, $N$, to complete the integration. However, if we fix $J$ and decrease $\mu$, by decreasing the time step $\Delta t$, the damping increases and \textbf{the solution will be less accurate}. 
+		
+	\end{minipage}
+	
+	\ESS
+}
+
+
+\frame
+{
+	\frametitle{Recommendations on choosing $\Delta t$ and $\Delta x $}
+	\BSS
+	
+	\begin{minipage}{0.4\textwidth}
+		\begin{itemize}
+			\item perform numerical analysis, speficically for each scheme
+			\item \textbf{for the upstream scheme}, the amplitude error can be minimised by using the largest stable value of $\mu$.
+			\item that is, do not exaggerate in making $\mu$ much less than 1: this decision impacts both cost and quality of the solutions
+			\item in other words, \underline{it pays off to live dangerously}!
+	\end{itemize}\end{minipage}
+	\hfill
+	\begin{minipage}{0.5\textwidth}	
+		\begin{figure}[H]
+			\includegraphics[trim={0cm 0cm 0cm 0cm},clip,width=7.cm]{/Users/vidale/Projects/Teaching/MTMW14/Figures/Resolution_damping.png}
+		\end{figure}
+	\end{minipage}
+	\ESS
+	
+}
+
+\section{Some real world applications}
+\frame
+{
+	\frametitle{Hurricane and Typhoon simulation in climate GCMs: precipitation composite}
+	\BSS
+	\begin{center}	
+		\includegraphics[width=0.8\textwidth]{Figures/TC-precipitation}
+	\end{center}
+	
+	\ESS
+	
+}
+
+\frame
+{
+	\frametitle{Hurricane and Typhoon simulation in climate GCMs: vertical structure composite}
+	\BSS
+	\begin{center}	
+		\includegraphics[width=0.8\textwidth]{Figures/TC-structures}
+	\end{center}
+	
+	\ESS
+	
+}
+
+\frame
+{
+	\frametitle{Why the differences}
+	\BSS
+	These GCMs are very different in terms of dynamical core, parameterizations etc., but they are also quite different in terms of the use of the time step. I have been experimenting with our UK model (HadGEM3), and Colin Zarzycki has been experimenting with the NCAR model, managing to double the number of hurricanes with a time step of 1/4, but I have also tested the same ideas in the ECMWF model, since it is the one that uses very long time steps.
+	\begin{center}	
+		\includegraphics[width=0.8\textwidth]{Figures/tden_PRESENT_TC_map_STD}
+	\end{center}
+	
+	\ESS
+	
+}
+
+\frame
+{
+	\frametitle{Hurricane and Typhoon simulation in climate GCMs: frequency}
+	\BSS
+	\begin{center}	
+		\includegraphics[width=0.8\textwidth]{Figures/Zarz1}
+	\end{center}
+	
+	\ESS
+	
+}
+
+\frame
+{
+	\frametitle{Hurricane and Typhoon simulation in climate GCMs: dynamics and physics}
+	\BSS
+	\begin{center}	
+		\includegraphics[width=0.8\textwidth]{Figures/Zarz2}
+	\end{center}
+	
+	\ESS
+	
+}
+
+
+\section{Boundary Conditions (BCs)}
+
+\subsection{Dirchlet, Neuman}
+\frame { 
+	\frametitle{Different types of BC: what they are and what they do}
+	\BSS 	
+	The \textbf{Dirichlet (or first-type) boundary condition }is a type of boundary condition, named after Peter Gustav Lejeune Dirichlet (1805–1859). When imposed on an ordinary or a partial differential equation, it specifies the values that a solution needs to take on along the boundary of the domain. For example, for an ODE:
+	
+	\begin{equation}
+		y''+y=0
+	\end{equation}
+	we could specify $y(a)=\alpha; y(b)=\beta$ on the interval $[a,b]$, where $\alpha$, $\beta$ are given numbers.
+	
+	\medskip
+	
+	The \textbf{Neumann (or second-type) boundary condition} is a type of boundary condition, named after Carl Neumann. When imposed on an ordinary or a partial differential equation, the condition specifies the values in which the derivative of a solution is applied within the boundary of the domain. For example, for the same ODE above:
+	
+	we could specify $y'(a)=\alpha; y'(b)=\beta$ on the interval $[a,b]$, where $\alpha$, $\beta$ are given numbers.
+	
+	\ESS
+}
+
+
+\subsection{Robin, mixed}
+\frame { 
+	\BSS 	
+	
+	The \textbf{Robin boundary condition, or third type boundary condition}, is a type of boundary condition, named after Victor Gustave Robin (1855–1897). When imposed on an ordinary or a partial differential equation, it is a specification of a linear combination of the values of a function and the values of its derivative on the boundary of the domain. For instance:\\
+	
+	\begin{equation}
+		au+b\frac{\partial u}{\partial n}y=g \textrm{ on } \partial \Omega
+	\end{equation}
+	
+	
+	\begin{wrapfigure}{r}{0.5\textwidth}
+		\begin{center}
+			\includegraphics[width=0.2\textwidth]{Figures/440px-Mixed_boundary_conditions.png}
+		\end{center}
+		\caption{Mixed boundary conditions}
+	\end{wrapfigure}
+	
+	
+	In 1-D, on the interval $\Omega=[0,1]$ we could for instance have:
+	
+	\begin{eqnarray}
+		au(0)-Bu'(0)=g(0) \\
+		au(1)+Bu'(1)=g(1)
+	\end{eqnarray}
+	
+	This contrasts with \textbf{mixed boundary conditions}, which are boundary conditions of different types specified on different subsets of the boundary.
+	
+	\ESS
+}
+
+\section{Appendix: Why truncated advection is imperfect}
+
+\subsection{The Advection Equation}
+
+\frame { 
+	\BSS 	
+Appendix: why truncated advection is imperfect.
+
+\begin{figure}[h]
+	\begin{center}
+		\includegraphics[scale=0.35]{/Users/vidale/Projects/Teaching/MTMW14/Figures/advection.pdf}
+	\end{center}
+	\caption{\BVTi{Temperature at a point increases when wind blows from the warm side.}\EVTi}
+	\label{fig:ken}
+\end{figure}
+
+
+In Figure~\ref{fig:ken}, the wind is bringing air from the $-x$
+direction. If the air `upstream' is warmer than the air `downstream',
+the observer will see the temperature increasing. The rate of change of
+temperature observed must depend on both the magnitude of this
+gradient and the speed at which the air is moving, {\em i.e.,}
+\begin{equation}
+	\frac{\partial T}{\partial t} =- u \frac{\partial T}{\partial x}.
+	\label{advectioncont}
+\end{equation}
+where the left hand side means the rate of change at a given position
+$x$ and the right hand side is called the {\em advection term}. $u$ is
+the wind component and $\partial T/\partial x$ means the gradient in
+the $x$-direction at a given time. 
+
+We can solve this analytically, but the question is what happens when we solve it numerically. As an example, let us look at CTCS.
+
+	\ESS
+}
+
+
+\subsubsection{Computational modes: The CTCS advection scheme}
+
+\frame { 
+	\BSS 	
+
+Let us try using the centred difference in time and the
+centred difference in space (CTCS for short):
+\BEQ \frac{T_{j}^{n+1}-T_{j}^{n-1}}{2\Delta t} + u \frac{T_{j+1}^{n} - T_{j-1}^{n}}{2\Delta x} = 0 \EEQ
+We can rewrite this equation to get:
+\BEQ T_{j}^{n+1} = T_{j}^{n-1} - \frac{u\Delta t}{\Delta x} \left[ T_{j+1}^{n} - T_{j-1}^{n} \right] \label{ctcsmodel} \EEQ
+The quantity $u\Delta t / \Delta x$ is dimensionless.  It appears so often in
+numerical schemes for the advection equation that it has its own name --- the
+\emph{Courant number}:
+\BEQ \alpha = \frac{u\Delta t}{\Delta x} .\EEQ
+
+The von Neumann stability analysis for the CTCS scheme is most easily
+done using complex notation for the trial solution, 
+\BEQ T_j^n=e^{ikx_j}\;\; ; \;\;\;\; T_j^{n+1}=ST_j^n \EEQ
+where $S=Ae^{i\phi}$ expresses 
+the change in amplitude and phase over one time-step.
+
+	\ESS
+}
+
+\frame { 
+	\BSS 	
+
+When we substitute the trial solution $T_j^n=e^{ikx_j}$ into a CTCS scheme, we shall end up with three terms that express what temperature is at points: \BEQ j-1, \;\;\;\ j \;\;\;\ \textrm{   and  } \;\; j+1 \EEQ
+These three terms are: \BEQ e^{ik(x_j-\Delta x)},  \;\;\;\;\; e^{ikx_j} \;\;\;\;\; \textrm{   and   } \;\; e^{ik(x_j + \Delta x)}\EEQ
+
+The common term $e^{ikx_j}$ cancels out, so that plugging the trial solution into the model (\ref{ctcsmodel}) yields:
+\BEQ
+S=S^{-1}-\alpha\left[ e^{ik\Delta x}-e^{-ik\Delta x} \right]
+\EEQ
+
+which can be re-arranged as a quadratic equation
+for the complex factor, $S$, by remembering Euler's formula: $\frac {e^{i\theta} - e^{-i \theta}}{2i}= sin(\theta)$:
+\BEQ
+S^2+S\alpha 2i\sin k\Delta x -1=0
+\EEQ
+
+which has two roots:
+\BEQ
+S_{\pm}=-i \alpha \sin k\Delta x\pm \sqrt{1-\alpha^2 \sin^2 k\Delta x}
+\label{asoln}
+\EEQ
+
+If the Courant number $|\alpha | \le 1$, the number under the root must
+be positive since $\sin^2 k\Delta x \le 1$. 
+
+{\em Exercise: Show that when $|\alpha | \le 1$ the magnitude of the
+	amplification factor $|S|^2=S^* S=1$, meaning that the scheme is
+	stable. However, when $|\alpha | > 1$ the $S_{-}$ solution is
+	unstable.}
+
+
+\ESS
+}
+
+\frame { 
+	\BSS 	
+
+
+This is an improvement on the FTCS scheme, which was unconditionally
+unstable. This is the single most important result in the numerical
+modelling of fluid flows.  It is called the Courant-Friedrichs-Lewy
+(CFL) condition.  What it boils down to is that, for a given
+grid-spacing $\Delta x$, the time step must satisfy \BEQ \Delta t <
+\frac{\Delta x}{u} . \EEQ The physical interpretation of this condition
+is that \emph{the scheme is unstable if fluid parcels move more than
+	one gridbox in one timestep}.
+
+The solution with +ve real part in (\ref{asoln}) does not change sign
+every timestep and is called the {\em physical mode}. However, the
+solution with the -ve square root alternates sign every step which is
+unphysical behaviour and is called the {\em computational mode}. The
+relative amplitudes of the two modes is determined by projection from
+the initial conditions. The implication is that although the CTCS
+scheme is stable for $|\alpha | \le 1$ we can expect unphysical
+oscillations that are worst at the grid-scale (where $\sin k\Delta
+x=1$).
+
+\begin{figure}
+	%\begin{center}
+	\mbox{\scalebox{0.05}{\includegraphics{Figures/adv-ctcs.png}}
+		\scalebox{0.05}{\includegraphics{Figures/adv-upstream.png}}}
+	%\end{center}
+	\caption{\textsl{Comparing numerical solutions for the advection of a top-hat distribution by uniform flow. Left: CTCS solution exhibits unphysical undershoots and overshoots. Right: Upstream scheme remains monotonic.}}
+	\label{fig:ctcs}
+\end{figure}
+
+
+\ESS
+}
+
+
+\end{document}

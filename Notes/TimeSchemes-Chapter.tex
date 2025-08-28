@@ -1,6 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
 \chapterimagetwo{tas1} % Chapter heading image
-\chapter{Time Schemes}
+\chapter{Time Schemes}\label{chapter:Time-Schemes}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 The fundamental idea in this chapter, as in the chapter discussing advection, is that {\bf there is no time scheme that can be considered universally good}: it all depends on what type of equation we are trying to solve. Performing numerical analysis prior to implementing a scheme is thus of paramount importance, as we cannot spend time randomly testing $n$ schemes for each problem.
@@ -132,6 +132,7 @@ As a preview of what we are going to discuss in later sections, and throughout t
 
 \begin{definition}[Explicit and implicit time schemes]		
  Any time scheme for which $\beta \ne 0$ will be \emph{implicit}; If $\beta = 0$, the scheme is \emph{explicit}.
+ \label{def:implicit}
  \end{definition}
 
 \newpage
@@ -194,7 +195,7 @@ which means that our scheme will be \underline{at least} first order accurate. B
 	The accuracy of a time scheme can be \emph{at least} $l+2$, but, remembering that one of the coefficients is $\beta$, the accuracy of an \underline{explicit} time scheme can be \emph{at least} $l+1$.
 	\end{definition} 
 
-\section{A few favourite explicit time schemes}
+\section{A few favourite explicit time schemes}\label{section:explicit}
 \subsection{$m=0$, $l=0$, Euler}
 The simplest, most intuitive scheme is Euler (Forward in Time). As shown by Fig. \ref{fig:Euler} It is a simple, intuitive scheme, which adheres to the principle of what a derivative is, but of course suffers strongly from attempting to compute it with the least possible amount of information and technique.
 
@@ -259,7 +260,7 @@ By careful selection of the $\alpha$ coefficients, it is again possible to obtai
 \section{A few implicit time schemes}
 With implicit schemes, it is immediately possible to obtain accuracy at least as high as $l+2$.
 
-\subsection{$m=0$, $l=0$, Backward and Trapezoidal schemes}
+\subsection{$m=0$, $l=0$, Backward and Trapezoidal schemes}\label{section:implicit}
 
 \begin{equation}
 	\frac{q^{n+1}-q^{n}}{\Delta t} = \beta f^{n+1} + \alpha f^n
@@ -302,7 +303,7 @@ Try to substitute $m=1$, $l=1$ into eqn. \ref{discretisation-error} and write ou
 Show that judicious choice of the coefficients ($\beta = \frac{1}{6}$, $\alpha_n = \frac{4}{6}$, $\alpha_{n-1} = \frac{1}{6}$) will yield fourth-order accuracy!
 \end{exercise}
 	
-\section{Iterative time schemes (e.g. Matsuno and Heun)}
+\section{Iterative time schemes (e.g. Matsuno and Heun)}\label{section:iterative}
 These schemes are also called "predictor-corrector" schemes (thus the note on the Milne corrector scheme). The idea is to obtain our estimate of the value of $q^{n+1}$ through an iterative, multi-step procedure, involving multiple evaluations of our function $f$. In a two-step iterative scheme, the first step is called "predictor", and the second step is called "corrector". This seems complicated, but an advantage is that it is possible to obtain higher accuracy without involving many time steps. It is also often possible to use longer time steps than with the non-iterative schemes seen so far. With that, it is necessary to evaluate $f$ several times, which could be expensive, something that is not required with non-iterative schemes.
 
 \subsection{Matsuno}

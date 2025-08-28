@@ -7,7 +7,6 @@
 
 \section{Simple advection}
 
-
 \section{Finite Difference Methods: 1D Examples}
 \subsection{The Advection Equation}
 \textsl{Partial differential equations, order of approximation, von
@@ -613,6 +612,124 @@ is being modelled without dealing with the {\em boundary layer}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
+\chapter{Stability analysis in 2D}
+
+We have seen in various textbooks, e.g. in Durran's book, as well as in the previous chapter, how to perform Von Neumann analysis in 1D. When we start to work with systems of coupled equations, things become more complicated, and it is best to express such systems in terms of vectors and matrices. \\
+
+In practice, we start by re-writing our system in this matrix form:
+
+\begin{equation}
+	\mathbf{X}'(t)=A \mathbf{X}(t)
+\end{equation}
+
+where:
+
+\begin{align}
+\mathbf{X}  = \begin{bmatrix}
+		x_{1}(t) \\
+		x_{2}(t) \\
+		\vdots \\
+		x_{n}(t)
+	\end{bmatrix}  , ~
+%\begin{pmatrix}
+\mathbf{X'}  =	\begin{bmatrix}
+		x'_{1}(t) \\
+		x'_{2}(t) \\
+		\vdots \\
+		x'_{n}(t)
+	\end{bmatrix}  ,  ~
+	\mathbf{A}  =\begin{bmatrix}
+		a_{11}   ~a_{12} ~ ...  ~a_{1n}\\           
+		a_{21}   ~a_{22} ~ ...  ~a_{2n}\\           
+		\vdots \\
+		a_{n1}  ~ a_{n2}  ~... ~ a_{nn}
+	\end{bmatrix} 
+%\end{pmatrix}
+\end{align}
+
+The energy matrix $A$ is the linear operator that contains information similar to that in the coefficient we were studying in 1D, but we must perform some transformations in order to extract the information we actually want, that is, whether or not our numerical scheme is stable. \\
+
+Intuitively, by comparison with the 1D case, we can expect that we shall be able to derive information about the stability of the system by analysing matrix $A$. In practice, this shall be done by computing the eigenvalues of the $A$ matrix, the largest of which will be key to determining whether or not our system is stable.
+
+\subsection{Solving our equation system}
+We look for non-trivial solutions of the homogeneous system above in the form of:
+
+\begin{equation}
+	\mathbf{X}(t)=e^{\lambda t} \mathbf{V}
+\end{equation}
+
+where $\mathbf{V} \ne 0$ is a constant $n$-dimensional vector that shall be defined later.
+
+Substituting the above expression for $\mathbf{X}(t)$ in the system of equations above, we obtain:
+
+\begin{equation}
+	\lambda e^{\lambda t}\mathbf{V} = A e^{\lambda t} \mathbf{V} , \implies A \mathbf{V} = \lambda \mathbf{V}
+	\end{equation}
+
+\subsection{A few reminders of eigenvalues and eigenvectors}
+
+The equation just derived above means that, under the action of a linear operator $A$, the vector $\mathbf{V}$ is converted to a collinear vector $\lambda \mathbf{V}$. Any vector with this property is called an \emph{eigenvector} of the linear transformation $A,$ and the number $\lambda$ is called an  \emph{eigenvalue}.
+
+\section{How eigenvalues and eigenvectors underpin stability analysis in 2D}
+In order for the vector function $\mathbf{X}(t)=e^{\lambda t}\mathbf{V}$ to be a solution of the homogeneous linear system, it is necessary and sufficient that the number $\lambda$ be an eigenvalue of the matrix $A$, and the vector $V$ be the corresponding eigenvector of this matrix $A$, and the vector $\mathbf{V}$ be the corresponding eigenvector of this matrix.
+
+\subsection{Finding eigenvalues and eigenvectors via the characteristic equation}
+The matrix-vector equation obtained above can be rewritten as: 
+
+\begin{equation}
+ A \mathbf{V} - \lambda \mathbf{V} = \mathbf{0}
+\end{equation}
+
+where $\mathbf{0}$ is the zero vector. Using the definition of the identity matrix $I$, we can write:
+
+\begin{equation}
+	A \mathbf{V} - \lambda I \mathbf{V} = \mathbf{0} ~or: ~ (A - \lambda I) \mathbf{V} = \mathbf{0} 
+\end{equation}
+
+and it follows then, for consistency with all the definitions above, that the determinant of $(A - \lambda I)$ must be zero.
+
+\begin{equation}
+\det{(A - \lambda I)} = 0
+\end{equation}
+
+which is called the \emph{auxiliary} or \emph{characteristic equation} of the linear transformation $A$. The polynomial on the left side of the equation is called the  \emph{characteristic polynomial} of the linear transformation (or linear operator). 
+
+The set of all eingenvalues $\lambda_1, \lambda_2, ... , \lambda_n$ forms the spectrum of the operator $A$.
+
+In summary, the first step in finding the solution of a system of linear differential equations is solving the
+auxiliary equation and finding all eigenvalues $\lambda_1, \lambda_2, ... , \lambda_n$. Next, substituting each eigenvalue $\lambda_i$ into the system of equations will allow us to find each one of the eigenvectors $\mathbf{V}$.
+
+\subsection{The norm of the eigenvalues and the condition for stability of the linear system}
+The norm of all eigenvalues must be found and tested for this condition of stability:
+
+\section{Carrying out the 2D Von Neumann analysis in practice}
+This iPython notebook enebles you to set up the ENSO ROM problem and to explore its numerical solutions with a number of well-known time schemes, and to find the analytic eigenvalues, which reveal whether or not each scheme is stable in time.
+ 
+	\href{https://github.com/pierluigividale/MTMW14/blob/main/Notebooks/Euler\_stability\_SymPy\_2025\_HaltinerWilliams.ipynb}{Link to iPython Notebook on the Von Neumann analysis of the ENSO ROM problem}
+
+\vspace{1em} 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\chapter{The Lorenz Model}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Resource: the Lorenz model}
+Do experiment with the Lorenz model, to see in practice:
+\begin{enumerate}
+\item how the three variables evolve in phase space with time
+\item how changing the initial conditions cause rapid separation of phase space trajectories in time
+\item how changing parameters in the Lorenz model influence what regime the system falls into
+\end{enumerate}
+
+\vspace{1em} 
+
+Here you can find a simple way to interact with a modern implementation of the Lorenz model: 
+	\href{https://github.com/pierluigividale/MTMW14/blob/main/Notebooks/run_Lorenz_example.ipynb}{ iPython Notebook to explore Lorenz's 1963 model}.\\
+	
+You will also need to download this python3 \href{https://github.com/pierluigividale/MTMW14/blob/main/Notebooks/make_lorenz_animation.py}{code to solve the Lorenz system} to the same directory where you store the iPython notebook above.
+
+\vspace{1em} 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
@@ -687,28 +804,6 @@ where: $\omega=\bar{u}k-\frac{\beta k}{K^2}$ and $K^2=k^2+l^2$.\\
 
 \vspace{1em} 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newpage
-\chapter{Eigenvalues and eigenvectors}
-
-\section{How can we perform stability analysis in 2D?}
-
-\section{What are eigenvalues and eigenvectors, and how can they help?}
-Link to iPython Notebook
-
-\vspace{1em} 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newpage
-\chapter{The Lorenz Model}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section{What is chaos?}
-
-\section{Resource: the Lorenz model}
-\href{https://www.dropbox.com/scl/fi/rw3p2aig729zogynv6r0l/run_Lorenz_example.ipynb?rlkey=dw8byerasoreiumat80r0frea&dl=0}{Link to iPython Notebook on Lorenz's 1963 model}
-
-\vspace{1em} 
 
 % ----------------------------------------------------------------------------------------
 % 	BIBLIOGRAPHY

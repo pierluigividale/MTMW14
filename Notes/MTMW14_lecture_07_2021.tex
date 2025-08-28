@@ -1,0 +1,590 @@
+\documentclass[xcolor=dvipsnames]{beamer} % dvipsnames gives more built-in colors
+\usetheme{Singapore}
+\useoutertheme{miniframes} % Alternatively: miniframes, infolines, split
+\useinnertheme{circles}
+\usecolortheme{dove}
+\usepackage{wrapfig}
+
+\def\verytiny{\fontsize{5pt}{5pt}\selectfont}
+\newcommand{\BE}{ \begin{enumerate}}
+\newcommand{\EE}{ \end{enumerate}}
+\newcommand{\BI}{ \begin{itemize}}
+\newcommand{\EI}{ \end{itemize}}
+\newcommand{\BEQ}{ \begin{equation}}
+\newcommand{\EEQ}{ \end{equation}}
+\newcommand{\BDM}{ \begin{displaymath}}
+\newcommand{\EDM}{ \end{displaymath}}
+\newcommand{\BFNS}{ \begin{footnotesize}}
+\newcommand{\EFNS}{ \end{footnotesize}}
+\newcommand{\BS}{ \begin{small}}
+\newcommand{\ES}{ \end{small}}
+\newcommand{\BSS}{ \begin{scriptsize}}
+\newcommand{\ESS}{ \end{scriptsize}}
+\newcommand{\BTi}{ \begin{tiny}}
+\newcommand{\ETi}{ \end{tiny}}
+\newcommand{\BVTi}{ \begin{verytiny}}
+\newcommand{\EVTi}{ \end{verytiny}}
+\newcommand{\balpha}{\mbox{\boldmath $\alpha$}}
+\newcommand{\bOmega}{\mbox{\boldmath $\Omega$}}
+\newcommand{\btau}{\mbox{\boldmath $\tau$}}
+\newcommand{\bchi}{\mbox{\boldmath $\chi$}}
+\newcommand{\bnabla}{\mbox{\boldmath $\nabla$}}
+\newcommand{\grad}{\mbox{\boldmath $\nabla$}}
+\newcommand{\boldeta}{\mbox{\boldmath $\eta$}}
+\newcommand{\bphi}{\mbox{\boldmath $\varphi$}}
+\newcommand{\ds}{\displaystyle}
+\newcommand{\nl}{\ \\ }
+\newcommand{\ud}{\textrm{ d}}
+\newcommand{\bs}{\bigskip}
+\newcommand{\BTc}{ \begin{tabular}{c}}
+\newcommand{\BTl}{ \begin{tabular}{l}}
+\newcommand{\BTr}{ \begin{tabular}{r}}
+\newcommand{\ET}{ \end{tabular}}
+\newcommand{\bu}{\mathbf{u}}
+\newcommand{\bv}{\mathbf{v}}
+\newcommand{\bx}{\mathbf{x}}
+\newcommand{\be}{\mathbf{e}}
+\newcommand{\bb}{\mathbf{b}}
+\newcommand{\bk}{\mathbf{k}}
+\newcommand{\bd}{\mathbf{d}}
+\newcommand{\bn}{\mathbf{n}}
+\newcommand{\bq}{\mathbf{q}}
+\newcommand{\ba}{\mathbf{a}}
+\newcommand{\bF}{\mathbf{F}}
+\newcommand{\bI}{\mathbf{I}}
+\newcommand{\bT}{\mathbf{T}}
+\newcommand{\ust}{u_{*}}
+\newcommand{\ddz}{\frac{\partial}{\partial z}}
+\newcommand{\ddt}{\frac{\partial}{\partial t}}
+\newcommand{\dudx}{\frac{\partial u}{\partial x}}
+\newcommand{\dudz}{\frac{\partial u}{\partial z}}
+\newcommand{\dvdz}{\frac{\partial v}{\partial z}}
+\newcommand{\dudt}{\frac{\partial u}{\partial t}}
+\newcommand{\dvdt}{\frac{\partial v}{\partial t}}
+\newcommand{\ddudxx}{\frac{\partial^2 u}{\partial x^2}}
+\newcommand{\dbudz}{\frac{\partial \bu}{\partial z}}
+\newcommand{\dbudt}{\frac{\partial \bu}{\partial t}}
+
+\newcommand{\arrow}[5]{ \put(#1,#2){\vector(#3,#4){#5}} }
+\newcommand{\grid}{ 
+\put(0,0){\vector(1,0){8}}
+\put(0,1){\line(1,0){7}}  \put(0,2){\line(1,0){7}}
+\put(0,3){\line(1,0){7}}  \put(0,4){\line(1,0){7}}
+\put(0,5){\line(1,0){7}}
+\put(0,0){\vector(0,1){6}}  
+\put(1,0){\line(0,1){5}}  \put(2,0){\line(0,1){5}}  
+\put(3,0){\line(0,1){5}}  \put(4,0){\line(0,1){5}}  
+\put(5,0){\line(0,1){5}}  \put(6,0){\line(0,1){5}}  
+\put(7,0){\line(0,1){5}}
+\put(2.8,-0.7){$j$}
+\put(7.3,-0.7){$x$}
+\put(-0.7,2.8){$n$}
+\put(-2.0,3.8){$n+1$}
+\put(-0.7,5.3){$t$}}
+\newcommand{\arakawa}{
+\put(1,0){\line(0,1){4}}
+\put(3,0){\line(0,1){4}}
+\put(0,1){\line(1,0){4}}
+\put(0,3){\line(1,0){4}}
+}
+
+
+\title{Numerical modelling of the atmospheres and oceans \\ Lecture 7}
+\author{P.L. Vidale, \\ 
+	based in part on a lecture by E. Hanert,\\
+	and on D. Randall's AT604 "LaTeX Book"}
+\institute{
+  Department of Meteorology\\
+  University of Reading, UK\\
+  p.l.vidale@reading.ac.uk}
+\date{4 March 2021}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\section[Outline]{}
+\frame{\tableofcontents}
+
+
+
+\section{Time integration for 2D SWE}
+\frame
+{
+\frametitle{Staggered time integration schemes for the SWE}
+\BSS
+The advection-diffusion equation in one dimension is a useful prototype with which to explore issues of stability, convergence and approximation error. However, the equations ocean modellers use are frequently multi-dimensional. This leads to special problems and results in some cases. With regards to temporal stability, however, schemes which are unstable in one dimension are also unstable in multi-dimensional problems. Schemes which are conditionally stable in one dimension are also conditionally stable in two dimensions or higher, but with more restrictive conditions on $\Delta t$.
+
+\vspace{0.2cm}For equations that support more than one type of process, the stability criterion will depend on the fastest propagating processes. However, the fastest propagating phenomena might be of little physical importance and therefore the stability condition might be too constraining. For instance, the linear shallow water equations allow the existence of inertia-gravity and Rossby waves. The propagation speed of the former is about $\sqrt{gH} \approx 100 $ ms$^{-1}$, which is quite large. For Rossby waves, the propagation is of the order of $\beta R_D^2$, which is much smaller. The time integration scheme will therefore greatly depend on the physical processes of interest. 
+
+\hspace{2cm}
+\ESS
+}
+
+\subsection{Implicit schemes}
+\frame
+{
+\frametitle{Implicit schemes}
+\BSS
+In the shallow water equations, fast gravity waves are due to the divergence and gradient terms, and slow Rossby waves are due to the Coriolis term. By treating them differently, one could try to circumvent the stability condition due to gravity waves. The following time integration schemes allow one to change the degree of implicity of the divergence, Coriolis and gradient terms:;
+\begin{eqnarray*}
+\eta^{n+1} + \alpha h \Delta t \bnabla \cdot \bu^{n+1} &=& \eta^n - (1-\alpha) h \Delta t \bnabla \cdot \bu^n,
+\\
+\bu^{n+1} + \beta f \Delta t \bk \times \bu^{n+1} + \gamma g \Delta t \bnabla \eta^{n+1} &=& \bu^n - (1-\beta) f \Delta t \bk \times \bu^n - (1-\gamma) g \Delta t \bnabla \eta^n.
+\end{eqnarray*}
+The implicity coefficients $\alpha$, $\beta$ and $\gamma \in [0,1]$. One way to have ``some information'' about the accuracy and stability of a time integration scheme is to compute the evolution of the energy:
+\[
+E^n = \int_{\Omega} \frac{1}{2} \rho \left( g (\eta^n)^2 + h \|\bu^n\|^2 \right) \ud \Omega.
+\]
+Note that this quantity only gives information about the changes in the amplitude of the solution. It does not indicate how the numerical method is affecting the phase of the solution.
+\ESS
+}
+
+
+\frame
+{
+\frametitle{``Mostly implicit'' schemes are unconditionally stable}
+\BSS
+\begin{center}
+\begin{tabular}{cc}
+$\alpha = \beta = \gamma = 1/2$  & $\alpha = \beta = \gamma = 1$ \\
+\includegraphics[width=0.4\textwidth]{Figures/energy_si.eps}
+&
+\includegraphics[width=0.4\textwidth]{Figures/energy_impl.eps}
+\end{tabular}
+\end{center}
+However, they can be quite dissipative if they are ``a bit too implicit''. The semi-implicit scheme ($\alpha = \beta = \gamma = 1/2$) is exactly conserving energy while a fully-implicit scheme ($\alpha = \beta = \gamma = 1$) is very dissipative and thus not always accurate.
+\ESS
+} 
+
+
+\frame
+{
+\frametitle{Both the gravity and Coriolis terms must be at least semi-implicit}
+\BSS
+\begin{center}
+\begin{tabular}{cc}
+$\alpha = \gamma = 1/2$, $\beta=0$  & $\beta = 1/2$, $\alpha = \gamma = 0$ \\
+\includegraphics[width=0.4\textwidth]{Figures/energy_sifexpl.eps}
+&
+\includegraphics[width=0.4\textwidth]{Figures/energy_expl.eps}
+\end{tabular}
+\end{center}
+\ESS
+\BTi
+When there is no dissipation, the equations are purely hyperbolic ($\mathcal{R}e(\kappa) = 0$) and the time integration scheme can only be stable if the implicity coefficients are all larger or equal to 1/2. In that case, the solution of the system requires to invert a non-diagonal matrix, which can be computationally expensive. The effect of using a ``mostly implicit'' time integration scheme with a large time step is to slow down fast propagating gravity waves. These schemes are thus useful for long simulation for which gravity waves are physically insignificant.
+\ETi
+}
+
+
+\subsection{Explicit schemes}
+\frame
+{
+\frametitle{Example of a stable explicit scheme: Adams-Bashforth 3}
+\BSS
+\begin{eqnarray*}
+&&\hspace{-0.6cm} \eta^{n+1} = \eta^n - h \Delta t \bnabla \cdot \left(\frac{23}{12} \bu^n - \frac{16}{12} \bu^{n-1} + \frac{5}{12} \bu^{n-2}\right),
+\\
+&&\hspace{-0.6cm} \bu^{n+1} = \bu^n - f \Delta t \bk \times \left(\frac{23}{12} \bu^n - \frac{16}{12} \bu^{n-1} + \frac{5}{12} \bu^{n-2}\right) - g \Delta t \bnabla \left( \frac{23}{12} \eta^n - \frac{16}{12} \eta^{n-1} + \frac{5}{12} \eta^{n-2} \right)
+\end{eqnarray*}
+
+%\begin{tabular}{lc}
+\begin{minipage}{0.6\textwidth}
+\begin{figure}[H]
+\includegraphics[trim={0.25cm 0.cm 0.25cm 0.25cm},clip,width=0.6\textwidth]{Figures/energy_AB3.eps}
+\end{figure}
+\end{minipage}
+\hfill
+\begin{minipage}{0.35\textwidth}
+	This scheme is conditionally stable with a stability condition prescribed by gravity waves. A leap-frog scheme would have about the same properties but it would become unstable if some dissipation was added to the scheme. \\
+\end{minipage}
+%\end{tabular}
+
+\medskip
+
+\footnote{More details: Durran D.R. (1991) ``The Third-order Adams-Bashforth method: An attractive alternative to Leap-frog time differencing''. \emph{Monthly Weather Review}, 119, 702-720.}
+
+\ESS
+}
+
+
+\frame
+{
+\frametitle{Another example: Forward-Backward in Time scheme}
+\BSS
+The Forward-Backward in Time (FBT) scheme has been introduced by Sielecki (1968) and later analysed and improved by Beckers and Deleersnijder (1993)\footnote{\BVTi Sielecki A. (1968) ``An energy conserving difference scheme for the storm surge equations'', \emph{Monthly Weather Review}, 96, 150-156. Beckers J. and Deleersnijder E. (1993) ``Stability of a FBTCS scheme applied to the propagation of shallow-water inertia-gravity waves on various grids'', \emph{Journal of Computational Physics}, 108, 95-104.\EVTi}. It tries to mimic a semi-implicit scheme by alternatively changing the order in which the two momentum equations are solved for. The future height anomaly term is used in the two momentum equations as soon as it is available; the Coriolis term is discretized by using the most recently computed velocity component, which requires alternation:
+\ESS
+\BSS
+\[
+\left\{ \begin{array}{l}
+\eta^{n+1} = \eta^n - h \Delta t \bnabla \cdot \bu^n,
+\\
+u^{n+1} = u^n + f \Delta t v^n - g \Delta t \ds \frac{\partial \eta}{\partial x}^{n+1},
+\\
+v^{n+1} = v^n - f \Delta t u^{n+1} - g \Delta t \ds \frac{\partial \eta}{\partial y}^{n+1},
+\end{array} \right.
+\]
+and
+\[
+\left\{ \begin{array}{l}
+\eta^{n+2} = \eta^{n+1} - h \Delta t \bnabla \cdot \bu^{n+1},
+\\
+v^{n+2} = v^{n+1} - f \Delta t u^{n+1} - g \Delta t \ds \frac{\partial \eta}{\partial y}^{n+2},
+\\
+u^{n+2} = u^{n+1} + f \Delta t v^{n+2} - g \Delta t \ds \frac{\partial \eta}{\partial x}^{n+2}.
+\end{array} \right.
+\]
+\ESS
+}
+
+
+\frame
+{
+\frametitle{Forward-Backward in Time scheme (cont'd)}
+\BFNS
+It can be seen that for each set of equations, the Coriolis term is first discretized explicitly and then implicitly. The order of the two momentum equations is switched in the second set of equations. As a result, the time discretization of the Coriolis term appears to be semi-implicit ``on average''. The divergence is always explicit and the gradient is always implicit. It can be shown that the scheme is conditionally stable with about the same stability condition as AB3.
+\EFNS
+\begin{center}
+\includegraphics[width=0.4\textwidth]{Figures/energy_FBT.eps}
+\end{center}
+}
+
+
+\section{Stability analysis in 1D and 2D}
+\frame
+{
+\frametitle{Comments about the second project}
+\BSS
+The goal of the second project is to solve the Stommel model on the finite difference C-grid with a FBT time integration scheme. The Stommel model is the simplest geophysical flow model able to represent a wind-driven circulation in a closed basin with a western boundary layer. The model equations read:
+\begin{eqnarray}
+&&\frac{\partial \mathbf{u}}{\partial t} + (f_0+\beta y) \mathbf{e}_z \times
+\mathbf{u} = -g \bnabla \eta - \gamma \mathbf{u} + \frac{\btau^{\eta}}{\rho h},\\
+&&\frac{\partial \eta}{\partial t} + h \bnabla \cdot \mathbf{u} = 0,
+\end{eqnarray}
+where $f_0$ is the reference value of the Coriolis parameter, $\beta$ is the reference value of the Coriolis parameter first derivative in the $y$-direction, $\gamma$ is a linear friction coefficient, $\rho$ is the homogeneous density of the fluid and $\btau^{\eta}$ is the wind stress acting on the surface of the fluid. The model solutions look like these:
+\begin{center}
+\includegraphics[width=0.9\textwidth]{Figures/sol_project2.eps}
+\end{center}
+\ESS
+}
+
+
+\frame
+{
+	\frametitle{How do we decide on grid, grid spacing, time step?}
+	
+	Remember that we started with the CFL criterion in 1D:
+	
+	\begin{equation}
+	\mu = U \frac {\Delta t}{\Delta x} \le 1
+	\end{equation}
+	
+	\BSS
+	There are now several ways in which we can meet the stability criteria for our particular 2D SWE problem. Thinking a bit harder about these decisions seems to lead to some circular reasoning: where do we start? \textbf{Are there tradeoffs?} 
+	\medskip
+	
+	Questions that we must consider when we choose the numerical method to solve our problem:
+	\begin{enumerate}
+		\item What is the "worst case scenario" distance relevant to CFL for SWEs in 2D?
+		\item How many grid points are the minimum required to resolve anything?
+		\item What is the size of our domain?
+		\item What is the size of the phenomenon we are trying to simulate?
+		\item What do all these decisions end up causing in terms of the physical realism of the solutions? For instance, compromising the accuracy of solution for one wave type.
+		
+	\end{enumerate}
+	\ESS
+}
+
+\subsection{Numerical analysis of the 1D "upstream" advection equation}
+\frame
+{
+	\frametitle{There is more to choosing $\Delta t$ and $\Delta x $}
+\BSS
+It is not a given that going for a small $\mu$ is always the best possible decision.
+For instance, let us start with the advection equation and let us choose the \textbf{upstream scheme}, which we know is \textbf{dissipative}. That means, each time step we lose a bit of the signal.
+
+
+If we increase the resolution of our model, making the time step smaller, we may think that we will obtain a better solution. However, this is not necessairly true for every $\mu$.
+
+\medskip
+Consider a domain of size $D$, resolved by a number $J$ of $\Delta x$ points, in which we are solving the advection equation:
+
+\begin{equation}
+\frac {A_j^{n+1}-A_j^{n}}{\Delta t} +c \left(  \frac {A_j^{n}-A_{j-1}^{n}}{\Delta x}  \right) = 0
+\label{adv-upstream}
+\end{equation}
+
+$D=J \Delta x$ and every time that we decrease $\Delta x$ we increase $J$, so that the domain size D does not change. For a signal that has wavenumber $k$ in the $x$ direction:
+
+\begin{equation}
+k \Delta x = \frac {k D}{J}
+\end{equation}
+
+\ESS
+}
+
+\frame
+{
+	\frametitle{Stability analysis of the upstream advection equation}
+
+\BSS
+If you remember your Von Neuman analysis, \textbf{the amplification factor, $\lambda$} for upstream advection (equation \ref{adv-upstream})	has this form:
+
+\begin{equation}
+|\lambda|^2 = 1+2\mu(\mu-1)(1-\cos k \Delta x) = 1+2\mu(\mu-1)[1-\cos ( \frac {k D} {J})]
+\end{equation}
+
+which tells us that $\lambda$ depends on both wavenumber ($k$) and our Courant number ($\mu$). 
+In order to maintain computational stability, \emph{we keep $\mu$ fixed as $\Delta x$ decreases}, and that decision limits our time step:
+
+\begin{equation}
+\Delta t = \frac {\mu \Delta x}{c} = \frac {\mu D}{cJ}
+\end{equation}
+
+Since we know the velocity of the fluid, $c$, we also know how long it takes for it to cross the entire domain: $T=\frac {D}{c}$. If we choose to carry out the time integration in $N$ steps:
+
+\begin{equation}
+N= \frac {T}{\Delta t} = \frac {D}{c \Delta t} = \frac {D}{\mu \Delta x} = \frac {J}{\mu}
+\end{equation}
+
+\ESS
+}	
+
+
+\frame
+{
+	\BSS
+	\frametitle{How damped is the signal after N time steps?}
+The total amount of damping that "accumulates" throughout the time integration ($N$ time steps) is given by:
+
+\begin{equation}
+|\lambda|^N=(|\lambda^2|)^{N/2} = \left \{ 1 -2 \mu (1-\mu) \left[ 1 - \cos ( \frac {k D} {J}) \right] \right \} ^{\frac {J}{2 \mu}}
+\end{equation}
+
+This relationship says that $\lambda$ depends on $J$ (the resolution) in two different ways, so that making $\Delta x$ smaller (increasing the resolution) can be good or bad. 
+
+\medskip
+Which is it?
+Let us pick a wavelength half the domain size, so that $kD=4 \pi$. This causes the $\cos$ factor in the equation to approach 1, which \textbf{weakens the damping}; on the other hand it also causes the exponent to increase, which \textbf{strenghtens the damping}. This is shown in the figure, for two values of $\mu$.
+
+\begin{minipage}{0.4\textwidth}
+\begin{figure}[H]
+	\includegraphics[trim={0cm 0cm 0cm 0cm},clip,width=5.cm]{/Users/vidale/Projects/Teaching/MTMW14/Figures/Resolution_damping.png}
+\end{figure}
+\end{minipage}
+\hfill
+\begin{minipage}{0.5\textwidth}
+Overall, \textbf{increasing the resolution, $J$, is good}: $\lambda$ tends to 1 on the right hand side, even though we take more time steps, $N$, to complete the integration. However, if we fix $J$ and decrease $\mu$, by decreasing the time step $\Delta t$, the damping increases and \textbf{the solution will be less accurate}. 
+	
+\end{minipage}
+
+\ESS
+}
+
+
+\frame
+{
+	\frametitle{Recommendations on choosing $\Delta t$ and $\Delta x $}
+	\BSS
+
+\begin{minipage}{0.4\textwidth}
+\begin{itemize}
+	\item perform numerical analysis, speficically for each scheme
+	\item \textbf{for the upstream scheme}, the amplitude error can be minimised by using the largest stable value of $\mu$.
+	\item that is, do not exaggerate in making $\mu$ much less than 1: this decision impacts both cost and quality of the solutions
+	\item in other words, \underline{it pays off to live dangerously}!
+\end{itemize}\end{minipage}
+\hfill
+\begin{minipage}{0.5\textwidth}	
+	\begin{figure}[H]
+	\includegraphics[trim={0cm 0cm 0cm 0cm},clip,width=7.cm]{/Users/vidale/Projects/Teaching/MTMW14/Figures/Resolution_damping.png}
+\end{figure}
+\end{minipage}
+\ESS
+
+}
+
+\section{Some real world applications}
+\frame
+{
+	\frametitle{Hurricane and Typhoon simulation in climate GCMs: precipitation composite}
+	\BSS
+	\begin{center}	
+	\includegraphics[width=0.8\textwidth]{Figures/TC-precipitation}
+\end{center}
+
+\ESS
+
+}
+
+
+\section{Some real world applications}
+\frame
+{
+	\frametitle{Hurricane and Typhoon simulation in climate GCMs: vertical structure composite}
+	\BSS
+	\begin{center}	
+		\includegraphics[width=0.8\textwidth]{Figures/TC-structures}
+	\end{center}
+	
+	\ESS
+	
+}
+
+\section{Some real world applications}
+\frame
+{
+	\frametitle{Why the differences}
+	\BSS
+	These GCMs are very different in terms of dynamical core, parameterizations etc., but they are also quite different in terms of the use of the time step. I have been experimenting with our UK model (HadGEM3), and Colin Zarzycki has been experimenting with the NCAR model, managing to double the number of hurricanes with a time step of 1/4, but I have also tested the same ideas in the ECMWF model, since it is the one that uses very long time steps.
+	\begin{center}	
+		\includegraphics[width=0.8\textwidth]{Figures/tden_PRESENT_TC_map_STD}
+	\end{center}
+	
+	\ESS
+	
+}
+
+\frame
+{
+	\frametitle{Hurricane and Typhoon simulation in climate GCMs: frequency}
+	\BSS
+	\begin{center}	
+		\includegraphics[width=0.8\textwidth]{Figures/Zarz1}
+	\end{center}
+	
+	\ESS
+	
+}
+
+\frame
+{
+	\frametitle{Hurricane and Typhoon simulation in climate GCMs: dynamics and physics}
+	\BSS
+	\begin{center}	
+		\includegraphics[width=0.8\textwidth]{Figures/Zarz2}
+	\end{center}
+	
+	\ESS
+	
+}
+
+\section{Are Finite Differences finished?}
+\frame
+{
+	\frametitle{Where are we? A mind map}	
+	\begin{center}	
+		\includegraphics[width=0.8\textwidth]{Figures/MTMW14_mindmap.png}
+	\end{center}
+}
+
+\frame
+{
+	\frametitle{A continued compromise}	
+	A number of possibilities exist, depending on the applications, implying different investments/costs, and providing different benefits:
+	
+	\medskip
+	
+	\BFNS
+	\resizebox{\textwidth}{!}{%
+		\begin{tabular}{|c|c|c|c|c|c|}
+			\hline 
+			Name & Application & Costs & Complexity & Benefit & Disadvantage\\ 
+			\hline 
+			Finite Differences & W/C & Low & Low & Intuitive & Expensive at high order \\ 
+			\hline 
+			Finite Volumes & Climate & Moderate & Medium & Conservation & Flux form\\ 
+			\hline 
+			Finite Elements & W/C & High & High & Versatility/Scalability & Hard maths\\ 
+			\hline 
+			Spectral Transforms & W/C & Low & Medium & Accurate & No conservation\\ 
+			\hline 
+			Spectral Elements & W/C & Moderate & High & Efficient & Hard maths \\ 
+			\hline 
+	\end{tabular} }
+	\EFNS	\\
+	
+	\medskip
+	Remember that, with Exascale, we are expected to develop models that will scale on computers with millions of cores. Currently the average W/C model can scale on up to 10'000 cores, and some of the best up to a few 100'000 cores. 
+}
+
+
+\frame
+{
+	\frametitle{Finite Volumes}	
+	The main idea stems from Gauss Theorem, so conservation is built-in at the start. It is awkward to have to express everything in flux form, so it is mostly adopted by models that need it, e.g. climate models.
+	
+	\medskip
+	Example models: CESM, FV3, GFDL\\
+	\medskip
+	Cost: O($N$)	
+}
+
+
+\frame
+{
+	\frametitle{Finite Elements}	
+	The main idea is to free ourselves from the need to work with regularly shaped units, be they grid points or volumes.
+	
+	Computing the cost functions can be rather complicated and expensive, but these models are versatile, allowing us to use irregular meshes, and they also tend to scale well.
+	
+	\medskip
+	Example models: Next-generation UM\\
+	\medskip
+	Cost: O($N$)	
+}
+
+\frame
+{
+	\frametitle{Spectral Transforms}
+	\BSS	
+	Here we give up the idea to represent functions at locations: everything is a wave, and any signal is approximated by a sum of waves of different wavelengths.
+	The cost can be very high if we do not use efficient transforms.
+	
+	\smallskip
+	Currently, with Fast Fourier and Lagrange transforms, these models can be up to 3x faster than most other models. The recent use of cubic grids (see next week's lecture) also provides these models with very high effective resolution: $2.9 \Delta x$\\
+	
+	\smallskip
+	It is cumbersome, however, to have to keep on transforming data between spectral space and a physical grid.	Also, it seems a little overkill to carry so many waves around the globe in order to be able to simulate some small feature in one part of the world.
+	
+	\smallskip
+	One very recent development saw the IFS model being able to take up the entire Piz Daint at the Swiss CSCS. 
+	
+	\medskip
+	Example models: IFS, EC-Earth, Arpege, MPI, CAM (old)\\
+	\medskip
+	Cost: O($N \log N$) to O($N^2$)
+	\ESS
+}
+
+\frame
+{
+	\frametitle{Spectral Elements}	
+	This is more or less the best of both worlds: promising quick and accurate solutions. The implementation, however is rather hard, and this is not a very commonly employed method.
+	
+	\medskip
+	Example models: CAM-SE\\
+	\medskip
+	Cost O($N$)	
+}
+
+
+\frame
+{
+	\frametitle{Work this afternoon}
+	\BSS
+	By now you should have:
+	\begin{enumerate}
+		\item read the papers!!
+		\item drawn the problem: domain and BCs
+		\item computed the relevant quantities and justified a C-grid
+		\item started to program up the analytic solution: aim to finish today
+		\item started to program up the energy integral
+	\end{enumerate}
+	\medskip
+	If you do not understand the reasons for all the decisions in Task A, please come and see me immediately.
+	\ESS
+}
+
+
+\end{document}

@@ -1,0 +1,63 @@
+\documentclass[10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage[version=4]{mhchem}
+\usepackage{stmaryrd}
+
+\begin{document}
+The equation for a simple harmonic oscillator
+
+\begin{equation}
+\frac{d^2 q}{d t^2}+\omega^2 q=0
+\end{equation}
+
+\begin{equation}
+\begin{aligned}
+& {\left[\begin{array}{l}
+d^{\prime} \\
+v^{\prime}
+\end{array}\right]+\left[\begin{array}{ll}
+0 & -1 \\
+\omega^2 & 0
+\end{array}\right]\left[\begin{array}{l}
+d \\
+v
+\end{array}\right]=\left[\begin{array}{l}
+0 \\
+0
+\end{array}\right]} \\
+& \text { or: } \\
+& u^{\prime}=L u \text { where } u=\left[\begin{array}{l}
+d \\
+v
+\end{array}\right], L=\left[\begin{array}{cc}
+0 & 1 \\
+-\omega^2 & 0
+\end{array}\right]
+\end{aligned}
+\end{equation}
+
+The finite difference form:
+
+$$
+u^{n+1}=P u^n \text {, where } P=\left[\begin{array}{cc}
+1 & \Delta t \\
+-\Delta t \omega^2 & 1
+\end{array}\right]
+$$
+
+$P$ is the simplification matrix
+$\operatorname{det}(P)=1+\omega^2 \Delta t^2 \rightarrow$ eigenvalues ere
+
+$$
+z_1=1+\Delta t \omega_i \quad z_2=1-\Delta t \omega_i
+$$
+
+The largest is the spetad radius $f$.
+Nooluhes $\rho=\left|z_1\right|=\left|z_2\right|=\sqrt{1+\Delta^2 w^2}$.
+
+
+\end{document}
