@@ -60,10 +60,10 @@
 	\centering
 	\vspace*{0cm}
 	\par\normalfont\fontsize{30}{25}\sffamily\selectfont
-	\textbf{MTMW14\\NUMERICAL MODELLING OF THE ATMOSPHERE AND OCEAN}\\
+	\textbf{MTMNUM\\NUMERICAL MODELLING OF THE ATMOSPHERE AND OCEAN}\\
 	{\LARGE }\par % Book title
 	\vspace*{1cm}
-	{\color{white}{\Huge P.L. Vidale \\ January 2025}}\par % Author name
+	{\color{white}{\Huge P.L. Vidale \\ February 2026}}\par % Author name
 	\endgroup
 	
 	%----------------------------------------------------------------------------------------
@@ -76,7 +76,7 @@
 	
 	%\noindent Copyright \copyright\ 2014 Andrea Hidalgo\\ % Copyright notice
 	
-	\noindent \textsc{Jan 2025, the University of Reading, Reading, UK}\\
+	\noindent \textsc{Feb 2026, the University of Reading, Reading, UK}\\
 	
 	\noindent Original template design and graphics by Andrea Hidalgo (2014) and Hervé CARDOT (2015).\\ % License information
 	
@@ -84,7 +84,7 @@
 	
 	\noindent The materials presented in these notes are based on David Randall's class notes (ATS-604), Dale Durran's book, as well as class notes previously prepared by Emanuel Hanert (2004-2009) and John Methven (2010-2013).\\ % License information
 	
-	\noindent \textit{Published in Jan 2025} % Printing/edition date
+	\noindent \textit{Published in 2026} % Printing/edition date
 	
 	%----------------------------------------------------------------------------------------
 	%	TABLE OF CONTENTS
@@ -109,8 +109,8 @@
 \chapter{Introduction}
 	
 	\section{Module guide}
-	\subsection{MTMW14 objectives}
-	MTMW14 aims to take you from the basic principles of numerical modelling, mostly learned in MTMW12, to the foundations of current weather and climate models, bringing you up to speed with the vital components of state-of-the-art numerical models for atmospheres and oceans and their use in predicting weather and climate.
+	\subsection{MTMNUM objectives}
+	MTMNUM aims to take you from the basic principles of numerical modelling, mostly learned in MTMFMD, to the foundations of current weather and climate models, bringing you up to speed with the vital components of state-of-the-art numerical models for atmospheres and oceans and their use in predicting weather and climate.
 	
 	Starting from fundamental properties of atmosphere and ocean:
 \begin{itemize}
@@ -120,38 +120,43 @@
 \item	Prepare you for designing, implementing and testing your own components, to be inserted and used in complex models.
 \end{itemize}
 	
-	This competence is going to be very useful in your careers, even if you aim to analyse, albeit not develop models. All is accomplished by doing, rather than just watching a lecturer.  This module is therefore mostly hands-on: you will learn by doing, and 70\% of the total marks are awarded for your work in the two projects. 
+	This competence is going to be very useful in your careers, even if you aim to analyse, albeit not develop models. {\bf All is accomplished by doing}, rather than just watching a lecturer.  This module is therefore mostly focussed on interactive hands-on learning, so that 70\% of the total marks are awarded for your work in the two projects. 
 
-\vspace{1em}
+\vspace{0.5em}
 \fcolorbox{ocre}{lime}{\parbox{\dimexpr \linewidth-2\fboxsep-2\fboxrule}{
-			\textbf{ \href{https://github.com/pierluigividale/MTMW14/blob/main/Projects/MTMNUM_project_ENSO_2025.pdf}{Project 1}}
+			\textbf{ \href{https://github.com/pierluigividale/MTMW14/blob/main/Projects/MTMNUM_project_ENSO_2026.pdf}{Project 1}}
 			 focusses on oscillatory / periodic behaviour, and is designed to explore ideas of model initialisation, chaos, ensemble forecasting. 
 	}}
-
-\vspace{1em}
+\vspace{0.25em}
 
 \fcolorbox{ocre}{pink}{\parbox{\dimexpr \linewidth-2\fboxsep-2\fboxrule}{
 		\textbf{\href{https://github.com/pierluigividale/MTMW14/blob/main/Projects/MTMW14_project_gyre_2024.pdf }{Project 2}}
 		is concerned with wave propagation in two dimensions, and introduces spatial schemes and solution methods that are commonly found in today's state-of-the-art models.
 }}
-\vspace{1em}
+\vspace{0.25em}
 		
-When setting out to solve the problems proposed in either project, it is important to distinguish what is expected from the analytical solutions (when available) and what is produced by the numerical solutions.
+\fcolorbox{ocre}{lightgray}{\parbox{\dimexpr \linewidth-2\fboxsep-2\fboxrule}{
+		\textbf{ \href{https://github.com/pierluigividale/MTMW14/tree/main/Projects/References}{References for both projects}}
+		contains the main papers that you will need to study in order to understand and successfully complete these two projects. 
+}}
+\vspace{0.5em}
+		
+When setting out to solve the problems proposed in either project, it is important to distinguish what is expected from the analytical solutions (when available) and what is produced by the numerical methods you have chosen for solving the governing equations.
 	
-	\subsection{A map of MTMW14 topics}
+	\subsection{A map of MTMNUM topics}
 	\begin{figure}[h!]
 	\includegraphics[width=1.\textwidth]{Figures/MTMW14_mindmap.png}
-	\caption{A map of MTMW14 topics, and how they are related}
+	\caption{A map of MTMNUM topics, and how they are related}
 	\end{figure}
 	
-	\subsection{MTMW14 resources}
+	\subsection{MTMNUM resources}
 	
 	\begin{itemize}
 		\item	Dale Durran's book:  \cite {Durran-book}
 		\item	Dave Randall's notes:  \cite{Randall-notes}
 		\item   Roger Pielke's book:  \cite {Pielke-book}
 		\item   Haltiner and Williams:  \cite {Haltiner-Williams-book}
-		\item	MTMW12 notes
+		\item	MTMFMD notes
 		\item	These notes and the papers introducing the two projects		
 	\end{itemize}
 	
@@ -177,11 +182,11 @@ When setting out to solve the problems proposed in either project, it is importa
 \href{https://journals.ametsoc.org/view/journals/amsm/59/1/amsmonographs-d-18-0018.1.xml} {\includegraphics[width=1.\textwidth, angle=0]{Figures/Randall-ESM100-title.png}}
 
 \clearpage
-\subsection{MTMW14 calendar}
+\subsection{MTMNUM calendar}
 
 \begin{figure}[h!]
-	\includegraphics[width=1.25\textwidth, angle=90]{MTMNUM Class Calendar 2025.pdf}
-	\caption{The 2025 calendar: please always refer to the electronic version for last-minute changes of venue}
+	\includegraphics[width=1.25\textwidth, angle=90]{MTMNUM Class Calendar 2026.pdf}
+	\caption{The 2026 calendar: please always refer to the electronic version for last-minute changes of venue}
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
