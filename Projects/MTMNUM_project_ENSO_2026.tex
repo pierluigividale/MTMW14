@@ -1,0 +1,332 @@
+\documentclass[11pt,a4paper]{article}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[T1]{fontenc}
+\usepackage{times}
+\usepackage{rotating}
+\usepackage{graphicx}
+\usepackage{natbib}
+\usepackage{psfrag}
+\usepackage{color}
+\usepackage{enumitem}
+\usepackage{wrapfig}
+\usepackage{changepage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\BE}{ \begin{enumerate}}
+\newcommand{\EE}{ \end{enumerate}}
+\newcommand{\BI}{ \begin{itemize}}
+\newcommand{\EI}{ \end{itemize}}
+\newcommand{\BEQ}{ \begin{equation}}
+\newcommand{\EEQ}{ \end{equation}}
+\newcommand{\BDM}{ \begin{displaymath}}
+\newcommand{\EDM}{ \end{displaymath}}
+\newcommand{\balpha}{\mbox{\boldmath $\alpha$}}
+\newcommand{\bOmega}{\mbox{\boldmath $\Omega$}}
+\newcommand{\btau}{\mbox{\boldmath $\tau$}}
+\newcommand{\bchi}{\mbox{\boldmath $\chi$}}
+\newcommand{\bnabla}{\mbox{\boldmath $\nabla$}}
+\newcommand{\boldeta}{\mbox{\boldmath $\eta$}}
+\newcommand{\bphi}{\mbox{\boldmath $\varphi$}}
+\newcommand{\ds}{\displaystyle}
+\newcommand{\nl}{\ \\ }
+\newcommand{\ud}{\textrm{ d}}
+\newcommand{\bs}{\bigskip}
+\newcommand{\BTc}{ \begin{tabular}{c}}
+\newcommand{\BTl}{ \begin{tabular}{l}}
+\newcommand{\BTr}{ \begin{tabular}{r}}
+\newcommand{\ET}{ \end{tabular}}
+\newcommand{\bu}{\mathbf{u}}
+\newcommand{\bx}{\mathbf{x}}
+\newcommand{\be}{\mathbf{e}}
+\newcommand{\bk}{\mathbf{k}}
+\newcommand{\bn}{\mathbf{n}}
+\newcommand{\ust}{u_{*}}
+\newcommand{\ddz}{\frac{\partial}{\partial z}}
+\newcommand{\dudz}{\frac{\partial u}{\partial z}}
+\newcommand{\dvdz}{\frac{\partial v}{\partial z}}
+\newcommand{\dtudz}{\frac{\partial \tilde u}{\partial z}}
+\newcommand{\dtvdz}{\frac{\partial \tilde v}{\partial z}}
+\newcommand{\dbudz}{\frac{\partial \bu}{\partial z}}
+\newcommand{\dtbudz}{\frac{\partial \tilde \bu}{\partial z}}
+\newcommand{\Ber}{\textrm{Ber}_0}
+\newcommand{\Bei}{\textrm{Bei}_0}
+\newcommand{\Ker}{\textrm{Ker}_0}
+\newcommand{\Kei}{\textrm{Kei}_0}
+\DeclareTextSymbol{\degree}{T1}{6}
+\DeclareTextSymbol{\degree}{OT1}{23}
+\def\deg{$\!$\degree}
+\def\degC{$\!$\degree C}
+\def\degK{$\!$\degree K}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\addtolength{\hoffset}{-0.5cm}
+\addtolength{\textwidth}{1cm}
+\addtolength{\voffset}{-0.5cm}
+\addtolength{\textheight}{1cm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.1in}
+
+\begin{center}
+{\Large MTMNUM: Numerical Modelling of Atmosphere and Oceans}\\
+~\\
+{\large \underline{Project 1}:\\
+	The ocean recharge oscillator, a reduced coupled model for ENSO illustrating the effects of nonlinearity and forcing, based on the model of Fei-Fei Jin (1997).}
+\end{center}
+
+\subsection*{Aims}
+\begin{itemize}
+		\item Learn about chaos and ensemble simulation.
+		\item Learn about oscillatory behaviour, stability, and how the choice of \textbf{a time scheme appropriate for this specific problem} will influence the realism of your results.
+		\item Start to learn about the coupling between the physics (the parametrized processes, usually on the righ-hand side of the governing equations) and the dynamics.
+	\item \underline{Optionally} (for extra credit) experiment with a more efficient time scheme. Please speak with me directly if you wish to make this investment.
+\end{itemize}
+
+\subsection*{Problem Description}
+\begin{wrapfigure}{r}{0.5\textwidth}
+	\centering
+	\includegraphics[width=0.5\textwidth]{Timmerman-ENSO-review.png}
+	\caption{The essentials of ENSO in the \cite{Timmerman-ENSO-18} review.}
+\end{wrapfigure}
+
+El Ni\~no Southern Oscillation (ENSO) is the most prominent mode of
+coupled ocean-atmosphere variability.  One essential mechanism to
+create the oscillation is the interaction between surface wind stress
+and thermocline depth along the equator. \cite{bjerknes:69} first
+recognised that a gradient in sea surface temperature (SST) increasing
+from east to west along the equator drives easterly winds across the
+Pacific. These easterlies cause the thermocline (the mixed layer on
+top of the ocean) to deepen in the west Pacific and become shallower
+in the east, acting to enhance the SST gradient and forming a positive
+feedback. Similarly, warm anomalies in the east Pacific are enhanced
+through positive feedback via anomalous westerlies. A second mechanism
+is required to enable the system to flip from the -ve to +ve SST
+gradient and back. 
+
+\cite{dijkstra:book} discusses a number of theories
+that have been proposed and points to the paper of \cite{jin:97a} as
+providing the most plausible simple model, the "recharge oscillator model" (ROM) that can explain the
+observations.
+
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[width=0.9\textwidth]{Dijkstra-FIg3.22-ENSO-schematic.png}
+	\caption{The ENSO oscillator in Jin's (1997) ROM}
+\end{figure}
+
+In Jin's ROM the cold SST phase in the East Pacific is
+brought to an end by {\em recharge} of the zonal average ocean heat
+content as the enhanced easterly wind stress drives convergence of
+Sverdrup transport in the ocean. The physical justification for the
+model (\cite{jin:97a}) will not be discussed further here, but you are expected to read the relevant papers and to make sure that the model you will develop can credibly reproduce the phenomena at hand. \cite{jin:97b} ROM is described by two ordinary differential equations:
+\begin{eqnarray}
+\frac{dh_{\scriptscriptstyle W}}{dt} & = & -r h_{\scriptscriptstyle W} -\alpha b T_{\scriptscriptstyle E}   - \alpha \xi_{\scriptscriptstyle 1} \\
+\frac{dT_{\scriptscriptstyle E}}{dt}  & = & R T_{\scriptscriptstyle E}   + \gamma h_{\scriptscriptstyle W} - e_{\scriptscriptstyle n} (h_{\scriptscriptstyle W} +bT_{\scriptscriptstyle E})^3   + \gamma \xi_{\scriptscriptstyle 1}  + \xi_{\scriptscriptstyle 2}  
+\end{eqnarray}
+where the prognostic variables are $T_{\scriptscriptstyle E} $ (east Pacific SST anomaly) and $h_{\scriptscriptstyle W}$ (west Pacific ocean thermocline depth anomaly), where:
+\begin{tabbing}
+	$b=b_0 \mu$~~~~~~~~~~~~~~\= is a measure of the {\em thermocline slope}, in balance with the zonal wind stress \\
+	 \> produced by the SST anomaly. \\
+	$\mu$  \> is the {\em coupling coefficient}.  \\
+	$b_0=2.5$ \> is a high-end value of the coupling parameter. \\
+	$\gamma=0.75$ \> specifies the {\em feedback of the thermocline gradient} on the SST gradient.\\
+	$c=1$ \> is the {\em damping rate} of SST anomalies.\\
+	$R=\gamma b-c$ \> collectively describes the  {\em Bjerknes positive feedback process}.\\
+	$r=0.25$ \> represents damping of the upper ocean heat content.\\
+	$\alpha=0.125$ \> relates enhanced easterly wind stress to the recharge of ocean heat content.\\
+	$e_n$ \> varies the degree of nonlinearity of ROM.\\
+	$\xi_{1}$ \> represents random wind stress forcing added the system.\\
+	$\xi_{2}$ \> represents random heating added the system.
+\end{tabbing}
+
+\pagebreak
+
+The model is \textbf{non-dimensionalised} using:
+\begin{table}[ht]
+\centering
+\begin{tabular}{|c|c|c|}
+		 \hline SST anomaly-scale & Thermocline depth anomaly-scale & Time-scale \\
+		$[T]=7.5\,$K, & $[h]=150\,$m & $[t]=2\,$months \\
+		\hline
+\end{tabular}
+\end{table}
+
+The focus of this project is on implementing and using the Jin model to explore the effects of
+a) nonlinearity and b) forcing on coupled systems.
+
+\subsection*{\Large\bf{Tasks}}
+{\large\bf Task A: the neutral linear (deterministic) ROM}
+
+First devise a finite difference numerical model to simulate the
+recharge oscillator without external forcing ($\xi_{1,2}=0$) or nonlinearity
+($e_n=0$).
+
+Write down the equations for your finite difference scheme and then
+implement them in a program using variable names for all the
+parameters.
+
+Set the values of model parameters as given above and set the coupling parameter to its {\em critical value}:
+$\mu=\mu_c=2/3$. \cite{jin:97a} has shown that this setting produces a
+stable oscillation with frequency $\omega_c=\sqrt{3/32}$ and therefore
+period $\tau_c=2\pi/\omega_c$ ($\approx$41 months when
+dimensionalised). 
+
+Run your model initially for exactly one period from the initial conditions: $T=1.125\,$K
+and $h=0$. Produce a time series plot with the $T_E,h_W$ pair, then a "phase" plot, with $T_E$ and $h_W$ as the two axes
+(re-dimensionalise by multiplying values by $[T_E]$ and $[h_W]$), showing
+the trajectory of the solution (see Fig.~3 of \cite{jin:97a} for an
+example - your solution should be similar but not necessarily the
+same). 
+
+Is your numerical method stable? Explain how you deduce
+this. If you choose to verify numerically instead of analytically, you will very likely need to continue the simulation for multiple periods in order to make sure, as one cycle is probably not going to reveal an unstable system.
+If your implementation of ROM is not stable, you might check your scheme for errors, or
+try a different time integration scheme. Do not proceed to the next tasks until you have a stable model.
+
+{\large\bf Task B: testing ROM behaviour around sub-critical and super-critical settings of the coupling parameter}
+
+Re-run your model for 5 periods with a value of $\mu > 2/3$ and $\mu <
+2/3$. Plot the time series of $T,h$, as well as the trajectory in $T-h$ coordinates as before (dimensionalised). What happens to the trajectory in the phase space in each of the two cases, when compared to the neutral case in Task A? Can
+you explain why?
+
+{\large\bf Task C: extending ROM to include the impact of non-linearity}
+
+Turn on nonlinearity by setting $e_n=0.1$. Run the model with the (neutral) critical value of 
+$\mu=\mu_c=2/3$. Compare the trajectory to the case without nonlinearity (Task A). 
+
+Try increasing $\mu$ beyond its critical value, up to $\mu = 0.75$ and compare what happens to the cases with $e_n=0$ (Task B). 
+
+{\large\bf Task D: test the self-excitation hypotheses}
+
+\cite{galanti:00} introduced the annual frequency to the problem by
+allowing the coupling parameter to vary on an annual cycle using:
+\begin{equation}
+\mu=\mu_0\left( 1+\mu_{ann}\cos \left( \frac{2\pi t}{\tau} - \frac{5\pi}{6} \right) \right).
+\end{equation}
+
+Modify your model to include the annual cycle in coupling parameter,
+setting $e_n=0.1$, $\mu_0=0.75$ and $\mu_{ann}=0.2$. $\tau$ is 12
+months (remember that you must make the units of $\tau$ and $t$ consistent with each other). What happens to the time series of $T,h$ and to the
+trajectory in phase space?
+
+
+{\large\bf Task E: test the stochastic initiation hypotheses by adding noisy wind forcing to the linear model}
+
+We now start to work with a very crude example of a physical parametrization: please add ``wind stress forcing'' to your model by setting:
+\begin{equation}
+\xi_1=f_{ann}\cos \left(\frac{2\pi t}{\tau}\right)+f_{ran} W\frac{\tau_{cor}}{\Delta t}
+\end{equation}
+where $W$ is a number between -1 and +1 picked at random (assuming
+uniform probability for $W$, lying at any point across the
+range) after every interval $\tau_{cor}$. This represents a white noise
+process. Use a random number function to generate $W$
+(and check that you re-scale the result to the correct range between
+-1 and +1).
+
+Run the model with the parameter settings: $e_n=0$,
+$\mu_0=0.66-0.75$ (try a few values in that range), $\mu_{ann}=0.2$, $f_{ann}=0.02$, $f_{ran}=0.2$ and
+$\tau_{cor}=1\,$day. Set the model time-step $\Delta t =1\,$day for
+simplicity (\emph{be extra careful with all time units}).  There are some pitfalls with this setup, and you must discuss this task with your demonstrators, as well as compare with previous tasks.
+
+Describe the new time series of $T$ and the
+trajectory. What are the major differences from the earlier runs, especially Tasks B and C? What
+are the effects of i) the annual forcing and ii) the random forcing?
+
+\begin{adjustwidth}{1cm}{}
+\emph{OPTIONALLY for Task E AND ONLY IF YOU HAVE EXTRA TIME, otherwise jumpt to Task F and come back later:} what happens if you change the time step (and/or the correlation time scale) when you apply this simple parametrization of the wind stress? How does this decision on time scales affect the overall solution?
+\end{adjustwidth}
+
+
+{\large\bf Task F: test the non-linearity and the stochastic forcing together}
+
+Run the model with the parameter settings: $e_n=0.1$,
+$\mu_0=0.75$, $\mu_{ann}=0.2$, $f_{ann}=0.02$, $f_{ran}=0.2$ and
+$\tau_{cor}=1\,$day.  How does this compare to the linear model with stochastic forcing?
+
+{\large\bf Task G: test whether chaotic behaviour can be triggered through addition of initial condition uncertainty}
+
+The irregular nature of the forecast trajectories indicates that the model may be sensitive to initial conditions, which is a major telltale of chaotic behaviour. To investigate this, we will use an ensemble approach to assess the spread of possible ENSO
+forecasts in the presence of i) uncertainty in the initial state of the system and ii) 
+the continuously random nature of the forcing. 
+
+Design a forecast ensemble using the model you have created so far, by: 
+\begin{enumerate}[label=(\alph*),noitemsep,topsep=0pt]
+\item introducing an outer loop over ensemble members and 
+\item perturbing the initial $T$ and $h$ used to start each forecast. Ensure that you pick a sensible range over which
+to perturb the initial conditions (for example within the amplitude of
+the oscillation). 
+\end{enumerate}
+
+Use your ensemble system to explore the ingredients necessary to
+produce sensitivity to initial conditions. Think very carefully about the interaction between the perturbations you introduce in the initial conditions and the perturbations caused by the continued randomness in the wind field forcing.
+
+Produce and analyse ``plume diagrams'', showing the time series of SST from each
+ensemble forecast on the same plot. Can
+you produce an SST time series that resembles the character of the
+observed ENSO signal? If not, how does it differ? 
+
+Finally, is your conclusion that the Jin model is chaotic, and, if so, why? If not, what could you do to make it chaotic? See the discussion on page 244 of \cite{Vallis:86} for important guidance.
+
+{\large\bf OPTIONAL Task H: try to further develop this simple model, and re-visit its chaotic behaviour}
+
+ \underline{After} you have carefully read  \cite{Vallis:86}, and re-visited the Lorenz model (see the class notes and Lecture 3), you may want to experiment with adding a third equation to include additional coupling between the wind / heat forcing and the present system.
+
+\pagebreak
+\subsection*{Planning your work is key: these are you milestones, week by week}
+\begin{enumerate}
+	\item Week 1: start reading the papers and drawing sketches with a pencil, to understand the problem at a process level, as well as the key figures we are going to try and produce. Learn from the lab demonstration (and Lecture 2) about the performance of time schemes for this type of problem and make your selection.
+	\item Week 2: complete reading the full problem set and the two papers; design the code structure on paper, then implement a small library of functions, including one for parameters
+	\item Week 3: implement full set of equations and run for each case
+	\item Week 4: complete the ensemble definition work and run the ensemble experiment AFTER you have fully interpreted all the results in Tasks A to E
+	\item Week 5: work on the physical interpretation of each Task; wrap-up as an overall conclusion on the physical realism of your model: is it complex enough to capture what we see in nature?
+\end{enumerate}
+
+\pagebreak
+\subsection*{Practical matters}
+Project~1 is \textbf{worth 35\%} of the mark for this module. Assessment is via a short scientific report describing what you have found, very much like a scientific paper.  The report must be word-processed, {\bf submitted as a PDF file}, and:
+\begin{enumerate}
+	\item{preferentially in the form of a Python Notebook (for 3 bonus points). \underline {Please note} that, while recommended, this is entirely your choice, it is NOT compulsory.} 
+	\item{the scientific discussion should not exceed {\bf six sides of A4 including figures}}
+	\item{your code is integral part of the report and will also be assessed (upload all required to reproduce your results onto BB by the deadline below). It should be highly structured, so that the main program should be at most 1 page. Everything else is to be written as functions, called by the main program (those should be included as an Appendix, and do not count towards the page limit, but concise code will earn full points)}
+	\item{variable names and units should be declared at the top of the main program and of each function}
+	\item{all figures and equations must be labelled, numbered and captioned}
+\end{enumerate} 
+
+Start by stating the problem and the fundamental equations, but do not include lengthy background material or
+a literature review. The emphasis is on the scientific justification
+of your method to solve this problem numerically and the accuracy and
+interpretation of the results. Follow the structure that we discussed in Lecture 1: formulation, implementation, evaluation.
+
+The marks will be distributed as follows:
+\begin{itemize}
+	\item implementation of the model (including your program's accuracy and legibility and a detailed description of the numerical scheme) [10/35]
+	\item using the model to answer Tasks A to E [10/35]
+	\item creating ensemble forecasts and interpreting results (Task F) [7/35]
+	\item the scientific presentation and interpretation of the results,  including a coherent and concise (scientific!) writing style (remember to label sections, graph axes, units etc.) [8/35]
+\end{itemize}
+
+The deadline for submission of the report is {\bf 12:00, Friday 20 March 2026}.  Late submission will result in loss of marks.  Submit your reports to the BlackBoard as a single \emph{tar.gz} archive.
+
+\pagebreak
+\subsection*{Planning your work}
+Project~1 is fairly complex and requires careful planning, as well as regular work.
+
+\begin{enumerate}
+	\item start by reading the paper and tasks and set realistic aims for each week, following the guidance provided in the Milestones section
+	\item aim to understand the overall problem, and each task, by referring to the original papers, before you attempt to code things up
+	\item communicate progress regularly to the instructor and demonstrators, so that we may identify problems and/or delays as early as possible
+	\item {\bf design your plan, algorithms etc. on paper}, including equations, units etc., and only then start coding
+	\item draw your diagrams on paper and compare with the ones produced by your programs
+	\item use modern coding design, so that your code is easy to maintain
+	\item use your GitHub repository for backup etc.
+\end{enumerate}	
+
+\vspace{-1cm}
+\bibliographystyle{natbib}
+\bibliography{johns}
+
+\end{document}
+
+
