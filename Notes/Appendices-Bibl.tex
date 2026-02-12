@@ -700,10 +700,15 @@ In summary, the first step in finding the solution of a system of linear differe
 auxiliary equation and finding all eigenvalues $\lambda_1, \lambda_2, ... , \lambda_n$. Next, substituting each eigenvalue $\lambda_i$ into the system of equations will allow us to find each one of the eigenvectors $\mathbf{V}$.
 
 \subsection{The norm of the eigenvalues and the condition for stability of the linear system}
-The norm of all eigenvalues must be found and tested for this condition of stability:
+The norm of the largest eigenvalue must be found and tested for this condition of stability:
+
+\begin{equation}
+	\rho(A) = max( \left\Vert \lambda_i \right\Vert ) \le 1
+\end{equation}
+where $\rho(A) $ is the spectral radius of $A$.
 
 \section{Carrying out the 2D Von Neumann analysis in practice}
-This iPython notebook enebles you to set up the ENSO ROM problem and to explore its numerical solutions with a number of well-known time schemes, and to find the analytic eigenvalues, which reveal whether or not each scheme is stable in time.
+The iPython notebook linked below enables you to set up the ENSO ROM problem and to explore its numerical solutions with a number of well-known time schemes, and to find the analytic eigenvalues, which reveal whether or not each scheme is stable in time.
  
 	\href{https://github.com/pierluigividale/MTMW14/blob/main/Notebooks/Euler\_stability\_SymPy\_2025\_HaltinerWilliams.ipynb}{Link to iPython Notebook on the Von Neumann analysis of the ENSO ROM problem}
 
